@@ -1,2 +1,8 @@
-node_modules
+# Terraform
+*tfvars
+.terraform*
+
+*node_modules
 .env
+
+*.pem

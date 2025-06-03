@@ -1,3 +1,6 @@
 # Terraform
 *tfvars
 .terraform*
+
+*node_modules
+.env

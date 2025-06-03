@@ -45,3 +45,9 @@ module "rds" {
   db_name                = var.db_name
   publicly_accessible    = false
 }
+
+module "budget" {
+  source       = "./modules/budget"
+  project_name = var.project_name
+  budget_emails = var.budget_emails
+}

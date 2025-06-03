@@ -76,3 +76,8 @@ variable "key_name" {
   type        = string
   default     = null
 }
+
+variable "budget_emails" {
+  description = "List of email addresses to receive AWS budget alerts"
+  type        = list(string)
+}

@@ -15,12 +15,6 @@ class TodoBoard extends LitElement {
       gap: 1.5rem;
       overflow-x: auto;
     }
-
-    h1 {
-      margin-bottom: 1rem;
-      font-size: 1.5rem;
-      color: #222;
-    }
   `;
 
   render() {
@@ -40,6 +34,20 @@ class TodoBoard extends LitElement {
         status: 'In Progress'
       },
       {
+        title: 'Create ticket component',
+        description: 'Make it look like a physical card',
+        assignedTo: 'Dave',
+        priority: 'High',
+        status: 'In Review'
+      },
+      {
+        title: 'Setup API',
+        description: 'Add CRUD endpoints',
+        assignedTo: 'Charlie',
+        priority: 'Medium',
+        status: 'Done'
+      },
+      {
         title: 'Setup database schema',
         description: 'Add tables for projects and tasks',
         assignedTo: 'Charlie',
@@ -48,10 +56,9 @@ class TodoBoard extends LitElement {
       }
     ];
 
-    const statuses = ['Backlog', 'In Progress', 'Done'];
+    const statuses = ['Backlog', 'In Progress', 'In Review', 'Done'];
 
     return html`
-      <h1>Team One Board</h1>
       <section class="board">
         ${statuses.map(
           (status) => html`

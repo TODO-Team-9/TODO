@@ -22,7 +22,7 @@ resource "aws_budgets_budget" "monthly_budget" {
   }
 
   dynamic "notification" {
-    for_each = [for i in range(1, 11) : i * 10]
+    for_each = [for i in range(2, 10) : i * 10]
     content {
       comparison_operator = "GREATER_THAN"
       notification_type   = "ACTUAL"

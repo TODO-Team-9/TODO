@@ -1,3 +1,13 @@
+resource "tls_private_key" "ec2" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "ec2" {
+  key_name   = "${var.project_name}-ec2-key"
+  public_key = tls_private_key.ec2.public_key_openssh
+}
+
 resource "aws_instance" "this" {
   count         = var.instance_count
   ami           = data.aws_ami.ubuntu.id
@@ -39,7 +49,7 @@ resource "aws_instance" "this" {
 
   EOF
   iam_instance_profile = var.iam_instance_profile
-  key_name = var.key_name
+  key_name = aws_key_pair.ec2.key_name
 }
 
 data "aws_ami" "ubuntu" {

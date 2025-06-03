@@ -31,7 +31,6 @@ module "ec2" {
   aws_region     = var.aws_region
   security_group_id = module.vpc.default_security_group_id
   iam_instance_profile = module.iam.iam_instance_profile_name
-  key_name = var.key_name
 }
 
 module "rds" {

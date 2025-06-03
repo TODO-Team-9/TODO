@@ -30,17 +30,3 @@ variable "iam_instance_profile" {
   type        = string
   default     = null
 }
-
-variable "key_name" {
-  description = "The name of the key pair to associate with the EC2 instance."
-  type        = string
-  default     = null
-}
-
-variable "github_pages_url" {
-  description = "The GitHub Pages URL for the frontend"
-  type        = string
-  default     = "areyouafootyfan.github.io/AreYouAFootyFan"
-}
-
-

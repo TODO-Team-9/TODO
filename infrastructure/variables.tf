@@ -81,3 +81,8 @@ variable "budget_emails" {
   description = "List of email addresses to receive AWS budget alerts"
   type        = list(string)
 }
+
+variable "trusted_ssh_ips" {
+  description = "List of trusted IP addresses allowed to SSH into EC2 instances"
+  type        = list(string)
+}

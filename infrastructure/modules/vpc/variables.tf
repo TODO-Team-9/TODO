@@ -24,3 +24,9 @@ variable "public_subnet_count" {
   type        = number
   default     = 2
 }
+
+variable "trusted_ssh_ips" {
+  description = "List of trusted IP addresses allowed to SSH into EC2 instances"
+  type        = list(string)
+  default     = []
+}

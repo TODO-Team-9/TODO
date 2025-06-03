@@ -36,13 +36,6 @@ resource "aws_security_group" "default" {
   vpc_id      = aws_vpc.this.id
 
   ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -67,7 +60,7 @@ resource "aws_security_group" "default" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.trusted_ssh_ips
   }
 
   egress {
@@ -80,13 +73,4 @@ resource "aws_security_group" "default" {
   tags = {
     Name = "${var.project_name}-default-sg"
   }
-}
-
-resource "aws_security_group_rule" "allow_rds_access" {
-  type        = "ingress"
-  from_port   = 5432
-  to_port     = 5432
-  protocol    = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
-  security_group_id = aws_vpc.this.default_security_group_id
 }

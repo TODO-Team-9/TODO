@@ -13,6 +13,7 @@ module "vpc" {
   vpc_cidr     = var.vpc_cidr
   aws_region   = var.aws_region
   public_subnet_count = 2
+  trusted_ssh_ips = var.trusted_ssh_ips
 }
 
 module "internet_gateway" {

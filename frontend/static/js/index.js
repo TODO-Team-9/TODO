@@ -1,4 +1,5 @@
 import HomeView from "./views/HomeView.js";
+import CreateTodo from "./views/CreateTodoView.js";
 
 let currentView = null;
 
@@ -14,6 +15,7 @@ export const router = async () => {
 
   const routes = [
     { path: "/", view: HomeView },
+    { path: "/create/todo", view: CreateTodo }
   ];
 
   const pathToRegex = (path) =>

@@ -5,8 +5,7 @@ class TodoTicket extends LitElement {
     title: { type: String },
     description: { type: String },
     assignedTo: { type: String },
-    priority: { type: String },
-    status: { type: String }
+    priority: { type: String }
   };
 
   static styles = css`
@@ -91,7 +90,6 @@ class TodoTicket extends LitElement {
       <p class="description">${this.description}</p>
       <footer class="footer">
         <section class="assigned">👤 ${this.assignedTo}</section>
-        <section class="status">${this.status}</section>
       </footer>
     `;
   }

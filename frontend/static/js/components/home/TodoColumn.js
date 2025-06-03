@@ -48,8 +48,7 @@ class TodoColumn extends LitElement {
               .title=${ticket.title}
               .description=${ticket.description}
               .assignedTo=${ticket.assignedTo}
-              .priority=${ticket.priority}
-              .status=${ticket.status}>
+              .priority=${ticket.priority}>
             </todo-ticket>
           `
         )}

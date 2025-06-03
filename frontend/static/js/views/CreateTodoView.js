@@ -1,19 +1,18 @@
 import AbstractView from "./AbstractView.js";
-import "../components/home/TodoBoard.js";
+import "../components/create/CreateTodo.js";
 import "../components/shared/MainLayout.js";
-// import "../components/shared/Navigation.js";
 
 export default class HomeView extends AbstractView {
     constructor() {
         super();
-        this.setTitle("Home");
+        this.setTitle("Create Todo");
     }
 
     async getHtml() {
         const layout = document.createElement('main-layout');
-        const todoBoard = document.createElement('todo-board');
-        layout.title = "Team One Project Board";
-        layout.appendChild(todoBoard);
+        const createTodo = document.createElement('create-todo');
+        layout.title = "Create Todo";
+        layout.appendChild(createTodo);
         return layout;
     }
 

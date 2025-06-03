@@ -57,19 +57,14 @@ class NavigationSidebar extends LitElement {
 
   render() {
     return html`
-      <div class="logo">TodoApp</div>
+      <h1 class="logo">TodoApp</h1>
       <nav>
-        <a href="#">Dashboard</a>
-        <a href="#">My Tasks</a>
-        <a href="#">Settings</a>
+        <a href="/" data-link>Team Board</a>
+        <a href="#" data-link>My Todos</a>
+        <a href="/create/todo" data-link>Create Todo</a>
+        <a href="#" data-link>Teams</a>
+        <a href="#" data-link>Create Team</a>
       </nav>
-      <div class="teams">
-        <div>Your Teams:</div>
-        <ul>
-          <li><label><input type="radio" name="team" value="Team 1" checked />Team 1</label></li>
-          <li><label><input type="radio" name="team" value="Team 2" />Team 2</label></li>
-        </ul>
-      </div>
     `;
   }
 }

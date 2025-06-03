@@ -1,0 +1,102 @@
+import { LitElement, html, css } from 'lit';
+
+class TodoTicket extends LitElement {
+  static properties = {
+    title: { type: String },
+    description: { type: String },
+    assignedTo: { type: String },
+    priority: { type: String },
+    status: { type: String }
+  };
+
+  static styles = css`
+    :host {
+      display: block;
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 1rem;
+      margin: 0.5rem 0;
+      font-family: sans-serif;
+      max-width: 300px;
+      border-left: 6px solid var(--priority-color, gray);
+      transition: box-shadow 0.2s ease;
+    }
+
+    :host(:hover) {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .title {
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    .priority {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      background: var(--priority-color, #ccc);
+      color: white;
+      text-transform: uppercase;
+    }
+
+    .description {
+      margin: 0.5rem 0;
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .footer {
+      font-size: 0.8rem;
+      color: #555;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .status {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .assigned {
+      font-style: italic;
+    }
+  `;
+
+  updated(changedProps) {
+    if (changedProps.has('priority')) {
+      const colorMap = {
+        high: '#e74c3c',
+        medium: '#f39c12',
+        low: '#2ecc71'
+      };
+      const color = colorMap[this.priority?.toLowerCase()] || '#ccc';
+      this.style.setProperty('--priority-color', color);
+    }
+  }
+
+  render() {
+    return html`
+      <header class="header">
+        <section class="title">${this.title}</section>
+        <section class="priority">${this.priority}</section>
+      </header>
+      <p class="description">${this.description}</p>
+      <footer class="footer">
+        <section class="assigned">👤 ${this.assignedTo}</section>
+        <section class="status">${this.status}</section>
+      </footer>
+    `;
+  }
+}
+
+customElements.define('todo-ticket', TodoTicket);
+
+export default TodoTicket;

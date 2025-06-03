@@ -49,7 +49,7 @@ resource "aws_instance" "this" {
 
   EOF
   iam_instance_profile = var.iam_instance_profile
-  key_name = aws_key_pair.ec2.key_name
+  key_name = var.key_name
 }
 
 data "aws_ami" "ubuntu" {

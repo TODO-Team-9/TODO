@@ -13,8 +13,8 @@ class TodoColumn extends LitElement {
       background: #f8f9fa;
       padding: 1rem;
       border-radius: 8px;
-      min-width: 300px;
-      max-width: 320px;
+      min-width: 5rem;
+      max-width: 15rem;
       flex-shrink: 0;
       box-shadow: inset 0 0 0 1px #ddd;
     }

@@ -8,8 +8,8 @@ class AppHeader extends LitElement {
   static styles = css`
     :host {
       display: block;
-      background-color: #2d2d2d;
-      color: white;
+      background-color: #e0e0e0;
+      color: black;
       padding: 1rem 2rem;
       font-family: sans-serif;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);

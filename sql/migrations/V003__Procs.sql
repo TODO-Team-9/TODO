@@ -168,7 +168,7 @@ CREATE OR REPLACE PROCEDURE add_user (
   p_username VARCHAR(50),
   p_email_address VARCHAR(128),
   p_password_hash VARCHAR(180),
-  p_two_factor_secret VARCHAR(256),
+  p_two_factor_secret VARCHAR(256)
 ) LANGUAGE plpgsql AS $$
 DECLARE
     v_system_role INT;
@@ -188,7 +188,7 @@ BEGIN
     RAISE NOTICE 'Added user successfully';
 
     EXCEPTION
-        WHEN other THEN
+        WHEN others THEN
             RAISE EXCEPTION 'Error adding user: %', SQLERRM;
 END;
 $$;

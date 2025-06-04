@@ -2,7 +2,7 @@ CREATE OR REPLACE VIEW all_teams AS
 SELECT
     t.team_id,
     t.team_name,
-    t.task_description
+    t.team_description,
     COUNT(m.member_id) AS member_count
 FROM teams t
 INNER JOIN members m ON t.team_id = m.team_id

@@ -1,10 +1,10 @@
 import { LitElement, html, css } from 'lit';
 
-import './Navigation.js';
-import '../home/MemberList.js';
-import '../home/TeamList.js';
+import '../shared/Navigation.js';
+import './MemberList.js';
+import './TeamList.js';
 
-class MainLayout extends LitElement {
+class TeamLayout extends LitElement {
   static styles = css`
     :host {
       display: flex;
@@ -47,7 +47,7 @@ class MainLayout extends LitElement {
   render() {
     return html`
       <nav-bar></nav-bar>
-      <div class="page">
+      <section class="page">
         <div class="teamlist">
           <team-list></team-list>
         </div>
@@ -57,9 +57,9 @@ class MainLayout extends LitElement {
         <div class="sidebar">
           <member-list></member-list>
         </div>
-      </div>
+      </section>
     `;
   }
 }
 
-customElements.define('main-layout', MainLayout);
+customElements.define('team-layout', TeamLayout);

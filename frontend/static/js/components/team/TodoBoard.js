@@ -57,7 +57,7 @@ class TodoBoard extends LitElement {
     const statuses = ['Backlog', 'In Progress', 'Done'];
 
     return html`
-    <board-header .title=${this.teamName}></board-header>
+    <team-header .title=${this.teamName} .buttonCaption=${'Create Todo'} .route=${'/create/todo'}></team-header>
       <section class="board">
         ${statuses.map(
           (status) => html`

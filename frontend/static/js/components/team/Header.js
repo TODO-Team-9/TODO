@@ -1,8 +1,11 @@
+import { navigator } from '../../index.js';
 import { LitElement, html, css } from 'lit';
 
-export class BoardHeader extends LitElement {
+export class TeamHeader extends LitElement {
   static properties = {
-    title: { type: String }
+    title: { type: String },
+    buttonCaption: { type: String },
+    route: { type: String }
   }
 
   static styles = css`
@@ -11,7 +14,6 @@ export class BoardHeader extends LitElement {
       justify-content: space-between;
       align-items: center;
       width: 100%;
-      max-width: 1000px;
       margin-bottom: 1rem;
       padding: 1rem;
       background-color: #ffffff;
@@ -41,12 +43,16 @@ export class BoardHeader extends LitElement {
     }
   `;
 
+    _navigate(e) {
+        navigator(this.route);
+    }
+
   render() {
     return html`
       <h2>${this.title}</h2>
-      <button>Create Todo</button>
+      <button @click="${this._navigate}">${this.buttonCaption}</button>
     `;
   }
 }
 
-customElements.define('board-header', BoardHeader);
+customElements.define('team-header', TeamHeader);

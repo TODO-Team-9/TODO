@@ -1,7 +1,6 @@
 import AbstractView from "./AbstractView.js";
-import "../components/home/TodoBoard.js";
-import "../components/shared/MainLayout.js";
-// import "../components/shared/Navigation.js";
+import "../components/team/TodoBoard.js";
+import "../components/team/TeamLayout.js";
 
 export default class HomeView extends AbstractView {
     constructor() {
@@ -10,7 +9,7 @@ export default class HomeView extends AbstractView {
     }
 
     async getHtml() {
-        const layout = document.createElement('main-layout');
+        const layout = document.createElement('team-layout');
         const todoBoard = document.createElement('todo-board');
         todoBoard.teamName = "Team One Project Board";
         layout.appendChild(todoBoard);

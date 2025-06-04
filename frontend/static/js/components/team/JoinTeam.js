@@ -96,7 +96,7 @@ class JoinTeam extends LitElement {
 
   render() {
     return html`
-      <team-header .title=${'Join Team Requests'} .buttonCaption=${'Team Board'} .route=${'/'}></team-header>
+      <team-header .title=${'Join Team Requests'} .buttonCaption=${'Team Board'} .route=${'/home'}></team-header>
         <section class="requests">
             <h2>Current Requests<h2>
             <custom-table

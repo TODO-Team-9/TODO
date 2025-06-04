@@ -80,7 +80,7 @@ class CreateTeam extends LitElement {
 
   render() {
     return html`
-      <team-header .title=${'Create Team'} .buttonCaption=${'Team Board'} .route=${'/'}></team-header>
+      <team-header .title=${'Create Team'} .buttonCaption=${'Team Board'} .route=${'/home'}></team-header>
       <section class="form-container">
         <form @submit=${this.handleSubmit}>
             <input name="name" placeholder="Name" required />

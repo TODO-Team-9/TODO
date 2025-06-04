@@ -5,6 +5,7 @@ import JoinTeamView from "./views/JoinTeamView.js";
 import LoginView from "./views/LoginView.js";
 import RegisterView from "./views/RegisterView.js";
 import RequestView from "./views/RequestView.js";
+import TeamStatsView from "./views/TeamStatsView.js";
 
 let currentView = null;
 
@@ -25,6 +26,7 @@ export const router = async () => {
     { path: "/create/todo", view: CreateTodoView },
     { path: "/create/team", view: CreateTeamView },
     { path: "/team/join", view: JoinTeamView },
+    { path: "/team/report", view: TeamStatsView },
     { path: "/requests", view: RequestView },
   ];
 

@@ -87,7 +87,7 @@ class TeamList extends LitElement {
         <section class="controls">
             <button data-id="/team/join" @click="${this._navigate}">Join Team</button>
             <button data-id="/create/team" @click="${this._navigate}">Create Team</button>
-            <button data-id="/team/stats" @click="${this._navigate}">Team Report</button>        
+            <button data-id="/team/report" @click="${this._navigate}">Team Report</button>        
         </section>
       <h3>Team Members</h3>
       <ul>

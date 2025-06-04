@@ -79,7 +79,7 @@ class CreateTodo extends LitElement {
 
   render() {
     return html`
-      <team-header .title=${'Create Todo'} .buttonCaption=${'Team Board'} .route=${'/'}></team-header>
+      <team-header .title=${'Create Todo'} .buttonCaption=${'Team Board'} .route=${'/home'}></team-header>
       <section class="form-container">
         <form @submit=${this.handleSubmit}>
             <input name="title" placeholder="Title" required />

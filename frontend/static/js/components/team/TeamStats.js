@@ -1,0 +1,51 @@
+import { LitElement, html, css } from 'lit';
+
+import "./Header.js";
+import "../shared/StatCard.js";
+
+class TeamStats extends LitElement {
+  static properties = {
+    backlog: { type: Number },
+    done: { type: Number },
+    inProgress: { type: Number },
+    inReview: { type: Number }
+  };
+
+  static styles = css`
+    :host {
+      display: block;
+      padding: 2rem;
+      font-family: sans-serif;
+      width: 90%;
+    }
+
+    .stats {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  `;
+
+  constructor() {
+    super();
+    this.backlog = 0;
+    this.done = 0;
+    this.inProgress = 0;
+    this.inReview = 0;
+  }
+
+  render() {
+    return html`
+        <team-header .title=${'Team Report'} .buttonCaption=${'Team Board'} .route=${'/home'}></team-header>
+        <section class="stats">
+            <stat-card .label="${'Backlog'}" .stat=${this.backlog}></stat-card>
+            <stat-card .label="${'In Progress'}" .stat=${this.inProgress}></stat-card>
+            <stat-card .label="${'In Review'}" .stat=${this.inReview}></stat-card>
+            <stat-card .label="${'Done'}" .stat=${this.done}></stat-card>
+        </section>
+    `;
+  }
+}
+
+customElements.define('team-stats', TeamStats);

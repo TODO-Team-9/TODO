@@ -54,7 +54,7 @@ class TodoBoard extends LitElement {
       }
     ];
 
-    const statuses = ['Backlog', 'In Progress', 'Done'];
+    const statuses = ['Backlog', 'In Progress','In Review' ,'Done'];
 
     return html`
     <team-header .title=${this.teamName} .buttonCaption=${'Create Todo'} .route=${'/create/todo'}></team-header>

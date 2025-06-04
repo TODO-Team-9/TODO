@@ -35,7 +35,7 @@ class NavigationSidebar extends LitElement {
         <div class="logo">TODO App</div>
         <div class="links">
           <a href="/">Home</a>
-          <a href="/teams">Teams</a>
+          <a href="/profile">Profile</a>
         </div>
       </nav>
     `;

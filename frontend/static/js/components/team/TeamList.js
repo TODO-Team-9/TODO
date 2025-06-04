@@ -24,6 +24,16 @@ class TeamList extends LitElement {
       cursor: pointer;
     }
 
+    select {
+        display: block;
+        width: 100%;
+        padding: 0.5rem;
+        text-align: center;
+        font-size: 1rem;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
     ul {
       list-style: none;
       padding: 0;
@@ -43,33 +53,44 @@ class TeamList extends LitElement {
     }
 
     .controls {
-        margin-top: 2.5rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
     }
   `;
 
   constructor() {
-    super();
-    this.teams = [{name: "Team A"}, {name: "Team B"}, {name: "Team C"}];
+        super();
+        this.teams = [{name: "Team A"}, {name: "Team B"}];
+        this.members = [{name: "Alice"}, {name: "Bob"}, {name: "Charlie"}];
   }
 
 
   render() {
     return html`
-        <h3>Your Teams</h3>
-        <ul>
+        <h3>Your Team</h3>
+        <select name="team">
             ${this.teams.map(
             (team) => html`
-                <li class="team">
+                <option>
                     ${team.name}
-                </li>
+                </option>
             `
             )}
-        </ul>
+        </select>
         <section class="controls">
             <button>Join</button>
             <button>Create</button>        
         </section>
-
+      <h3>Team Members</h3>
+      <ul>
+        ${this.members.map(
+          (member) => html`
+            <li class="member">
+                ${member.name}
+            </li>
+          `
+        )}        
+      </ul>
     `;
   }
 }

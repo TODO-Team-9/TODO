@@ -48,15 +48,12 @@ class TeamLayout extends LitElement {
     return html`
       <nav-bar></nav-bar>
       <section class="page">
-        <div class="teamlist">
+        <section class="teamlist">
           <team-list></team-list>
-        </div>
-        <div class="main">
+        </section>
+        <section class="main">
           <slot></slot>
-        </div>
-        <div class="sidebar">
-          <member-list></member-list>
-        </div>
+        </section>
       </section>
     `;
   }

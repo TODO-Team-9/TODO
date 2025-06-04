@@ -2,6 +2,8 @@ import HomeView from "./views/HomeView.js";
 import CreateTodoView from "./views/CreateTodoView.js";
 import CreateTeamView from "./views/CreateTeamView.js";
 import JoinTeamView from "./views/JoinTeamView.js";
+import LoginView from "./views/LoginView.js";
+import RegisterView from "./views/RegisterView.js";
 
 let currentView = null;
 
@@ -16,7 +18,8 @@ export const router = async () => {
   }
 
   const routes = [
-    { path: "/", view: HomeView },
+    { path: "/", view: LoginView },
+    { path: "/register", view: RegisterView },
     { path: "/home", view: HomeView },
     { path: "/create/todo", view: CreateTodoView },
     { path: "/create/team", view: CreateTeamView },

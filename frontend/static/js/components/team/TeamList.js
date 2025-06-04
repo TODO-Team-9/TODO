@@ -1,8 +1,10 @@
 import { LitElement, html, css } from 'lit';
+import { navigator } from '../../index.js';
 
 class TeamList extends LitElement {
     static properties = {
-        teams: { type: Array }
+        teams: { type: Array },
+        members: { type: Array }
     }
 
   static styles = css`
@@ -65,6 +67,11 @@ class TeamList extends LitElement {
   }
 
 
+    _navigate(e) {
+        const url = e.currentTarget.dataset.id;
+        navigator(url);
+    }
+
   render() {
     return html`
         <h3>Your Team</h3>
@@ -78,8 +85,8 @@ class TeamList extends LitElement {
             )}
         </select>
         <section class="controls">
-            <button>Join</button>
-            <button>Create</button>        
+            <button data-id="/join" @click="${this._navigate}">Join Team</button>
+            <button data-id="/create/team" @click="${this._navigate}">Create Team</button>        
         </section>
       <h3>Team Members</h3>
       <ul>

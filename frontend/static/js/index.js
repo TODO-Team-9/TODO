@@ -1,5 +1,6 @@
 import HomeView from "./views/HomeView.js";
-import CreateTodo from "./views/CreateTodoView.js";
+import CreateTodoView from "./views/CreateTodoView.js";
+import CreateTeamView from "./views/CreateTeamView.js";
 
 let currentView = null;
 
@@ -15,7 +16,8 @@ export const router = async () => {
 
   const routes = [
     { path: "/", view: HomeView },
-    { path: "/create/todo", view: CreateTodo }
+    { path: "/create/todo", view: CreateTodoView },
+    { path: "/create/team", view: CreateTeamView }
   ];
 
   const pathToRegex = (path) =>

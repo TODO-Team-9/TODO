@@ -1,49 +1,63 @@
 import { LitElement, html, css } from 'lit';
 
 import './Navigation.js';
-import './Header.js';
+import '../home/MemberList.js';
+import '../home/TeamList.js';
 
 class MainLayout extends LitElement {
-  static properties = {
-    title: { type: String },
-  };
-
   static styles = css`
     :host {
       display: flex;
+      flex-direction: column;
       height: 100vh;
       font-family: sans-serif;
     }
 
-    .main {
-      flex: 1;
+    nav-bar {
+      flex-shrink: 0;
+    }
+
+    .page {
       display: flex;
-      flex-direction: column;
+      flex: 1;
       overflow: hidden;
     }
 
-    .content {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        background-color: #f5f5f5;
-        padding: 1rem;
+    .sidebar,
+    .teamlist {
+      width: 15rem;
+      background-color: #f3f3f3;
+      padding: 1rem;
+      overflow-y: auto;
+      box-shadow: inset 0 0 1px rgba(0,0,0,0.1);
+    }
+
+    .main {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      background-color: #fdfdfd;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
     }
   `;
 
-  constructor() {
-    super();
-  }
-
   render() {
     return html`
-      <navigation-sidebar></navigation-sidebar>
-      <section class="main">
-        <app-header .title=${this.title}></app-header>
-        <section class="content">
+      <nav-bar></nav-bar>
+      <div class="page">
+        <div class="teamlist">
+          <team-list></team-list>
+        </div>
+        <div class="main">
           <slot></slot>
-        </section>
-      </section>
+        </div>
+        <div class="sidebar">
+          <member-list></member-list>
+        </div>
+      </div>
     `;
   }
 }

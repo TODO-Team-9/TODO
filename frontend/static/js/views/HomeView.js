@@ -12,7 +12,7 @@ export default class HomeView extends AbstractView {
     async getHtml() {
         const layout = document.createElement('main-layout');
         const todoBoard = document.createElement('todo-board');
-        layout.title = "Team One Project Board";
+        todoBoard.teamName = "Team One Project Board";
         layout.appendChild(todoBoard);
         return layout;
     }

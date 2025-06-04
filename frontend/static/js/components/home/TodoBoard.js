@@ -1,8 +1,13 @@
 import { LitElement, html, css } from 'lit';
 import './TodoColumn.js';
 import './TodoTicket.js';
-
+import './Header.js';
 class TodoBoard extends LitElement {
+    static properties = {
+        teamName: { type: String },
+        tasks: { type: Array }
+    } 
+
   static styles = css`
     :host {
       display: block;
@@ -34,13 +39,6 @@ class TodoBoard extends LitElement {
         status: 'In Progress'
       },
       {
-        title: 'Create ticket component',
-        description: 'Make it look like a physical card',
-        assignedTo: 'Dave',
-        priority: 'High',
-        status: 'In Review'
-      },
-      {
         title: 'Setup API',
         description: 'Add CRUD endpoints',
         assignedTo: 'Charlie',
@@ -56,9 +54,10 @@ class TodoBoard extends LitElement {
       }
     ];
 
-    const statuses = ['Backlog', 'In Progress', 'In Review', 'Done'];
+    const statuses = ['Backlog', 'In Progress', 'Done'];
 
     return html`
+    <board-header .title=${this.teamName}></board-header>
       <section class="board">
         ${statuses.map(
           (status) => html`

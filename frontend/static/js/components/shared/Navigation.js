@@ -3,70 +3,43 @@ import { LitElement, html, css } from 'lit';
 class NavigationSidebar extends LitElement {
   static styles = css`
     :host {
-      display: flex;
-      flex-direction: column;
-      width: 15rem;
-      background-color: #e0e0e0;
-      height: 100vh;
-      padding: 1rem;
-      box-sizing: border-box;
-      font-family: sans-serif;
-    }
-
-    .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      margin-bottom: 2rem;
+      display: block;
+      background-color: #2e2e2e;
+      color: white;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     nav {
       display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      margin-bottom: 2rem;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    nav a {
-      background: #fff;
-      padding: 0.5rem;
-      border-radius: 6px;
+    .links a {
+      margin-right: 1.5rem;
       text-decoration: none;
-      color: #333;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      color: white;
+      font-weight: bold;
     }
 
-    .teams {
-      font-size: 0.9rem;
-      color: #555;
-    }
-
-    .teams ul {
-      list-style: none;
-      padding: 0.5rem 0 0;
-      margin: 0;
-    }
-
-    .teams li {
-      margin-bottom: 0.3rem;
-    }
-
-    .teams input[type='radio'] {
-      margin-right: 0.5rem;
+    .links a:hover {
+      text-decoration: underline;
     }
   `;
 
   render() {
     return html`
-      <h1 class="logo">TodoApp</h1>
       <nav>
-        <a href="/" data-link>Team Board</a>
-        <a href="#" data-link>My Todos</a>
-        <a href="/create/todo" data-link>Create Todo</a>
-        <a href="#" data-link>Teams</a>
-        <a href="#" data-link>Create Team</a>
+        <div class="logo">TODO App</div>
+        <div class="links">
+          <a href="/">Home</a>
+          <a href="/teams">Teams</a>
+        </div>
       </nav>
     `;
   }
 }
 
-customElements.define('navigation-sidebar', NavigationSidebar);
+customElements.define('nav-bar', NavigationSidebar);

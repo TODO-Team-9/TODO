@@ -27,15 +27,23 @@ class NavigationSidebar extends LitElement {
     .links a:hover {
       text-decoration: underline;
     }
+
+    .links a.active {
+      text-decoration: underline;
+    }
   `;
+
+    get currentPath() {
+        return window.location.pathname.replace(/\/$/, '');
+    }
 
   render() {
     return html`
       <nav>
         <div class="logo">TODO App</div>
         <div class="links">
-          <a href="/">Home</a>
-          <a href="/profile">Profile</a>
+            <a href="/home" class=${this.currentPath !== '/profile' ? 'active' : ''}>Home</a>
+            <a href="/profile" class=${this.currentPath === '/profile' ? 'active' : ''}>Profile</a>
         </div>
       </nav>
     `;

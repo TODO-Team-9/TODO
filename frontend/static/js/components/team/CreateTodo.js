@@ -87,18 +87,18 @@ class CreateTodo extends LitElement {
             <input name="assignedTo" placeholder="Assigned To" required />
             
             <select name="priority" required>
-            <option disabled selected value="">Priority</option>
-            <option>Low</option>
-            <option>Medium</option>
-            <option>High</option>
+                <option disabled selected value="">Priority</option>
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
             </select>
 
             <select name="status" required>
-            <option disabled selected value="">Status</option>
-            <option>Backlog</option>
-            <option>In Progress</option>
-            <option>In Review</option>
-            <option>Done</option>
+                <option disabled selected value="">Status</option>
+                <option>Backlog</option>
+                <option>In Progress</option>
+                <option>In Review</option>
+                <option>Done</option>
             </select>
 
             <button type="submit">Create Todo</button>

@@ -1,7 +1,6 @@
 import { LitElement, html, css } from 'lit';
 
 import '../shared/Navigation.js';
-import './MemberList.js';
 import './TeamList.js';
 
 class TeamLayout extends LitElement {

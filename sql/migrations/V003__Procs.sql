@@ -163,3 +163,62 @@ BEGIN
             RAISE EXCEPTION 'Error promoting member: %', SQLERRM;
 END;
 $$;
+
+CREATE OR REPLACE PROCEDURE add_user (
+  p_username VARCHAR(50),
+  p_email_address VARCHAR(128),
+  p_password_hash VARCHAR(180),
+  p_two_factor_secret VARCHAR(256),
+) LANGUAGE plpgsql AS $$
+DECLARE
+    v_system_role INT;
+BEGIN
+    p_username := TRIM(p_username);
+    p_email_address := TRIM(p_email_address);
+
+    SELECT system_role_id INTO v_system_role
+    FROM system_roles
+    WHERE system_role_name = 'System User';
+
+    INSERT INTO users
+        (username, email_address, password_hash, two_factor_secret, system_role_id)
+    VALUES
+        (p_username, p_email_address, p_password_hash, p_two_factor_secret, v_system_role);
+
+    RAISE NOTICE 'Added user successfully';
+
+    EXCEPTION
+        WHEN other THEN
+            RAISE EXCEPTION 'Error adding user: %', SQLERRM;
+END;
+$$;
+
+CREATE OR REPLACE PROCEDURE deactivate_user (
+    p_user_id INT
+) LANGUAGE plpgsql AS $$
+DECLARE
+    v_deactivated TIMESTAMPTZ;
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM users WHERE user_id = p_user_id) THEN
+        RAISE EXCEPTION 'User does not exist';
+    END IF;
+
+    SELECT deactivated_at INTO v_deactivated
+    FROM users
+    WHERE user_id = p_user_id;
+
+    IF v_deactivated IS NOT NULL THEN
+        RAISE EXCEPTION 'User is already deactivated';
+    END IF;
+
+    UPDATE users
+    SET deactivated_at = NOW()
+    WHERE user_id = p_user_id;
+
+    RAISE NOTICE 'Deactivated user successfully';
+
+    EXCEPTION
+        WHEN others THEN
+            RAISE EXCEPTION 'Error deactivating user: %', SQLERRM;
+END;
+$$;

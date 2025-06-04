@@ -6,6 +6,7 @@ import "../shared/Table.js";
 
 class JoinTeam extends LitElement {
     static properties = {
+        onCreate: { type: Function },
         teams: { type: Array }
     }
 
@@ -72,10 +73,6 @@ class JoinTeam extends LitElement {
       background-color:rgb(71, 71, 71);
     }
   `;
-
-  static properties = {
-    onCreate: { type: Function },
-  };
 
   constructor() {
     super();

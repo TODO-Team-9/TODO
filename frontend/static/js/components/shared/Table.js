@@ -97,9 +97,14 @@ class CustomTable extends LitElement {
         font-weight: 600;
     }
     
-    .btn.cancel{
+    .btn.decline{
         background-color: #e74c3c;
-        font-weight: 600;
+        font-weight: 500;
+    }
+
+    .btn.approve{
+        background-color: #2ecc71;
+        font-weight: 500;
     }
   `;
 
@@ -129,7 +134,7 @@ class CustomTable extends LitElement {
                 ${this.actions.length ? html`
                     <td class="actions">
                     ${this.actions.map(action => html`
-                        <button class="${action.label === 'Cancel' ? 'btn ' + action.label.toLowerCase() : ''}"
+                        <button class="${action.label === 'Decline' || action.label === 'Approve' ? 'btn ' + action.label.toLowerCase() : ''}"
                          @click=${() => action.callback(row)}>
                         ${action.label}
                         </button>

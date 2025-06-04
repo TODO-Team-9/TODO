@@ -42,7 +42,8 @@ class NavigationSidebar extends LitElement {
       <nav>
         <div class="logo">TODO App</div>
         <div class="links">
-            <a href="/home" class=${this.currentPath !== '/profile' ? 'active' : ''}>Home</a>
+            <a href="/home" class=${(this.currentPath !== '/profile' && this.currentPath !== '/requests') ? 'active' : ''}>Home</a>
+            <a href="/requests" class=${this.currentPath === '/requests' ? 'active' : ''}>Requests</a>
             <a href="/profile" class=${this.currentPath === '/profile' ? 'active' : ''}>Profile</a>
         </div>
       </nav>

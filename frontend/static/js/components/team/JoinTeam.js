@@ -82,16 +82,6 @@ class JoinTeam extends LitElement {
 
   handleSubmit(e) {
     e.preventDefault();
-    // const form = e.target;
-    // const task = {
-    //   title: form.title.value.trim(),
-    //   description: form.description.value.trim(),
-    //   assignedTo: form.assignedTo.value.trim(),
-    //   priority: form.priority.value,
-    //   status: form.status.value,
-    // };
-    // this.dispatchEvent(new CustomEvent('task-created', { detail: task }));
-    // form.reset();
   }
 
   render() {

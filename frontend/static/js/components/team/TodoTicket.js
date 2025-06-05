@@ -33,12 +33,12 @@ class TodoTicket extends LitElement {
     }
 
     .title {
-      font-size: 1.1rem;
+      font-size: 14pt;
       font-weight: bold;
     }
 
     .priority {
-      font-size: 0.75rem;
+      font-size: 8pt;
       padding: 0.25rem 0.5rem;
       border-radius: 4px;
       background: var(--priority-color, #ccc);
@@ -48,12 +48,12 @@ class TodoTicket extends LitElement {
 
     .description {
       margin: 0.5rem 0;
-      font-size: 0.9rem;
+      font-size: 11pt;
       color: #333;
     }
 
     .footer {
-      font-size: 0.8rem;
+      font-size: 9pt;
       color: #555;
       display: flex;
       justify-content: space-between;

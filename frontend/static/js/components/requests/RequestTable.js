@@ -18,7 +18,7 @@ class RequestTable extends LitElement {
 
     h2 {
       margin-top: 0;
-      font-size: 1.2rem;
+      font-size: 14pt;
       text-align: center
     }
 

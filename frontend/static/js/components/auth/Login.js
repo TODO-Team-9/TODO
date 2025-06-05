@@ -17,7 +17,7 @@ class LoginForm extends LitElement {
     h2 {
       margin-top: 0;
       text-align: center;
-      font-size: 1.5rem;
+      font-size: 24pt;
     }
 
     form {
@@ -28,7 +28,7 @@ class LoginForm extends LitElement {
 
     input {
       padding: 0.75rem;
-      font-size: 1rem;
+      font-size: 12pt;
       border-radius: 4px;
       border: 1px solid #ccc;
     }
@@ -50,7 +50,7 @@ class LoginForm extends LitElement {
     .helper {
       text-align: center;
       margin-top: 1rem;
-      font-size: 0.9rem;
+      font-size: 11pt;
     }
 
     .helper a {

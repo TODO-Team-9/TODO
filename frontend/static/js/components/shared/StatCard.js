@@ -18,7 +18,7 @@ class StatCard extends LitElement {
     }
 
     .label {
-      font-size: 0.9rem;
+      font-size: 11pt;
       color: #666;
       margin-bottom: 0.25rem;
     }

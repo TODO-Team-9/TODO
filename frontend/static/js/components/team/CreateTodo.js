@@ -13,7 +13,7 @@ class CreateTodo extends LitElement {
 
     h2 {
       margin-top: 0;
-      font-size: 1.2rem;
+      font-size: 14pt;
       text-align: center
     }
 
@@ -37,7 +37,7 @@ class CreateTodo extends LitElement {
 
     input, textarea, select, button {
       padding: 0.5rem;
-      font-size: 1rem;
+      font-size: 12pt;
       border-radius: 4px;
       border: 1px solid #ccc;
     }

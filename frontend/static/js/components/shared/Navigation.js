@@ -7,7 +7,7 @@ class NavigationSidebar extends LitElement {
       background-color: #2e2e2e;
       color: white;
       padding: 1rem 2rem;
-      font-size: 1.2rem;
+      font-size: 14pt;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 

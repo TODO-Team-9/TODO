@@ -24,13 +24,13 @@ export class TeamHeader extends LitElement {
 
     h2 {
       margin: 0;
-      font-size: 1.5rem;
+      font-size: 24pt;
       font-weight: 600;
     }
 
     button {
       padding: 0.5rem 1rem;
-      font-size: 1rem;
+      font-size: 12pt;
       background-color: #2e2e2e;
       color: white;
       border: none;

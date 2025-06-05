@@ -18,7 +18,7 @@ class TodoColumn extends LitElement {
     }
 
     h2 {
-      font-size: 1.1rem;
+      font-size: 14pt;
       margin: 0 0 1rem;
       text-transform: uppercase;
       color: #444;

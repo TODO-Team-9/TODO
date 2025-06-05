@@ -9,7 +9,7 @@ class TeamList extends LitElement {
 
   static styles = css`
     h3 {    
-      font-size: 1.1rem;
+      font-size: 14pt;
     }
 
     button {
@@ -31,7 +31,7 @@ class TeamList extends LitElement {
         width: 100%;
         padding: 0.5rem;
         text-align: center;
-        font-size: 1rem;
+        font-size: 12pt;
         border-radius: 4px;
         border: 1px solid #ccc;
     }

@@ -28,7 +28,7 @@ class CustomTable extends LitElement {
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.95rem;
+      font-size: 11pt;
     }
 
     thead {
@@ -46,7 +46,7 @@ class CustomTable extends LitElement {
       font-weight: 600;
       color: #333;
       text-transform: uppercase;
-      font-size: 0.85rem;
+      font-size: 10pt;
     }
 
     tr:last-child td {
@@ -66,7 +66,7 @@ class CustomTable extends LitElement {
       border: none;
       cursor: pointer;
       font-weight: 500;
-      font-size: 0.85rem;
+      font-size: 10pt;
       width: 6rem;
     }
 

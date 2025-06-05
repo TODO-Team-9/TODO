@@ -1,4 +1,13 @@
 node_modules
-.env
 dist
 public
+
+# Terraform
+*tfvars
+.terraform*
+
+*node_modules
+.env
+
+*.pem
+*.conf

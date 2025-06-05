@@ -40,12 +40,12 @@ class NavigationSidebar extends LitElement {
   render() {
     return html`
       <nav>
-        <div class="logo">TODO App</div>
-        <div class="links">
+        <section class="logo">TODO App</section>
+        <section class="links">
             <a href="/home" class=${(this.currentPath !== '/profile' && this.currentPath !== '/requests') ? 'active' : ''}>Home</a>
             <a href="/requests" class=${this.currentPath === '/requests' ? 'active' : ''}>Requests</a>
             <a href="/profile" class=${this.currentPath === '/profile' ? 'active' : ''}>Profile</a>
-        </div>
+        </section>
       </nav>
     `;
   }

@@ -64,9 +64,9 @@ BEGIN
         t.created_at,
         t.completed_at
     FROM tasks t
-    JOIN teams tm ON t.team_id = tm.team_id
-    JOIN statuses s ON t.status_id = s.status_id
-    JOIN priorities p ON t.priority_id = p.priority_id
+    INNER JOIN teams tm ON t.team_id = tm.team_id
+    INNER JOIN statuses s ON t.status_id = s.status_id
+    INNER JOIN priorities p ON t.priority_id = p.priority_id
     LEFT JOIN members m ON t.member_id = m.member_id
     WHERE m.user_id = p_user_id AND m.removed_at IS NULL;
 END;

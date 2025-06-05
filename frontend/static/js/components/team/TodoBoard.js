@@ -2,11 +2,12 @@ import { LitElement, html, css } from 'lit';
 import './TodoColumn.js';
 import './TodoTicket.js';
 import './Header.js';
+
 class TodoBoard extends LitElement {
-    static properties = {
-        teamName: { type: String },
-        tasks: { type: Array }
-    } 
+  static properties = {
+    teamName: { type: String },
+    tasks: { type: Array }
+  };
 
   static styles = css`
     :host {
@@ -22,8 +23,10 @@ class TodoBoard extends LitElement {
     }
   `;
 
-  render() {
-    const tasks = [
+  constructor() {
+    super();
+    this.teamName = "My Team";
+    this.tasks = [
       {
         title: 'Implement login',
         description: 'Build Google OAuth2 login flow',
@@ -53,17 +56,27 @@ class TodoBoard extends LitElement {
         status: 'Done'
       }
     ];
+  }
 
-    const statuses = ['Backlog', 'In Progress','In Review' ,'Done'];
+  _onTicketDropped(e) {
+    const { ticket, newStatus } = e.detail;
+    this.tasks = this.tasks.map((t) =>
+      t.title === ticket.title ? { ...t, status: newStatus } : t
+    );
+  }
+
+  render() {
+    const statuses = ['Backlog', 'In Progress', 'In Review', 'Done'];
 
     return html`
-    <team-header .title=${this.teamName} .buttonCaption=${'Create Todo'} .route=${'/create/todo'}></team-header>
+      <team-header .title=${this.teamName} .buttonCaption=${'Create Todo'} .route=${'/create/todo'}></team-header>
       <section class="board">
         ${statuses.map(
           (status) => html`
             <todo-column
               .title=${status}
-              .tickets=${tasks.filter((t) => t.status === status)}>
+              .tickets=${this.tasks.filter((t) => t.status === status)}
+              @ticket-dropped=${this._onTicketDropped}>
             </todo-column>
           `
         )}
@@ -73,3 +86,5 @@ class TodoBoard extends LitElement {
 }
 
 customElements.define('todo-board', TodoBoard);
+
+export default TodoBoard;

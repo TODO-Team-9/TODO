@@ -21,6 +21,7 @@ class TodoTicket extends LitElement {
       max-width: 300px;
       border-left: 6px solid var(--priority-color, gray);
       transition: box-shadow 0.2s ease;
+      cursor: grab;
     }
 
     :host(:hover) {
@@ -60,11 +61,6 @@ class TodoTicket extends LitElement {
       justify-content: space-between;
     }
 
-    .status {
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-
     .assigned {
       font-style: italic;
     }
@@ -82,26 +78,39 @@ class TodoTicket extends LitElement {
     }
   }
 
-    _navigate(e) {
-        navigator('/todo');
-    }
+  _navigate() {
+    navigator('/todo');
+  }
+
+  _onDragStart(e) {
+    const data = {
+      title: this.title,
+      description: this.description,
+      assignedTo: this.assignedTo,
+      priority: this.priority
+    };
+    e.dataTransfer.setData('application/json', JSON.stringify(data));
+  }
 
   render() {
     return html`
-    <section @click="${this._navigate}">
-      <header class="header">
-        <section class="title">${this.title}</section>
-        <section class="priority">${this.priority}</section>
-      </header>
-      <p class="description">${this.description}</p>
-      <footer class="footer">
-        <section class="assigned">👤 ${this.assignedTo}</section>
-      </footer>
-    </section>
+      <section
+        draggable="true"
+        @dragstart=${this._onDragStart}
+        @click=${this._navigate}
+      >
+        <header class="header">
+          <section class="title">${this.title}</section>
+          <section class="priority">${this.priority}</section>
+        </header>
+        <p class="description">${this.description}</p>
+        <footer class="footer">
+          <section class="assigned">👤 ${this.assignedTo}</section>
+        </footer>
+      </section>
     `;
   }
 }
-
 customElements.define('todo-ticket', TodoTicket);
 
 export default TodoTicket;

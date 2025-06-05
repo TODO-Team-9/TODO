@@ -38,7 +38,7 @@ class TodoColumn extends LitElement {
   }
 
   _onDragOver(e) {
-    e.preventDefault(); // Allow drop
+    e.preventDefault();
   }
 
   _onDrop(e) {

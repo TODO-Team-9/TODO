@@ -18,7 +18,7 @@ class TodoTicket extends LitElement {
       padding: 1rem;
       margin: 0.5rem 0;
       font-family: sans-serif;
-      max-width: 300px;
+      max-width: 15rem;
       border-left: 6px solid var(--priority-color, gray);
       transition: box-shadow 0.2s ease;
       cursor: grab;

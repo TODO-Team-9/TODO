@@ -5,7 +5,7 @@ CREATE TABLE users (
   password_hash VARCHAR(180) NOT NULL,
   two_factor_secret VARCHAR(256) NOT NULL,
   system_role_id INT NOT NULL,
-  deactivated_at TIMESTAMP
+  deactivated_at TIMESTAMPTZ
 );
 
 CREATE TABLE teams (
@@ -19,7 +19,7 @@ CREATE TABLE members (
   user_id INT NOT NULL,
   team_id INT NOT NULL,
   team_role_id INT NOT NULL,
-  removed_at TIMESTAMP
+  removed_at TIMESTAMPTZ
 );
 
 CREATE TABLE team_roles (
@@ -39,8 +39,8 @@ CREATE TABLE tasks (
   team_id INT NOT NULL,
   status_id INT NOT NULL,
   priority_id INT NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  completed_at TIMESTAMP,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  completed_at TIMESTAMPTZ,
   member_id INT
 );
 
@@ -59,7 +59,7 @@ CREATE TABLE join_requests (
   team_id INT NOT NULL,
   user_id INT NOT NULL,
   request_status INT NOT NULL,
-  requested_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  requested_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE request_statuses (

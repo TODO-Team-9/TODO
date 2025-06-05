@@ -1,3 +1,7 @@
+node_modules
+dist
+public
+
 # Terraform
 *tfvars
 .terraform*
@@ -7,3 +11,6 @@
 
 *.pem
 *.conf
+
+.vscode
+*.session.sql

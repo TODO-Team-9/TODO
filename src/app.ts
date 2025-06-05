@@ -12,7 +12,7 @@ const PORT = process.env.PORT ?? 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/static", express.static(path.join(__dirname, "../public/static")));
+app.use("/", express.static(path.join(__dirname, "../public")));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);

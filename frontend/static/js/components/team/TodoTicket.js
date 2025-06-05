@@ -1,4 +1,5 @@
 import { LitElement, html, css } from 'lit';
+import { navigator } from '../../index.js';
 
 class TodoTicket extends LitElement {
   static properties = {
@@ -81,8 +82,13 @@ class TodoTicket extends LitElement {
     }
   }
 
+    _navigate(e) {
+        navigator('/todo');
+    }
+
   render() {
     return html`
+    <section @click="${this._navigate}">
       <header class="header">
         <section class="title">${this.title}</section>
         <section class="priority">${this.priority}</section>
@@ -91,6 +97,7 @@ class TodoTicket extends LitElement {
       <footer class="footer">
         <section class="assigned">👤 ${this.assignedTo}</section>
       </footer>
+    </section>
     `;
   }
 }

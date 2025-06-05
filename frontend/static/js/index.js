@@ -6,6 +6,7 @@ import LoginView from "./views/LoginView.js";
 import RegisterView from "./views/RegisterView.js";
 import RequestView from "./views/RequestView.js";
 import TeamStatsView from "./views/TeamStatsView.js";
+import FullTodoView from "./views/FullTodoView.js";
 
 let currentView = null;
 
@@ -28,6 +29,7 @@ export const router = async () => {
     { path: "/team/join", view: JoinTeamView },
     { path: "/team/report", view: TeamStatsView },
     { path: "/requests", view: RequestView },
+    { path: "/todo", view: FullTodoView },
   ];
 
   const pathToRegex = (path) =>

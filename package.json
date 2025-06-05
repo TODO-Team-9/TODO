@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node dist/app.js",
     "dev": "ts-node src/app.ts",
-    "build": "tsc"
+    "build": "tsc && vite build",
+    "dev:frontend": "vite",
+    "build:frontend": "vite build"
   },
   "keywords": [],
   "author": "",
@@ -18,13 +20,16 @@
     "@types/pg": "^8.11.14",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
   },
   "dependencies": {
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "jose": "^6.0.10",
     "jsonwebtoken": "^9.0.2",
+    "lit": "^3.3.0",
+    "lit-html": "^3.3.0",
     "pg": "^8.15.6",
     "postgres": "^3.4.7"
   }

@@ -222,3 +222,51 @@ BEGIN
             RAISE EXCEPTION 'Error deactivating user: %', SQLERRM;
 END;
 $$;
+
+CREATE OR REPLACE PROCEDURE assign_task(
+    p_task_id INT,
+    p_member_id INT
+) LANGUAGE plpgsql AS $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM tasks WHERE task_id = p_task_id) THEN
+        RAISE EXCEPTION 'Task does not exist';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM members WHERE member_id = p_member_id AND removed_at IS NULL) THEN
+        RAISE EXCEPTION 'Member does not exist or is removed';
+    END IF;
+    UPDATE tasks SET member_id = p_member_id WHERE task_id = p_task_id;
+    RAISE NOTICE 'Task assigned successfully';
+END;
+$$;
+
+CREATE OR REPLACE PROCEDURE change_task_status(
+    p_task_id INT,
+    p_status_id INT
+) LANGUAGE plpgsql AS $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM tasks WHERE task_id = p_task_id) THEN
+        RAISE EXCEPTION 'Task does not exist';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM statuses WHERE status_id = p_status_id) THEN
+        RAISE EXCEPTION 'Status does not exist';
+    END IF;
+    UPDATE tasks SET status_id = p_status_id WHERE task_id = p_task_id;
+    RAISE NOTICE 'Task status updated successfully';
+END;
+$$;
+
+CREATE OR REPLACE PROCEDURE update_join_request(
+    p_request_id INT,
+    p_new_status INT
+) LANGUAGE plpgsql AS $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM join_requests WHERE request_id = p_request_id) THEN
+        RAISE EXCEPTION 'Join request does not exist';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM request_statuses WHERE request_status_id = p_new_status) THEN
+        RAISE EXCEPTION 'Request status does not exist';
+    END IF;
+    UPDATE join_requests SET request_status = p_new_status WHERE request_id = p_request_id;
+    RAISE NOTICE 'Join request updated successfully';
+END;
+$$;

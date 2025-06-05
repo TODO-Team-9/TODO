@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE deactivated_user (
+CREATE OR REPLACE PROCEDURE deactivate_user (
     p_user_id INT
 ) LANGUAGE plpgsql AS $$
 DECLARE
@@ -190,36 +190,6 @@ BEGIN
     EXCEPTION
         WHEN others THEN
             RAISE EXCEPTION 'Error adding user: %', SQLERRM;
-END;
-$$;
-
-CREATE OR REPLACE PROCEDURE deactivate_user (
-    p_user_id INT
-) LANGUAGE plpgsql AS $$
-DECLARE
-    v_deactivated TIMESTAMPTZ;
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM users WHERE user_id = p_user_id) THEN
-        RAISE EXCEPTION 'User does not exist';
-    END IF;
-
-    SELECT deactivated_at INTO v_deactivated
-    FROM users
-    WHERE user_id = p_user_id;
-
-    IF v_deactivated IS NOT NULL THEN
-        RAISE EXCEPTION 'User is already deactivated';
-    END IF;
-
-    UPDATE users
-    SET deactivated_at = NOW()
-    WHERE user_id = p_user_id;
-
-    RAISE NOTICE 'Deactivated user successfully';
-
-    EXCEPTION
-        WHEN others THEN
-            RAISE EXCEPTION 'Error deactivating user: %', SQLERRM;
 END;
 $$;
 

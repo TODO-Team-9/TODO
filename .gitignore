@@ -7,3 +7,6 @@
 
 *.pem
 *.conf
+
+.vscode
+*.session.sql

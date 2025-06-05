@@ -26,3 +26,17 @@ BEGIN
     WHERE t.team_id = p_team_id;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_team_members_usernames(p_team_id INT)
+RETURNS TABLE (
+    member_id INT,
+    username VARCHAR(50)
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT m.member_id, u.username
+    FROM members m
+    INNER JOIN users u ON m.user_id = u.user_id
+    WHERE m.team_id = p_team_id AND m.removed_at IS NULL;
+END;
+$$ LANGUAGE plpgsql;

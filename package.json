@@ -30,7 +30,6 @@
     "google-auth-library": "^9.15.1",
     "jose": "^6.0.10",
     "jsonwebtoken": "^9.0.2",
-    "malware": "^1.0.0",
     "pg": "^8.15.6",
     "postgres": "^3.4.7",
     "qrcode": "^1.5.4",

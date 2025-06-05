@@ -35,9 +35,7 @@ export async function register(req: Request, res: Response): Promise<void> {
       res.status(500).json({ error: "Failed to create user" });
       return;
     }
-    // Generate TOTP secret and QR code for 2FA setup
     const totp = await generateTOTPSecret(newUser.username);
-    // Optionally, you could save totp.base32 to the user here if you want to force 2FA on registration
     const { passwordHash, ...userWithoutSensitiveData } = newUser;
 
     res.status(201).json({
@@ -78,7 +76,6 @@ export async function login(req: Request, res: Response): Promise<void> {
       res.status(401).json({ error: "Invalid credentials" });
       return;
     }
-    // If user has a 2FA secret, require TOTP token
     if (user.twoFactorSecret) {
       const { token } = req.body;
       if (!token) {
@@ -91,13 +88,19 @@ export async function login(req: Request, res: Response): Promise<void> {
         return;
       }
     }
+
+    if (!process.env.JWT_SECRET) {
+      res.status(500).json({ error: "JWT secret is not configured" });
+      return;
+    }
+
     const tokenJwt = jwt.sign(
       {
         userId: user.userId,
         username: user.username,
         role: user.systemRoleId,
       },
-      process.env.JWT_SECRET ?? "default_secret_change_this",
+      process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
 

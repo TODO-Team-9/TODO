@@ -19,15 +19,16 @@ export interface UserRegistration {
   password: string;
 }
 
-const ENCRYPTION_KEY =
-  process.env.TWOFA_ENCRYPTION_KEY 
-const IV_LENGTH = 16;
+const INITIALIZATION_VECTOR_LENGTH = 16;
 
 function encrypt(text: string): string {
-  const iv = crypto.randomBytes(IV_LENGTH);
+  if (!process.env.TWOFA_ENCRYPTION_KEY) {
+    throw new Error("TWOFA_ENCRYPTION_KEY environment variable is not set.");
+  }
+  const iv = crypto.randomBytes(INITIALIZATION_VECTOR_LENGTH);
   const cipher = crypto.createCipheriv(
     "aes-256-gcm",
-    Buffer.from(ENCRYPTION_KEY),
+    Buffer.from(process.env.TWOFA_ENCRYPTION_KEY),
     iv
   );
   let encrypted = cipher.update(text, "utf8");
@@ -43,13 +44,16 @@ function encrypt(text: string): string {
 }
 
 function decrypt(text: string): string {
+  if (!process.env.TWOFA_ENCRYPTION_KEY) {
+    throw new Error("TWOFA_ENCRYPTION_KEY environment variable is not set.");
+  }
   const textParts = text.split(":");
   const iv = Buffer.from(textParts[0], "hex");
   const tag = Buffer.from(textParts[1], "hex");
   const encryptedText = Buffer.from(textParts[2], "hex");
   const decipher = crypto.createDecipheriv(
     "aes-256-gcm",
-    Buffer.from(ENCRYPTION_KEY),
+    Buffer.from(process.env.TWOFA_ENCRYPTION_KEY),
     iv
   );
   decipher.setAuthTag(tag);
@@ -58,7 +62,7 @@ function decrypt(text: string): string {
   return decrypted.toString();
 }
 
-async function createUser(user: UserRegistration): Promise<User | null> {
+async function createUser(user: UserRegistration): Promise<User> {
   const { username, emailAddress, password } = user;
   const passwordHash = await hashPassword(password);
   const twoFactorSecret = "";
@@ -69,7 +73,16 @@ async function createUser(user: UserRegistration): Promise<User | null> {
       VALUES (${username}, ${emailAddress}, ${passwordHash}, ${twoFactorSecret}, ${SystemRoles.SYSTEM_USER}) 
       RETURNING *
     `;
-    return result[0] ? (result[0] as unknown as User) : null;
+    return {
+      userId: result[0].user_id,
+      username: result[0].username,
+      emailAddress: result[0].email_address,
+      passwordHash: result[0].password_hash,
+      twoFactorSecret: result[0].two_factor_secret
+        ? decrypt(result[0].two_factor_secret)
+        : "",
+      systemRoleId: result[0].system_role_id,
+    };
   } catch (error) {
     console.error("Error creating user:", error);
     throw error;
@@ -81,14 +94,21 @@ async function findByUsername(username: string): Promise<User | null> {
     const result = await sql`
       SELECT user_id, username, email_address, password_hash, two_factor_secret, system_role_id, deactivated_at FROM users WHERE username = ${username}
     `;
-    if (result[0]) {
-      const user = result[0] as unknown as User;
-      if (user.twoFactorSecret) {
-        user.twoFactorSecret = decrypt(user.twoFactorSecret);
-      }
-      return user;
+
+    if (!result || result.length === 0) {
+      return null;
     }
-    return null;
+
+    return {
+      userId: result[0].userId,
+      username: result[0].username,
+      emailAddress: result[0].emailAddress,
+      passwordHash: result[0].passwordHash,
+      twoFactorSecret: result[0].twoFactorSecret
+        ? decrypt(result[0].twoFactorSecret)
+        : "",
+      systemRoleId: result[0].systemRoleId,
+    };
   } catch (error) {
     console.error("Error finding user by username:", error);
     throw error;
@@ -100,14 +120,21 @@ async function findByEmail(email: string): Promise<User | null> {
     const result = await sql`
       SELECT user_id, username, email_address, password_hash, two_factor_secret, system_role_id, deactivated_at FROM users WHERE email_address = ${email}
     `;
-    if (result.length) {
-      const user = result[0] as unknown as User;
-      if (user.twoFactorSecret) {
-        user.twoFactorSecret = decrypt(user.twoFactorSecret);
-      }
-      return user;
+
+    if (!result || result.length === 0) {
+      return null;
     }
-    return null;
+
+    return {
+      userId: result[0].userId,
+      username: result[0].username,
+      emailAddress: result[0].emailAddress,
+      passwordHash: result[0].passwordHash,
+      twoFactorSecret: result[0].twoFactorSecret
+        ? decrypt(result[0].twoFactorSecret)
+        : "",
+      systemRoleId: result[0].systemRoleId,
+    };
   } catch (error) {
     console.error("Error finding user by email:", error);
     throw error;
@@ -119,14 +146,21 @@ async function findById(userId: number): Promise<User | null> {
     const result = await sql`
       SELECT user_id, username, email_address, password_hash, two_factor_secret, system_role_id, deactivated_at FROM users WHERE user_id = ${userId}
     `;
-    if (result.length) {
-      const user = result[0] as unknown as User;
-      if (user.twoFactorSecret) {
-        user.twoFactorSecret = decrypt(user.twoFactorSecret);
-      }
-      return user;
+
+    if (!result || result.length === 0) {
+      return null;
     }
-    return null;
+
+    return {
+      userId: result[0].userId,
+      username: result[0].username,
+      emailAddress: result[0].emailAddress,
+      passwordHash: result[0].passwordHash,
+      twoFactorSecret: result[0].twoFactorSecret
+        ? decrypt(result[0].twoFactorSecret)
+        : "",
+      systemRoleId: result[0].systemRoleId,
+    };
   } catch (error) {
     console.error("Error finding user by ID:", error);
     throw error;

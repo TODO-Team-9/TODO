@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit';
 
 import "./Header.js";
+import "./MemberStats.js";
 import "../shared/StatCard.js";
 
 class TeamStats extends LitElement {
@@ -24,6 +25,7 @@ class TeamStats extends LitElement {
       gap: 1rem;
       justify-content: center;
       flex-wrap: wrap;
+      margin-bottom: 1.5rem;
     }
   `;
 
@@ -44,6 +46,8 @@ class TeamStats extends LitElement {
             <stat-card .label="${'In Review'}" .stat=${this.inReview}></stat-card>
             <stat-card .label="${'Done'}" .stat=${this.done}></stat-card>
         </section>
+        <member-stats></member-stats>
+
     `;
   }
 }

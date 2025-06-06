@@ -1,9 +1,9 @@
-import sql from '../db';
-import { SystemRole } from '../models/SystemRole';
-import { TeamRole } from '../models/TeamRole';
-import { Status } from '../models/Status';
-import { Priority } from '../models/Priority';
-import { RequestStatus } from '../models/RequestStatus';
+import sql from "../db";
+import { SystemRole } from "../models/SystemRole";
+import { TeamRole } from "../models/TeamRole";
+import { Status } from "../models/Status";
+import { Priority } from "../models/Priority";
+import { RequestStatus } from "../models/RequestStatus";
 
 export class LookupService {
   async getSystemRoles(): Promise<SystemRole[]> {
@@ -30,4 +30,4 @@ export class LookupService {
     const statuses = await sql<RequestStatus[]>`SELECT * FROM request_statuses`;
     return statuses;
   }
-} 
+}

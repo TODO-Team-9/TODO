@@ -1,8 +1,12 @@
-import sql from '../db';
-import { Task } from '../models/Task';
+import sql from "../db";
+import { Task } from "../models/Task";
 
 export class TaskService {
-  async assignTask(taskId: number, memberId?: number, username?: string): Promise<void> {
+  async assignTask(
+    taskId: number,
+    memberId?: number,
+    username?: string
+  ): Promise<void> {
     if (memberId !== undefined && memberId !== null) {
       await sql`
         CALL assign_task(${taskId}, ${memberId})
@@ -12,7 +16,7 @@ export class TaskService {
         CALL assign_task_by_username(${taskId}, ${username})
       `;
     } else {
-      throw new Error('Either memberId or username must be provided');
+      throw new Error("Either memberId or username must be provided");
     }
   }
 
@@ -56,7 +60,7 @@ export class TaskService {
       ORDER BY created_at DESC
       LIMIT 1
     `;
-    if (!task) throw new Error('Task creation failed');
+    if (!task) throw new Error("Task creation failed");
     return task;
   }
 
@@ -65,4 +69,4 @@ export class TaskService {
       CALL delete_task(${taskId})
     `;
   }
-} 
+}

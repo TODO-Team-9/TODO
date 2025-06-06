@@ -1,0 +1,65 @@
+// Authentication utility functions
+export class AuthManager {
+  static getToken() {
+    return localStorage.getItem("authToken");
+  }
+
+  static getUser() {
+    const user = localStorage.getItem("user");
+    return user ? JSON.parse(user) : null;
+  }
+
+  static isAuthenticated() {
+    const token = this.getToken();
+    if (!token) return false;
+
+    try {
+      // Basic JWT token validation (you might want to add expiry check)
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return payload.exp * 1000 > Date.now();
+    } catch (error) {
+      return false;
+    }
+  }
+
+  static logout() {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    window.location.href = "/";
+  }
+
+  static async makeAuthenticatedRequest(url, options = {}) {
+    const token = this.getToken();
+
+    const defaultOptions = {
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    };
+
+    const mergedOptions = {
+      ...defaultOptions,
+      ...options,
+      headers: {
+        ...defaultOptions.headers,
+        ...options.headers,
+      },
+    };
+
+    try {
+      const response = await fetch(url, mergedOptions);
+
+      if (response.status === 401) {
+        // Token expired or invalid
+        this.logout();
+        return null;
+      }
+
+      return response;
+    } catch (error) {
+      console.error("Authenticated request failed:", error);
+      throw error;
+    }
+  }
+}

@@ -1,6 +1,24 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html, css } from "lit";
+import { getApiUrl } from "../../utils/config.js";
+import "./TwoFactorSetup.js";
 
 class RegisterForm extends LitElement {
+  static properties = {
+    loading: { type: Boolean },
+    errorMessage: { type: String },
+    successMessage: { type: String },
+    showTwoFactorSetup: { type: Boolean },
+    twoFactorData: { type: Object },
+  };
+
+  constructor() {
+    super();
+    this.loading = false;
+    this.errorMessage = "";
+    this.successMessage = "";
+    this.showTwoFactorSetup = false;
+    this.twoFactorData = null;
+  }
   static styles = css`
     :host {
       display: block;
@@ -58,20 +76,93 @@ class RegisterForm extends LitElement {
       font-weight: bold;
       text-decoration: none;
     }
-
     .helper a:hover {
       text-decoration: underline;
+    }
+
+    .error {
+      color: #d32f2f;
+      background-color: #ffebee;
+      padding: 0.75rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      text-align: center;
+      font-size: 11pt;
+    }
+
+    .success {
+      color: #2e7d32;
+      background-color: #e8f5e8;
+      padding: 0.75rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      text-align: center;
+      font-size: 11pt;
+    }
+
+    .loading {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
     }
   `;
 
   render() {
+    if (this.showTwoFactorSetup) {
+      return html`
+        <h2>Complete Your Registration</h2>
+        ${this.successMessage
+          ? html`<div class="success">${this.successMessage}</div>`
+          : ""}
+        <two-factor-setup
+          .qrCodeDataURL=${this.twoFactorData?.qrCodeDataURL}
+          .secret=${this.twoFactorData?.secret}
+          .isRegistrationFlow=${true}
+        >
+        </two-factor-setup>
+      `;
+    }
+
     return html`
       <h2>Register</h2>
-      <form @submit=${this.handleRegister}>
-        <input type="text" placeholder="User Name" required />
-        <input type="email" placeholder="Email" required />
-        <input type="password" placeholder="Password" required />
-        <button type="submit">Register</button>
+      ${this.errorMessage
+        ? html`<div class="error">${this.errorMessage}</div>`
+        : ""}
+      ${this.successMessage
+        ? html`<div class="success">${this.successMessage}</div>`
+        : ""}
+      <form
+        @submit=${this.handleRegister}
+        class=${this.loading ? "loading" : ""}
+      >
+        <input
+          type="text"
+          name="username"
+          placeholder="User Name"
+          required
+          ?disabled=${this.loading}
+        />
+        <input
+          type="email"
+          name="emailAddress"
+          placeholder="Email"
+          required
+          ?disabled=${this.loading}
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+          ?disabled=${this.loading}
+        />
+        <button type="submit" ?disabled=${this.loading}>
+          ${this.loading ? "Creating account..." : "Register"}
+        </button>
       </form>
       <article class="helper">
         Already have an account? <a href="/">Login</a>
@@ -79,10 +170,52 @@ class RegisterForm extends LitElement {
     `;
   }
 
-  handleRegister(e) {
+  async handleRegister(e) {
     e.preventDefault();
-    console.log("Register");
+    this.loading = true;
+    this.errorMessage = "";
+    this.successMessage = "";
+
+    const formData = new FormData(e.target);
+    const username = formData.get("username");
+    const emailAddress = formData.get("emailAddress");
+    const password = formData.get("password");
+    try {
+      const response = await fetch(getApiUrl("api/auth/register"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          emailAddress,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store user data temporarily and show 2FA setup
+        this.twoFactorData = data.twoFactor;
+
+        // Store the user data and password temporarily (for 2FA completion)
+        localStorage.setItem("tempUser", JSON.stringify(data.user));
+        localStorage.setItem("tempPassword", password);
+
+        this.showTwoFactorSetup = true;
+        this.successMessage =
+          "Registration successful! Now set up Two-Factor Authentication.";
+      } else {
+        this.errorMessage = data.error || "Registration failed";
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      this.errorMessage = "Network error. Please try again.";
+    } finally {
+      this.loading = false;
+    }
   }
 }
 
-customElements.define('register-form', RegisterForm);
+customElements.define("register-form", RegisterForm);

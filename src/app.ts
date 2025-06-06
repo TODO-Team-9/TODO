@@ -6,9 +6,13 @@ dotenv.config({ path: path.join(__dirname, "../.env") });
 
 import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
+import corsMiddleware from "./middleware/cors.middleware";
 
 const app = express();
 const PORT = process.env.PORT ?? 3000;
+
+// CORS middleware
+app.use(corsMiddleware);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

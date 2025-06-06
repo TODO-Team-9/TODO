@@ -103,7 +103,6 @@ export async function login(req: Request, res: Response): Promise<void> {
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
-
     res.status(200).json({
       message: "Login successful",
       token: tokenJwt,
@@ -112,6 +111,7 @@ export async function login(req: Request, res: Response): Promise<void> {
         username: user.username,
         emailAddress: user.emailAddress,
         systemRoleId: user.systemRoleId,
+        twoFactorEnabled: !!user.twoFactorSecret,
       },
     });
   } catch (error) {
@@ -120,18 +120,67 @@ export async function login(req: Request, res: Response): Promise<void> {
   }
 }
 
+// Generate 2FA setup for authenticated user
+export async function generate2FA(req: Request, res: Response) {
+  const userId = req.user?.userId;
+  const username = req.user?.username;
+
+  if (!userId || !username) {
+    return res.status(401).json({ error: "User not authenticated" });
+  }
+
+  try {
+    const totp = await generateTOTPSecret(username);
+    res.json({
+      message: "2FA setup generated",
+      twoFactor: {
+        secret: totp.base32,
+        qrCodeDataURL: totp.qrCodeDataURL,
+      },
+    });
+  } catch (error) {
+    console.error("Generate 2FA error:", error);
+    res.status(500).json({ error: "Failed to generate 2FA setup" });
+  }
+}
+
 // Enable 2FA for a user (save TOTP secret)
 export async function enable2FA(req: Request, res: Response) {
   const userId = req.user?.userId;
-  const { secret } = req.body;
-  if (!userId || !secret) {
-    return res.status(400).json({ error: "Missing user or secret" });
+  const { secret, token } = req.body;
+
+  if (!userId || !secret || !token) {
+    return res.status(400).json({ error: "Missing user, secret, or token" });
   }
+
   try {
+    // Verify the token first
+    const isTokenValid = verifyTOTPToken(secret, token);
+    if (!isTokenValid) {
+      return res.status(400).json({ error: "Invalid verification code" });
+    }
+
     await UserModel.setTwoFactorSecret(userId, secret);
-    res.json({ message: "2FA enabled" });
+    res.json({ message: "2FA enabled successfully" });
   } catch (err) {
     console.error("Enable 2FA error:", err);
     res.status(500).json({ error: "Failed to enable 2FA" });
+  }
+}
+
+// Disable 2FA for a user (remove TOTP secret)
+export async function disable2FA(req: Request, res: Response) {
+  const userId = req.user?.userId;
+
+  if (!userId) {
+    return res.status(401).json({ error: "User not authenticated" });
+  }
+
+  try {
+    await UserModel.setTwoFactorSecret(userId, "");
+    res.json({ message: "2FA disabled successfully" });
+  } catch (err) {
+    console.error("Disable 2FA error:", err);
+    res.status(500).json({ error: "Failed to disable 2FA" });
   }
 }

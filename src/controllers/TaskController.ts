@@ -4,66 +4,66 @@ import { HTTP_Status } from '../enums/HTTP_Status';
 
 const taskService = new TaskService();
 
-export const createTask = async (req: Request, res: Response): Promise<void> => {
+export const createTask = async (request: Request, response: Response): Promise<void> => {
   try {
-    const { taskName, taskDescription, teamId, memberId } = req.body;
+    const { taskName, taskDescription, teamId, memberId } = request.body;
     if (!taskName || !teamId) {
-      res.status(HTTP_Status.BAD_REQUEST).json({ error: 'taskName and teamId are required' });
+      response.status(HTTP_Status.BAD_REQUEST).json({ error: 'taskName and teamId are required' });
       return;
     }
     const task = await taskService.createTask(taskName, taskDescription ?? null, teamId, memberId);
-    res.status(HTTP_Status.CREATED).json(task);
-  } catch (err: any) {
-    res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: err.message });
+    response.status(HTTP_Status.CREATED).json(task);
+  } catch (error: any) {
+    response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 };
 
-export const assignTask = async (req: Request, res: Response): Promise<void> => {
+export const assignTask = async (request: Request, response: Response): Promise<void> => {
   try {
-    const { taskId } = req.params;
-    const { memberId } = req.body;
+    const { taskId } = request.params;
+    const { memberId } = request.body;
     if (!memberId) {
-      res.status(HTTP_Status.BAD_REQUEST).json({ error: 'memberId is required' });
+      response.status(HTTP_Status.BAD_REQUEST).json({ error: 'memberId is required' });
       return;
     }
     await taskService.assignTask(Number(taskId), Number(memberId));
-    res.status(HTTP_Status.OK).json({ message: 'Task assigned successfully' });
-  } catch (err: any) {
-    res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: err.message });
+    response.status(HTTP_Status.OK).json({ message: 'Task assigned successfully' });
+  } catch (error: any) {
+    response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 };
 
-export const changeTaskStatus = async (req: Request, res: Response): Promise<void> => {
+export const changeTaskStatus = async (request: Request, response: Response): Promise<void> => {
   try {
-    const { taskId } = req.params;
-    const { statusId } = req.body;
+    const { taskId } = request.params;
+    const { statusId } = request.body;
     if (!statusId) {
-      res.status(HTTP_Status.BAD_REQUEST).json({ error: 'statusId is required' });
+      response.status(HTTP_Status.BAD_REQUEST).json({ error: 'statusId is required' });
       return;
     }
     await taskService.changeTaskStatus(Number(taskId), Number(statusId));
-    res.status(HTTP_Status.OK).json({ message: 'Task status updated successfully' });
-  } catch (err: any) {
-    res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: err.message });
+    response.status(HTTP_Status.OK).json({ message: 'Task status updated successfully' });
+  } catch (error: any) {
+    response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 };
 
-export const getTasksForTeam = async (req: Request, res: Response): Promise<void> => {
+export const getTasksForTeam = async (request: Request, response: Response): Promise<void> => {
   try {
-    const { teamId } = req.params;
+    const { teamId } = request.params;
     const tasks = await taskService.getTasksForTeam(Number(teamId));
-    res.status(HTTP_Status.OK).json(tasks);
-  } catch (err: any) {
-    res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: err.message });
+    response.status(HTTP_Status.OK).json(tasks);
+  } catch (error: any) {
+    response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 };
 
-export const getTasksForUser = async (req: Request, res: Response): Promise<void> => {
+export const getTasksForUser = async (request: Request, response: Response): Promise<void> => {
   try {
-    const { userId } = req.params;
+    const { userId } = request.params;
     const tasks = await taskService.getTasksForUser(Number(userId));
-    res.status(HTTP_Status.OK).json(tasks);
-  } catch (err: any) {
-    res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: err.message });
+    response.status(HTTP_Status.OK).json(tasks);
+  } catch (error: any) {
+    response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 }; 

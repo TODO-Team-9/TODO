@@ -15,7 +15,6 @@ export class TaskService {
   }
 
   async getTasksForTeam(teamId: number): Promise<Task[]> {
-    // Use the get_tasks function or tasks_overview view
     const tasks = await sql<Task[]>`
       SELECT * FROM get_tasks(${teamId})
     `;
@@ -23,7 +22,6 @@ export class TaskService {
   }
 
   async getTasksForUser(userId: number): Promise<Task[]> {
-    // Use the get_user_tasks function
     const tasks = await sql<Task[]>`
       SELECT * FROM get_user_tasks(${userId})
     `;
@@ -36,7 +34,6 @@ export class TaskService {
     teamId: number,
     memberId?: number | null
   ): Promise<Task> {
-    // Call the create_task stored procedure
     await sql`
       CALL create_task(
         ${taskName},
@@ -45,7 +42,6 @@ export class TaskService {
         ${memberId ?? null}
       )
     `;
-    // Fetch the most recently created task for this team with the given name (assuming task names are unique per team)
     const [task] = await sql<Task[]>`
       SELECT * FROM tasks
       WHERE team_id = ${teamId} AND task_name = ${taskName}

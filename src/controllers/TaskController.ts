@@ -21,15 +21,19 @@ export const createTask = async (request: Request, response: Response): Promise<
 export const assignTask = async (request: Request, response: Response): Promise<void> => {
   try {
     const { taskId } = request.params;
-    const { memberId } = request.body;
-    if (!memberId) {
-      response.status(HTTP_Status.BAD_REQUEST).json({ error: 'memberId is required' });
+    const { memberId, username } = request.body;
+    if (memberId === undefined && !username) {
+      response.status(HTTP_Status.BAD_REQUEST).json({ error: 'memberId or username is required' });
       return;
     }
-    await taskService.assignTask(Number(taskId), Number(memberId));
+    await taskService.assignTask(Number(taskId), memberId !== undefined ? Number(memberId) : undefined, username);
     response.status(HTTP_Status.OK).json({ message: 'Task assigned successfully' });
   } catch (error: any) {
-    response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    if (error.message && (error.message.includes('does not exist') || error.message.includes('does not exist in that team'))) {
+      response.status(HTTP_Status.NOT_FOUND).json({ error: error.message });
+    } else {
+      response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    }
   }
 };
 

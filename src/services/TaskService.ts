@@ -2,10 +2,18 @@ import sql from '../db';
 import { Task } from '../models/Task';
 
 export class TaskService {
-  async assignTask(taskId: number, memberId: number): Promise<void> {
-    await sql`
-      CALL assign_task(${taskId}, ${memberId})
-    `;
+  async assignTask(taskId: number, memberId?: number, username?: string): Promise<void> {
+    if (memberId !== undefined && memberId !== null) {
+      await sql`
+        CALL assign_task(${taskId}, ${memberId})
+      `;
+    } else if (username) {
+      await sql`
+        CALL assign_task_by_username(${taskId}, ${username})
+      `;
+    } else {
+      throw new Error('Either memberId or username must be provided');
+    }
   }
 
   async changeTaskStatus(taskId: number, statusId: number): Promise<void> {

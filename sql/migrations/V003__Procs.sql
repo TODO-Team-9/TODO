@@ -323,3 +323,29 @@ BEGIN
             RAISE EXCEPTION 'Error deleting task: %', SQLERRM;
 END;
 $$;
+
+CREATE OR REPLACE PROCEDURE assign_task_by_username(
+    p_task_id INT,
+    p_username VARCHAR(50)
+) LANGUAGE plpgsql AS $$
+DECLARE
+    v_member_id INT;
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM tasks WHERE task_id = p_task_id) THEN
+        RAISE EXCEPTION 'Task does not exist';
+    END IF;
+    SELECT m.member_id INTO v_member_id
+    FROM members m
+    INNER JOIN users u ON m.user_id = u.user_id
+    WHERE u.username = p_username AND m.removed_at IS NULL
+    LIMIT 1;
+    IF v_member_id IS NULL THEN
+        RAISE EXCEPTION 'Active member with username % does not exist', p_username;
+    END IF;
+    UPDATE tasks SET member_id = v_member_id WHERE task_id = p_task_id;
+    RAISE NOTICE 'Task assigned to member with username % successfully', p_username;
+    EXCEPTION
+        WHEN others THEN
+            RAISE EXCEPTION 'Error assigning task by username: %', SQLERRM;
+END;
+$$;

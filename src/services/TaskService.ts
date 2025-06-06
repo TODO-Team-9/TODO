@@ -37,8 +37,8 @@ export class TaskService {
     await sql`
       CALL create_task(
         ${taskName},
-        ${taskDescription},
         ${teamId},
+        ${taskDescription},
         ${memberId ?? null}
       )
     `;

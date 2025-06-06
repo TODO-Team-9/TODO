@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { JoinRequestService } from "../services/JoinRequestService";
+import { JoinRequestService } from "../services/joinRequest.service";
 import { HTTP_Status } from "../enums/HTTP_Status";
 
 const joinRequestService = new JoinRequestService();

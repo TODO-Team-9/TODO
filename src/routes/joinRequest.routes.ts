@@ -3,7 +3,7 @@ import {
   createJoinRequest,
   updateJoinRequestStatus,
   getJoinRequestsForTeam,
-} from "../controllers/JoinRequestController";
+} from "../controllers/joinRequest.controller";
 
 const router = express.Router();
 

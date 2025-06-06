@@ -5,7 +5,7 @@ import {
   getStatuses,
   getPriorities,
   getRequestStatuses,
-} from "../controllers/LookupController";
+} from "../controllers/lookup.controller";
 
 const router = express.Router();
 

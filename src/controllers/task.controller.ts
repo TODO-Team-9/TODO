@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { TaskService } from "../services/TaskService";
+import { TaskService } from "../services/task.service";
 import { HTTP_Status } from "../enums/HTTP_Status";
 
 const taskService = new TaskService();

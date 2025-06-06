@@ -277,3 +277,36 @@ BEGIN
             RAISE EXCEPTION 'Error creating task: %', SQLERRM;
 END;
 $$;
+
+CREATE OR REPLACE PROCEDURE create_join_request(
+    p_team_id INT,
+    p_user_id INT
+) LANGUAGE plpgsql AS $$
+DECLARE
+    v_pending_status_id INT;
+    v_exists INT;
+BEGIN
+    -- Get the request_status_id for 'PENDING'
+    SELECT request_status_id INTO v_pending_status_id FROM request_statuses WHERE request_status_name = 'PENDING';
+    IF v_pending_status_id IS NULL THEN
+        RAISE EXCEPTION 'PENDING status does not exist';
+    END IF;
+
+    -- Check if a pending request already exists for this user and team
+    SELECT COUNT(*) INTO v_exists FROM join_requests
+    WHERE team_id = p_team_id AND user_id = p_user_id AND request_status = v_pending_status_id;
+    IF v_exists > 0 THEN
+        RAISE EXCEPTION 'A pending join request already exists for this user and team';
+    END IF;
+
+    -- Insert the join request
+    INSERT INTO join_requests (team_id, user_id, request_status, requested_at)
+    VALUES (p_team_id, p_user_id, v_pending_status_id, NOW());
+
+    RAISE NOTICE 'Join request created successfully';
+
+    EXCEPTION
+        WHEN others THEN
+            RAISE EXCEPTION 'Error creating join request: %', SQLERRM;
+END;
+$$;

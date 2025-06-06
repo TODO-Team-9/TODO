@@ -1,9 +1,10 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from "vite";
 
 export default defineConfig({
-  root: './frontend',
+  root: "./frontend",
   build: {
-    outDir: '../public',
+    outDir: "../public",
     emptyOutDir: true,
-  }
+  },
+  envDir: "./frontend", // Look for .env files in the frontend directory
 });

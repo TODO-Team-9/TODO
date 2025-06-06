@@ -6,6 +6,10 @@ import LoginView from "./views/LoginView.js";
 import RegisterView from "./views/RegisterView.js";
 import RequestView from "./views/RequestView.js";
 import TeamStatsView from "./views/TeamStatsView.js";
+import TwoFactorSetupView from "./views/TwoFactorSetupView.js";
+import UserSettingsView from "./views/UserSettingsView.js";
+import ProfileView from "./views/ProfileView.js";
+import { AuthManager } from "./utils/auth.js";
 
 let currentView = null;
 
@@ -18,16 +22,18 @@ export const router = async () => {
   if (currentView && typeof currentView.cleanup === "function") {
     currentView.cleanup();
   }
-
   const routes = [
-    { path: "/", view: LoginView },
-    { path: "/register", view: RegisterView },
-    { path: "/home", view: HomeView },
-    { path: "/create/todo", view: CreateTodoView },
-    { path: "/create/team", view: CreateTeamView },
-    { path: "/team/join", view: JoinTeamView },
-    { path: "/team/report", view: TeamStatsView },
-    { path: "/requests", view: RequestView },
+    { path: "/", view: LoginView, requiresAuth: false },
+    { path: "/register", view: RegisterView, requiresAuth: false },
+    { path: "/setup-2fa", view: TwoFactorSetupView, requiresAuth: true },
+    { path: "/settings", view: UserSettingsView, requiresAuth: true },
+    { path: "/profile", view: ProfileView, requiresAuth: true },
+    { path: "/home", view: HomeView, requiresAuth: true },
+    { path: "/create/todo", view: CreateTodoView, requiresAuth: true },
+    { path: "/create/team", view: CreateTeamView, requiresAuth: true },
+    { path: "/team/join", view: JoinTeamView, requiresAuth: true },
+    { path: "/team/report", view: TeamStatsView, requiresAuth: true },
+    { path: "/requests", view: RequestView, requiresAuth: true },
   ];
 
   const pathToRegex = (path) =>
@@ -64,6 +70,26 @@ export const router = async () => {
     };
   }
 
+  // Check authentication
+  const isAuthenticated = AuthManager.isAuthenticated();
+  const route = currentRoute.route;
+
+  // Redirect unauthenticated users to login
+  if (route.requiresAuth && !isAuthenticated) {
+    navigator("/");
+    return;
+  }
+
+  // Redirect authenticated users away from login/register
+  if (
+    !route.requiresAuth &&
+    isAuthenticated &&
+    (route.path === "/" || route.path === "/register")
+  ) {
+    navigator("/home");
+    return;
+  }
+
   const view = new currentRoute.route.view(getParams(currentRoute));
   currentView = view;
 
@@ -75,7 +101,6 @@ export const router = async () => {
     view.mount();
   }
 };
-
 
 window.addEventListener("popstate", router);
 

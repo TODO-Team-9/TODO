@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { LookupService } from "../services/LookupService";
+import { LookupService } from "../services/lookup.service";
 import { HTTP_Status } from "../enums/HTTP_Status";
 
 const lookupService = new LookupService();

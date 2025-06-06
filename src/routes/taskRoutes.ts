@@ -1,8 +1,9 @@
 import express from 'express';
-import { assignTask, changeTaskStatus, getTasksForTeam, getTasksForUser } from '../controllers/TaskController';
+import { assignTask, changeTaskStatus, getTasksForTeam, getTasksForUser, createTask } from '../controllers/TaskController';
 
 const router = express.Router();
 
+router.post('/tasks', createTask);
 router.post('/tasks/:taskId/assign', assignTask);
 router.post('/tasks/:taskId/status', changeTaskStatus);
 router.get('/teams/:teamId/tasks', getTasksForTeam);

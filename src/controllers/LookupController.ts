@@ -61,7 +61,7 @@ export const getPriorities = async (
 };
 
 export const getRequestStatuses = async (
-  _req: Request,
+  _request: Request,
   response: Response
 ): Promise<void> => {
   try {

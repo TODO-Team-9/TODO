@@ -308,3 +308,18 @@ BEGIN
             RAISE EXCEPTION 'Error creating join request: %', SQLERRM;
 END;
 $$;
+
+CREATE OR REPLACE PROCEDURE delete_task(
+    p_task_id INT
+) LANGUAGE plpgsql AS $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM tasks WHERE task_id = p_task_id) THEN
+        RAISE EXCEPTION 'Task does not exist';
+    END IF;
+    DELETE FROM tasks WHERE task_id = p_task_id;
+    RAISE NOTICE 'Task deleted successfully';
+    EXCEPTION
+        WHEN others THEN
+            RAISE EXCEPTION 'Error deleting task: %', SQLERRM;
+END;
+$$;

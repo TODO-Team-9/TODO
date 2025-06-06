@@ -51,4 +51,10 @@ export class TaskService {
     if (!task) throw new Error('Task creation failed');
     return task;
   }
+
+  async deleteTask(taskId: number): Promise<void> {
+    await sql`
+      CALL delete_task(${taskId})
+    `;
+  }
 } 

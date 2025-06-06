@@ -66,4 +66,18 @@ export const getTasksForUser = async (request: Request, response: Response): Pro
   } catch (error: any) {
     response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
+};
+
+export const deleteTask = async (request: Request, response: Response): Promise<void> => {
+  try {
+    const { taskId } = request.params;
+    await taskService.deleteTask(Number(taskId));
+    response.status(HTTP_Status.NO_CONTENT).send();
+  } catch (error: any) {
+    if (error.message && error.message.includes('Task does not exist')) {
+      response.status(HTTP_Status.NOT_FOUND).json({ error: 'Task not found' });
+    } else {
+      response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    }
+  }
 }; 

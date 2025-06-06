@@ -40,7 +40,7 @@ export const getPriorities = async (_request: Request, response: Response): Prom
   }
 };
 
-export const getrequestuestStatuses = async (_req: Request, response: Response): Promise<void> => {
+export const getRequestStatuses = async (_req: Request, response: Response): Promise<void> => {
   try {
     const statuses = await lookupService.getRequestStatuses();
     response.status(HTTP_Status.OK).json(statuses);

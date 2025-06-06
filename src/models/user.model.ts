@@ -68,47 +68,34 @@ async function createUser(user: UserRegistration): Promise<User> {
   const twoFactorSecret = "";
 
   try {
-    const result = await sql`
+    const result = await sql<User[]>`
       INSERT INTO users (username, email_address, password_hash, two_factor_secret, system_role_id) 
       VALUES (${username}, ${emailAddress}, ${passwordHash}, ${twoFactorSecret}, ${SystemRoles.SYSTEM_USER}) 
       RETURNING *
     `;
-    return {
-      userId: result[0].user_id,
-      username: result[0].username,
-      emailAddress: result[0].email_address,
-      passwordHash: result[0].password_hash,
-      twoFactorSecret: result[0].two_factor_secret
-        ? decrypt(result[0].two_factor_secret)
-        : "",
-      systemRoleId: result[0].system_role_id,
-    };
+    return result[0];
   } catch (error) {
     console.error("Error creating user:", error);
     throw error;
   }
 }
 
+function processUserResult(user: User): User {
+  if (user.twoFactorSecret) {
+    user.twoFactorSecret = decrypt(user.twoFactorSecret);
+  }
+  return user;
+}
+
 async function findByUsername(username: string): Promise<User | null> {
   try {
-    const result = await sql`
+    const result = await sql<User[]>`
       SELECT user_id, username, email_address, password_hash, two_factor_secret, system_role_id, deactivated_at FROM users WHERE username = ${username}
     `;
-
-    if (!result || result.length === 0) {
-      return null;
+    if (result.length) {
+      return processUserResult(result[0]);
     }
-
-    return {
-      userId: result[0].userId,
-      username: result[0].username,
-      emailAddress: result[0].emailAddress,
-      passwordHash: result[0].passwordHash,
-      twoFactorSecret: result[0].twoFactorSecret
-        ? decrypt(result[0].twoFactorSecret)
-        : "",
-      systemRoleId: result[0].systemRoleId,
-    };
+    return null;
   } catch (error) {
     console.error("Error finding user by username:", error);
     throw error;
@@ -117,24 +104,13 @@ async function findByUsername(username: string): Promise<User | null> {
 
 async function findByEmail(email: string): Promise<User | null> {
   try {
-    const result = await sql`
+    const result = await sql<User[]>`
       SELECT user_id, username, email_address, password_hash, two_factor_secret, system_role_id, deactivated_at FROM users WHERE email_address = ${email}
     `;
-
-    if (!result || result.length === 0) {
-      return null;
+    if (result.length) {
+      return processUserResult(result[0]);
     }
-
-    return {
-      userId: result[0].userId,
-      username: result[0].username,
-      emailAddress: result[0].emailAddress,
-      passwordHash: result[0].passwordHash,
-      twoFactorSecret: result[0].twoFactorSecret
-        ? decrypt(result[0].twoFactorSecret)
-        : "",
-      systemRoleId: result[0].systemRoleId,
-    };
+    return null;
   } catch (error) {
     console.error("Error finding user by email:", error);
     throw error;
@@ -143,24 +119,13 @@ async function findByEmail(email: string): Promise<User | null> {
 
 async function findById(userId: number): Promise<User | null> {
   try {
-    const result = await sql`
+    const result = await sql<User[]>`
       SELECT user_id, username, email_address, password_hash, two_factor_secret, system_role_id, deactivated_at FROM users WHERE user_id = ${userId}
     `;
-
-    if (!result || result.length === 0) {
-      return null;
+    if (result.length) {
+      return processUserResult(result[0]);
     }
-
-    return {
-      userId: result[0].userId,
-      username: result[0].username,
-      emailAddress: result[0].emailAddress,
-      passwordHash: result[0].passwordHash,
-      twoFactorSecret: result[0].twoFactorSecret
-        ? decrypt(result[0].twoFactorSecret)
-        : "",
-      systemRoleId: result[0].systemRoleId,
-    };
+    return null;
   } catch (error) {
     console.error("Error finding user by ID:", error);
     throw error;

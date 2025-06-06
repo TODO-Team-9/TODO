@@ -1,4 +1,4 @@
-INSERT INTO statuses (statuses)
+INSERT INTO statuses (status_name)
 VALUES
     ('Backlog'),
     ('In Progress'),

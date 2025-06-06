@@ -213,6 +213,8 @@ CREATE OR REPLACE PROCEDURE change_task_status(
     p_task_id INT,
     p_status_id INT
 ) LANGUAGE plpgsql AS $$
+DECLARE
+    v_completed_status_id INT;
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM tasks WHERE task_id = p_task_id) THEN
         RAISE EXCEPTION 'Task does not exist';
@@ -220,7 +222,12 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM statuses WHERE status_id = p_status_id) THEN
         RAISE EXCEPTION 'Status does not exist';
     END IF;
-    UPDATE tasks SET status_id = p_status_id WHERE task_id = p_task_id;
+    SELECT status_id INTO v_completed_status_id FROM statuses WHERE status_name = 'Completed';
+    IF p_status_id = v_completed_status_id THEN
+        UPDATE tasks SET status_id = p_status_id, completed_at = NOW() WHERE task_id = p_task_id;
+    ELSE
+        UPDATE tasks SET status_id = p_status_id, completed_at = NULL WHERE task_id = p_task_id;
+    END IF;
     RAISE NOTICE 'Task status updated successfully';
 END;
 $$;

@@ -240,3 +240,40 @@ BEGIN
     RAISE NOTICE 'Join request updated successfully';
 END;
 $$;
+
+CREATE OR REPLACE PROCEDURE create_task(
+    p_task_name VARCHAR(32),
+    p_task_description VARCHAR(256) DEFAULT NULL,
+    p_team_id INT,
+    p_member_id INT DEFAULT NULL
+) LANGUAGE plpgsql AS $$
+DECLARE
+    v_status_id INT;
+    v_priority_id INT;
+BEGIN
+    -- Get the status_id for 'Backlog'
+    SELECT status_id INTO v_status_id FROM statuses WHERE status_name = 'Backlog';
+    IF v_status_id IS NULL THEN
+        RAISE EXCEPTION 'Default status "Backlog" does not exist';
+    END IF;
+
+    -- Get the priority_id for 'Low'
+    SELECT priority_id INTO v_priority_id FROM priorities WHERE priority_name = 'Low';
+    IF v_priority_id IS NULL THEN
+        RAISE EXCEPTION 'Default priority "Low" does not exist';
+    END IF;
+
+    -- Insert the new task
+    INSERT INTO tasks (
+        task_name, task_description, team_id, status_id, priority_id, member_id
+    ) VALUES (
+        p_task_name, p_task_description, p_team_id, v_status_id, v_priority_id, p_member_id
+    );
+
+    RAISE NOTICE 'Task created successfully';
+
+    EXCEPTION
+        WHEN others THEN
+            RAISE EXCEPTION 'Error creating task: %', SQLERRM;
+END;
+$$;

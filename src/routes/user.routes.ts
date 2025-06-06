@@ -4,6 +4,12 @@ import {
   isAccessAdministrator,
 } from "../middleware/auth.middleware";
 import UserModel from "../models/user.model";
+import {
+  createUser,
+  deactivateUser,
+  getUserById,
+  getAllUsers,
+} from "../controllers/user.controller";
 
 const router = Router();
 
@@ -35,5 +41,10 @@ router.get("/:id", authenticate, ((req, res) => {
       res.status(500).json({ error: "Failed to fetch user" });
     });
 }) as RequestHandler);
+
+router.post("/users", createUser);
+router.post("/users/:id/deactivate", deactivateUser);
+router.get("/users/:id", getUserById);
+router.get("/users", getAllUsers);
 
 export default router;

@@ -64,10 +64,35 @@ BEGIN
         t.created_at,
         t.completed_at
     FROM tasks t
-    JOIN teams tm ON t.team_id = tm.team_id
-    JOIN statuses s ON t.status_id = s.status_id
-    JOIN priorities p ON t.priority_id = p.priority_id
+    INNER JOIN teams tm ON t.team_id = tm.team_id
+    INNER JOIN statuses s ON t.status_id = s.status_id
+    INNER JOIN priorities p ON t.priority_id = p.priority_id
     LEFT JOIN members m ON t.member_id = m.member_id
     WHERE m.user_id = p_user_id AND m.removed_at IS NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_pending_join_requests_for_team(p_team_id INT)
+RETURNS TABLE (
+    request_id INT,
+    team_id INT,
+    user_id INT,
+    username VARCHAR(50),
+    request_status INT,
+    requested_at TIMESTAMPTZ
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        jr.request_id,
+        jr.team_id,
+        jr.user_id,
+        u.username,
+        jr.request_status,
+        jr.requested_at
+    FROM join_requests jr
+    JOIN request_statuses rs ON jr.request_status = rs.request_status_id
+    JOIN users u ON jr.user_id = u.user_id
+    WHERE jr.team_id = p_team_id AND rs.request_status_name = 'PENDING';
 END;
 $$ LANGUAGE plpgsql;

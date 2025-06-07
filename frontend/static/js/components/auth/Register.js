@@ -10,6 +10,8 @@ class RegisterForm extends LitElement {
     showTwoFactorSetup: { type: Boolean },
     twoFactorData: { type: Object },
     passwordMismatch: { type: Boolean },
+    tempUserData: { type: Object },
+    tempPassword: { type: String },
   };
   constructor() {
     super();
@@ -19,6 +21,8 @@ class RegisterForm extends LitElement {
     this.showTwoFactorSetup = false;
     this.twoFactorData = null;
     this.passwordMismatch = false;
+    this.tempUserData = null;
+    this.tempPassword = "";
   }
   static styles = css`
     :host {
@@ -134,6 +138,8 @@ class RegisterForm extends LitElement {
           .qrCodeDataURL=${this.twoFactorData?.qrCodeDataURL}
           .secret=${this.twoFactorData?.secret}
           .isRegistrationFlow=${true}
+          .tempUserData=${this.tempUserData}
+          .tempPassword=${this.tempPassword}
         >
         </two-factor-setup>
       `;
@@ -242,14 +248,13 @@ class RegisterForm extends LitElement {
       });
 
       const data = await response.json();
-
       if (response.ok) {
         // Store user data temporarily and show 2FA setup
         this.twoFactorData = data.twoFactor;
 
-        // Store the user data and password temporarily (for 2FA completion)
-        localStorage.setItem("tempUser", JSON.stringify(data.user));
-        localStorage.setItem("tempPassword", password);
+        // Store the user data and password temporarily (in component state, not localStorage)
+        this.tempUserData = data.user;
+        this.tempPassword = password;
 
         this.showTwoFactorSetup = true;
         this.successMessage =

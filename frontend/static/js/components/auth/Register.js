@@ -9,8 +9,8 @@ class RegisterForm extends LitElement {
     successMessage: { type: String },
     showTwoFactorSetup: { type: Boolean },
     twoFactorData: { type: Object },
+    passwordMismatch: { type: Boolean },
   };
-
   constructor() {
     super();
     this.loading = false;
@@ -18,6 +18,7 @@ class RegisterForm extends LitElement {
     this.successMessage = "";
     this.showTwoFactorSetup = false;
     this.twoFactorData = null;
+    this.passwordMismatch = false;
   }
   static styles = css`
     :host {
@@ -43,12 +44,23 @@ class RegisterForm extends LitElement {
       flex-direction: column;
       gap: 1rem;
     }
-
     input {
       padding: 0.75rem;
       font-size: 12pt;
       border-radius: 4px;
       border: 1px solid #ccc;
+    }
+
+    input.password-mismatch {
+      border-color: #d32f2f;
+      background-color: #ffebee;
+    }
+
+    .password-error {
+      color: #d32f2f;
+      font-size: 10pt;
+      margin-top: -0.5rem;
+      margin-bottom: 0.5rem;
     }
 
     button {
@@ -159,7 +171,20 @@ class RegisterForm extends LitElement {
           placeholder="Password"
           required
           ?disabled=${this.loading}
+          @input=${this.validatePasswords}
         />
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          required
+          ?disabled=${this.loading}
+          class=${this.passwordMismatch ? "password-mismatch" : ""}
+          @input=${this.validatePasswords}
+        />
+        ${this.passwordMismatch
+          ? html`<div class="password-error">Passwords do not match</div>`
+          : ""}
         <button type="submit" ?disabled=${this.loading}>
           ${this.loading ? "Creating account..." : "Register"}
         </button>
@@ -170,6 +195,20 @@ class RegisterForm extends LitElement {
     `;
   }
 
+  validatePasswords() {
+    const password = this.shadowRoot.querySelector(
+      'input[name="password"]'
+    ).value;
+    const confirmPassword = this.shadowRoot.querySelector(
+      'input[name="confirmPassword"]'
+    ).value;
+
+    if (confirmPassword && password !== confirmPassword) {
+      this.passwordMismatch = true;
+    } else {
+      this.passwordMismatch = false;
+    }
+  }
   async handleRegister(e) {
     e.preventDefault();
     this.loading = true;
@@ -180,6 +219,15 @@ class RegisterForm extends LitElement {
     const username = formData.get("username");
     const emailAddress = formData.get("emailAddress");
     const password = formData.get("password");
+    const confirmPassword = formData.get("confirmPassword");
+
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      this.errorMessage = "Passwords do not match";
+      this.passwordMismatch = true;
+      this.loading = false;
+      return;
+    }
     try {
       const response = await fetch(getApiUrl("api/auth/register"), {
         method: "POST",

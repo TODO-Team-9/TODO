@@ -1,7 +1,6 @@
 import bcrypt from "bcrypt";
-import { User, UserRegistration } from '../models/User';
+import { User, UserRegistration } from "../models/User";
 import { SALT_ROUNDS } from "../constants/bcrypt.constants";
-import { Role } from "../enums/Role";
 import sql from "../config/db";
 import { EncryptionService } from "./encryption.service";
 
@@ -35,12 +34,12 @@ export class UserService {
     const twoFactorSecret = "";
 
     try {
-      const result = await sql<User[]>`
-        INSERT INTO users (username, email_address, password_hash, two_factor_secret, system_role_id) 
-        VALUES (${username}, ${emailAddress}, ${passwordHash}, ${twoFactorSecret}, ${Role.System.SYSTEM_USER}) 
-        RETURNING *
-      `;
-      return this.processUserResult(result[0]);
+      await sql`CALL add_user(${username}, ${emailAddress}, ${passwordHash}, ${twoFactorSecret})`;
+      const user = await this.findByUsername(username);
+      if (!user) {
+        throw new Error("Failed to retrieve created user");
+      }
+      return user;
     } catch (error) {
       console.error("Error creating user:", error);
       throw error;
@@ -113,10 +112,10 @@ export class UserService {
         SELECT user_id, username, email_address, password_hash, two_factor_secret, system_role_id, deactivated_at 
         FROM users
       `;
-      return users.map(user => this.processUserResult(user));
+      return users.map((user) => this.processUserResult(user));
     } catch (error) {
       console.error("Error getting all users:", error);
       throw error;
     }
   }
-} 
+}

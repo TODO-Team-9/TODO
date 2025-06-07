@@ -1,14 +1,14 @@
-import sql from '../db';
-import { Member } from '../models/Member';
+import sql from "../config/db";
+import { Member } from "../models/Member";
 
 export class MemberService {
   async addMember(userId: number, teamId: number): Promise<Member> {
     // Input validation
     if (!userId || isNaN(userId) || userId <= 0) {
-      throw new Error('Invalid user ID');
+      throw new Error("Invalid user ID");
     }
     if (!teamId || isNaN(teamId) || teamId <= 0) {
-      throw new Error('Invalid team ID');
+      throw new Error("Invalid team ID");
     }
 
     // Call add_member stored procedure
@@ -26,7 +26,7 @@ export class MemberService {
     `;
 
     if (!member) {
-      throw new Error('Member creation failed');
+      throw new Error("Member creation failed");
     }
 
     return member;
@@ -35,10 +35,10 @@ export class MemberService {
   async removeMember(userId: number, teamId: number): Promise<void> {
     // Input validation
     if (!userId || isNaN(userId) || userId <= 0) {
-      throw new Error('Invalid user ID');
+      throw new Error("Invalid user ID");
     }
     if (!teamId || isNaN(teamId) || teamId <= 0) {
-      throw new Error('Invalid team ID');
+      throw new Error("Invalid team ID");
     }
 
     // Call remove_member stored procedure
@@ -50,10 +50,10 @@ export class MemberService {
   async promoteMember(memberId: number, teamId: number): Promise<void> {
     // Input validation
     if (!memberId || isNaN(memberId) || memberId <= 0) {
-      throw new Error('Invalid member ID');
+      throw new Error("Invalid member ID");
     }
     if (!teamId || isNaN(teamId) || teamId <= 0) {
-      throw new Error('Invalid team ID');
+      throw new Error("Invalid team ID");
     }
 
     // Call promote_member stored procedure with team context
@@ -62,10 +62,12 @@ export class MemberService {
     `;
   }
 
-  async getTeamMembers(teamId: number): Promise<(Member & { username: string })[]> {
+  async getTeamMembers(
+    teamId: number
+  ): Promise<(Member & { username: string })[]> {
     // Input validation
     if (!teamId || isNaN(teamId) || teamId <= 0) {
-      throw new Error('Invalid team ID');
+      throw new Error("Invalid team ID");
     }
 
     // Query team_members_usernames view
@@ -80,4 +82,4 @@ export class MemberService {
 
     return members;
   }
-} 
+}

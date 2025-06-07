@@ -1,19 +1,24 @@
 import { Request, Response, NextFunction } from "express";
+import { HTTP_Status } from "../enums/HTTP_Status";
 
-const corsMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
+const corsMiddleware = (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
+  response.header("Access-Control-Allow-Origin", "*");
+  response.header(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, OPTIONS, PATCH"
   );
-  res.header(
+  response.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
   );
-  res.header("Access-Control-Allow-Credentials", "true");
+  response.header("Access-Control-Allow-Credentials", "true");
 
-  if (req.method === "OPTIONS") {
-    res.sendStatus(200);
+  if (request.method === "OPTIONS") {
+    response.sendStatus(HTTP_Status.OK);
   } else {
     next();
   }

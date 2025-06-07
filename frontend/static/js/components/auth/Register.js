@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { getApiUrl } from "../../utils/config.js";
+import { validatePassword, passwordRules } from "../../utils/password.js";
 import "./TwoFactorSetup.js";
 
 class RegisterForm extends LitElement {
@@ -12,6 +13,8 @@ class RegisterForm extends LitElement {
     passwordMismatch: { type: Boolean },
     tempUserData: { type: Object },
     tempPassword: { type: String },
+    passwordValidationErrors: { type: Array },
+    showPasswordRequirements: { type: Boolean },
   };
   constructor() {
     super();
@@ -23,6 +26,8 @@ class RegisterForm extends LitElement {
     this.passwordMismatch = false;
     this.tempUserData = null;
     this.tempPassword = "";
+    this.passwordValidationErrors = [];
+    this.showPasswordRequirements = false;
   }
   static styles = css`
     :host {
@@ -54,10 +59,19 @@ class RegisterForm extends LitElement {
       border-radius: 4px;
       border: 1px solid #ccc;
     }
-
     input.password-mismatch {
       border-color: #d32f2f;
       background-color: #ffebee;
+    }
+
+    input.password-invalid {
+      border-color: #d32f2f;
+      background-color: #ffebee;
+    }
+
+    input.password-valid {
+      border-color: #2e7d32;
+      background-color: #e8f5e8;
     }
 
     .password-error {
@@ -65,6 +79,45 @@ class RegisterForm extends LitElement {
       font-size: 10pt;
       margin-top: -0.5rem;
       margin-bottom: 0.5rem;
+    }
+
+    .password-requirements {
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+      font-size: 10pt;
+    }
+
+    .password-requirements h4 {
+      margin: 0 0 0.5rem 0;
+      color: #333;
+      font-size: 11pt;
+    }
+
+    .password-requirements ul {
+      margin: 0;
+      padding-left: 1rem;
+      list-style: none;
+    }
+
+    .password-requirements li {
+      margin: 0.25rem 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-requirements .check {
+      color: #2e7d32;
+      margin-right: 0.5rem;
+      font-weight: bold;
+    }
+
+    .password-requirements .cross {
+      color: #d32f2f;
+      margin-right: 0.5rem;
+      font-weight: bold;
     }
 
     button {
@@ -177,8 +230,15 @@ class RegisterForm extends LitElement {
           placeholder="Password"
           required
           ?disabled=${this.loading}
+          class=${this.getPasswordInputClass()}
           @input=${this.validatePasswords}
+          @focus=${() => (this.showPasswordRequirements = true)}
+          @blur=${() => (this.showPasswordRequirements = false)}
         />
+        ${this.showPasswordRequirements ||
+        this.passwordValidationErrors.length > 0
+          ? this.renderPasswordRequirements()
+          : ""}
         <input
           type="password"
           name="confirmPassword"
@@ -200,7 +260,6 @@ class RegisterForm extends LitElement {
       </article>
     `;
   }
-
   validatePasswords() {
     const password = this.shadowRoot.querySelector(
       'input[name="password"]'
@@ -209,11 +268,47 @@ class RegisterForm extends LitElement {
       'input[name="confirmPassword"]'
     ).value;
 
+    // Validate password complexity
+    const passwordValidation = validatePassword(password);
+    this.passwordValidationErrors = passwordValidation.errors;
+
+    // Check if passwords match
     if (confirmPassword && password !== confirmPassword) {
       this.passwordMismatch = true;
     } else {
       this.passwordMismatch = false;
     }
+  }
+
+  getPasswordInputClass() {
+    const password =
+      this.shadowRoot?.querySelector('input[name="password"]')?.value || "";
+    if (!password) return "";
+
+    const validation = validatePassword(password);
+    return validation.isValid ? "password-valid" : "password-invalid";
+  }
+  renderPasswordRequirements() {
+    const password =
+      this.shadowRoot?.querySelector('input[name="password"]')?.value || "";
+
+    return html`
+      <div class="password-requirements">
+        <h4>Password Requirements:</h4>
+        <ul>
+          ${passwordRules.map(
+            (rule) => html`
+              <li>
+                <span class=${rule.test(password) ? "check" : "cross"}>
+                  ${rule.test(password) ? "✓" : "✗"}
+                </span>
+                ${rule.text}
+              </li>
+            `
+          )}
+        </ul>
+      </div>
+    `;
   }
   async handleRegister(e) {
     e.preventDefault();
@@ -225,12 +320,20 @@ class RegisterForm extends LitElement {
     const username = formData.get("username");
     const emailAddress = formData.get("emailAddress");
     const password = formData.get("password");
-    const confirmPassword = formData.get("confirmPassword");
-
-    // Validate passwords match
+    const confirmPassword = formData.get("confirmPassword"); // Validate passwords match
     if (password !== confirmPassword) {
       this.errorMessage = "Passwords do not match";
       this.passwordMismatch = true;
+      this.loading = false;
+      return;
+    }
+
+    // Validate password complexity
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      this.errorMessage =
+        "Password does not meet complexity requirements:\n" +
+        passwordValidation.errors.join("\n");
       this.loading = false;
       return;
     }

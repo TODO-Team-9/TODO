@@ -99,11 +99,12 @@ export class UserService {
   }
 
   async deactivateUser(userId: number): Promise<void> {
-    await sql`
-      UPDATE users 
-      SET deactivated_at = CURRENT_TIMESTAMP 
-      WHERE user_id = ${userId}
-    `;
+    try {
+      await sql`CALL deactivate_user(${userId})`;
+    } catch (error: any) {
+      console.error("Error deactivating user:", error);
+      throw error;
+    }
   }
 
   async getAllUsers(): Promise<User[]> {

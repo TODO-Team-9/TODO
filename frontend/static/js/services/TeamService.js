@@ -1,8 +1,20 @@
 import apiService from './ApiRequestService.js';
 
 class TeamService {
-    async getAllCategories(page = 1, limit = 4) {
-        return apiService.get(`/api/categories/list?page=${page}&limit=${limit}`);
+    async createTeam() {
+        return apiService.post();
+    }
+
+    async getTeamMembers() {
+        return apiService.get();
+    }
+
+    async assignTeamMember() {
+        return apiService.get();
+    }
+
+    async getTeamTodos() {
+        return apiService.get();
     }
 }
 

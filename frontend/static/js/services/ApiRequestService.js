@@ -3,17 +3,11 @@ import authService from './AuthService.js';
 class ApiService {
     async request(url, options = {}) {
         try {
-            if (authService.isAuthenticated()) {
-                options.headers = {
-                    ...options.headers,
-                    ...authService.getAuthHeaders()
-                };
-            } else if (!options.headers) {
-                options.headers = {
-                    'Content-Type': 'application/json'
-                };
-            }
-            
+            // need to add auth header
+            options.headers = {
+                'Content-Type': 'application/json'
+            };
+
             const response = await fetch(url, options);
             
             if (response.status === 401 && authService.isAuthenticated()) {

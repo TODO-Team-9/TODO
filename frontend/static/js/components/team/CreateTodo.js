@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit';
 
 import "./Header.js";
+import  todoService  from '../../services/TodoService.js';
 
 class CreateTodo extends LitElement {
   static styles = css`
@@ -65,6 +66,18 @@ class CreateTodo extends LitElement {
 
   handleSubmit(e) {
     e.preventDefault();
+    const form = e.target;
+    const todo = {
+      taskName: form.title.value.trim(),
+      taskDescription: form.description.value.trim(),
+      memberId: 1, // TODO: map name to ID.
+      teamId: 1, // TODO logic to get current team ID
+      priority: form.priority.value,
+    };
+    
+    todoService.createTodo(todo);
+    alert('Todo Created');
+    // form.reset();
   }
 
   render() {

@@ -6,4 +6,10 @@ export interface User {
   twoFactorSecret: string;
   systemRoleId: number;
   deactivatedAt: string | null; // ISO timestamp or null
+}
+
+export interface UserRegistration {
+  username: string;
+  emailAddress: string;
+  password: string;
 } 

@@ -1,23 +1,121 @@
-import { User } from '../models/User';
+import bcrypt from "bcrypt";
+import { User, UserRegistration } from '../models/User';
+import { SALT_ROUNDS } from "../constants/bcrypt.constants";
+import { SystemRoles } from "../constants/db.constants";
+import sql from "../config/db";
+import { EncryptionService } from "./encryption.service";
 
 export class UserService {
-  async createUser(/* params */): Promise<User> {
-    // TODO: Call add_user stored procedure
-    throw new Error('Not implemented');
+  private validatePepper(): void {
+    if (!process.env.PEPPER) {
+      throw new Error("PEPPER environment variable is not set.");
+    }
+  }
+
+  private async hashPassword(password: string): Promise<string> {
+    this.validatePepper();
+    return await bcrypt.hash(password + process.env.PEPPER, SALT_ROUNDS);
+  }
+
+  async verifyPassword(password: string, hash: string): Promise<boolean> {
+    this.validatePepper();
+    return await bcrypt.compare(password + process.env.PEPPER, hash);
+  }
+
+  private processUserResult(user: User): User {
+    if (user.twoFactorSecret) {
+      user.twoFactorSecret = EncryptionService.decrypt(user.twoFactorSecret);
+    }
+    return user;
+  }
+
+  async createUser(userData: UserRegistration): Promise<User> {
+    const { username, emailAddress, password } = userData;
+    const passwordHash = await this.hashPassword(password);
+    const twoFactorSecret = "";
+
+    try {
+      const result = await sql<User[]>`
+        INSERT INTO users (username, email_address, password_hash, two_factor_secret, system_role_id) 
+        VALUES (${username}, ${emailAddress}, ${passwordHash}, ${twoFactorSecret}, ${SystemRoles.SYSTEM_USER}) 
+        RETURNING *
+      `;
+      return this.processUserResult(result[0]);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      throw error;
+    }
+  }
+
+  async findByUsername(username: string): Promise<User | null> {
+    try {
+      const result = await sql<User[]>`
+        SELECT user_id, username, email_address, password_hash, two_factor_secret, system_role_id, deactivated_at 
+        FROM users 
+        WHERE username = ${username}
+      `;
+      return result.length ? this.processUserResult(result[0]) : null;
+    } catch (error) {
+      console.error("Error finding user by username:", error);
+      throw error;
+    }
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    try {
+      const result = await sql<User[]>`
+        SELECT user_id, username, email_address, password_hash, two_factor_secret, system_role_id, deactivated_at 
+        FROM users 
+        WHERE email_address = ${email}
+      `;
+      return result.length ? this.processUserResult(result[0]) : null;
+    } catch (error) {
+      console.error("Error finding user by email:", error);
+      throw error;
+    }
+  }
+
+  async findById(userId: number): Promise<User | null> {
+    try {
+      const result = await sql<User[]>`
+        SELECT user_id, username, email_address, password_hash, two_factor_secret, system_role_id, deactivated_at 
+        FROM users 
+        WHERE user_id = ${userId}
+      `;
+      return result.length ? this.processUserResult(result[0]) : null;
+    } catch (error) {
+      console.error("Error finding user by ID:", error);
+      throw error;
+    }
+  }
+
+  async setTwoFactorSecret(userId: number, secret: string): Promise<void> {
+    const encryptedSecret = EncryptionService.encrypt(secret);
+    await sql`
+      UPDATE users 
+      SET two_factor_secret = ${encryptedSecret} 
+      WHERE user_id = ${userId}
+    `;
   }
 
   async deactivateUser(userId: number): Promise<void> {
-    // TODO: Call deactivate_user stored procedure
-    throw new Error('Not implemented');
-  }
-
-  async getUserById(userId: number): Promise<User | null> {
-    // TODO: Query users table
-    throw new Error('Not implemented');
+    await sql`
+      UPDATE users 
+      SET deactivated_at = CURRENT_TIMESTAMP 
+      WHERE user_id = ${userId}
+    `;
   }
 
   async getAllUsers(): Promise<User[]> {
-    // TODO: Query users table
-    throw new Error('Not implemented');
+    try {
+      const users = await sql<User[]>`
+        SELECT user_id, username, email_address, password_hash, two_factor_secret, system_role_id, deactivated_at 
+        FROM users
+      `;
+      return users.map(user => this.processUserResult(user));
+    } catch (error) {
+      console.error("Error getting all users:", error);
+      throw error;
+    }
   }
 } 

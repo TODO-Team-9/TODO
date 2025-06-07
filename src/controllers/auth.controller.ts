@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import UserModel, { UserRegistration } from "../models/user.model";
 import { generateTOTPSecret, verifyTOTPToken } from "../services/totp.service";
+import { validatePassword } from "../utils/password.utils";
 
 export async function register(req: Request, res: Response): Promise<void> {
   try {
@@ -9,6 +10,16 @@ export async function register(req: Request, res: Response): Promise<void> {
 
     if (!username || !emailAddress || !password) {
       res.status(400).json({ error: "All fields are required" });
+      return;
+    }
+
+    // Validate password complexity
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      res.status(400).json({
+        error: "Password does not meet complexity requirements",
+        details: passwordValidation.errors,
+      });
       return;
     }
 

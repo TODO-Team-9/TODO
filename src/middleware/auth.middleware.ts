@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { SystemRoles } from "../constants/db.constants";
+import { Role } from "../enums/Role";
 
 interface JwtPayload {
   userId: number;
@@ -66,7 +66,7 @@ export const isAccessAdministrator = (
     return;
   }
 
-  if (req.user.role !== SystemRoles.ACCESS_ADMINISTATOR) {
+  if (req.user.role !== Role.System.ACCESS_ADMINISTRATOR) {
     res.status(403).json({ error: "Access denied: Admin privileges required" });
     return;
   }

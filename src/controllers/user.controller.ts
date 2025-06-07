@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/user.service";
 import { HTTP_Status } from "../enums/HTTP_Status";
-import { SystemRoles } from "../constants/db.constants";
+import { Role } from "../enums/Role";
 
 const userService = new UserService();
 
@@ -43,7 +43,7 @@ export async function deactivateUser(req: Request, res: Response): Promise<void>
   try {
     const userId = parseInt(req.params.id, 10);
     
-    if (req.user?.role !== SystemRoles.ACCESS_ADMINISTATOR) {
+    if (req.user?.role !== Role.System.ACCESS_ADMINISTRATOR) {
       res.status(HTTP_Status.FORBIDDEN).json({ error: "Access denied" });
       return;
     }
@@ -66,7 +66,7 @@ export async function getUserById(req: Request, res: Response): Promise<void> {
   try {
     const userId = parseInt(req.params.id, 10);
 
-    if (req.user?.userId !== userId && req.user?.role !== SystemRoles.ACCESS_ADMINISTATOR) {
+    if (req.user?.userId !== userId && req.user?.role !== Role.System.ACCESS_ADMINISTRATOR) {
       res.status(HTTP_Status.FORBIDDEN).json({ error: "Access denied" });
       return;
     }
@@ -87,7 +87,7 @@ export async function getUserById(req: Request, res: Response): Promise<void> {
 
 export async function getAllUsers(req: Request, res: Response): Promise<void> {
   try {
-    if (req.user?.role !== SystemRoles.ACCESS_ADMINISTATOR) {
+    if (req.user?.role !== Role.System.ACCESS_ADMINISTRATOR) {
       res.status(HTTP_Status.FORBIDDEN).json({ error: "Access denied" });
       return;
     }

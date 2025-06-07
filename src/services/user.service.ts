@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { User, UserRegistration } from '../models/User';
 import { SALT_ROUNDS } from "../constants/bcrypt.constants";
-import { SystemRoles } from "../constants/db.constants";
+import { Role } from "../enums/Role";
 import sql from "../config/db";
 import { EncryptionService } from "./encryption.service";
 
@@ -37,7 +37,7 @@ export class UserService {
     try {
       const result = await sql<User[]>`
         INSERT INTO users (username, email_address, password_hash, two_factor_secret, system_role_id) 
-        VALUES (${username}, ${emailAddress}, ${passwordHash}, ${twoFactorSecret}, ${SystemRoles.SYSTEM_USER}) 
+        VALUES (${username}, ${emailAddress}, ${passwordHash}, ${twoFactorSecret}, ${Role.System.SYSTEM_USER}) 
         RETURNING *
       `;
       return this.processUserResult(result[0]);

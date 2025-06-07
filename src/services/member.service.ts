@@ -1,23 +1,80 @@
+import sql from '../db';
 import { Member } from '../models/Member';
 
 export class MemberService {
-  async addMember(/* params */): Promise<Member> {
-    // TODO: Call add_member stored procedure
-    throw new Error('Not implemented');
+  async addMember(userId: number, teamId: number): Promise<Member> {
+    // Input validation
+    if (!userId || isNaN(userId) || userId <= 0) {
+      throw new Error('Invalid user ID');
+    }
+    if (!teamId || isNaN(teamId) || teamId <= 0) {
+      throw new Error('Invalid team ID');
+    }
+
+    // Call add_member stored procedure
+    await sql`
+      CALL add_member(${userId}, ${teamId})
+    `;
+
+    // Retrieve the newly created member
+    const [member] = await sql<Member[]>`
+      SELECT * FROM members 
+      WHERE user_id = ${userId} AND team_id = ${teamId}
+      AND removed_at IS NULL
+      ORDER BY member_id DESC 
+      LIMIT 1
+    `;
+
+    if (!member) {
+      throw new Error('Member creation failed');
+    }
+
+    return member;
   }
 
   async removeMember(userId: number, teamId: number): Promise<void> {
-    // TODO: Call remove_member stored procedure
-    throw new Error('Not implemented');
+    // Input validation
+    if (!userId || isNaN(userId) || userId <= 0) {
+      throw new Error('Invalid user ID');
+    }
+    if (!teamId || isNaN(teamId) || teamId <= 0) {
+      throw new Error('Invalid team ID');
+    }
+
+    // Call remove_member stored procedure
+    await sql`
+      CALL remove_member(${userId}, ${teamId})
+    `;
   }
 
   async promoteMember(memberId: number): Promise<void> {
-    // TODO: Call promote_member stored procedure
-    throw new Error('Not implemented');
+    // Input validation
+    if (!memberId || isNaN(memberId) || memberId <= 0) {
+      throw new Error('Invalid member ID');
+    }
+
+    // Call promote_member stored procedure
+    await sql`
+      CALL promote_member(${memberId})
+    `;
   }
 
-  async getTeamMembers(teamId: number): Promise<Member[]> {
-    // TODO: Query team_members_usernames view
-    throw new Error('Not implemented');
+  async getTeamMembers(teamId: number): Promise<(Member & { username: string })[]> {
+    // Input validation
+    if (!teamId || isNaN(teamId) || teamId <= 0) {
+      throw new Error('Invalid team ID');
+    }
+
+    // Query team_members_usernames view
+    const members = await sql<(Member & { username: string })[]>`
+      SELECT m.*, u.username
+      FROM members m
+      JOIN users u ON m.user_id = u.user_id
+      WHERE m.team_id = ${teamId}
+      AND m.removed_at IS NULL
+      ORDER BY m.member_id
+    `;
+
+    return members;
   }
 } 

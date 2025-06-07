@@ -47,15 +47,18 @@ export class MemberService {
     `;
   }
 
-  async promoteMember(memberId: number): Promise<void> {
+  async promoteMember(memberId: number, teamId: number): Promise<void> {
     // Input validation
     if (!memberId || isNaN(memberId) || memberId <= 0) {
       throw new Error('Invalid member ID');
     }
+    if (!teamId || isNaN(teamId) || teamId <= 0) {
+      throw new Error('Invalid team ID');
+    }
 
-    // Call promote_member stored procedure
+    // Call promote_member stored procedure with team context
     await sql`
-      CALL promote_member(${memberId})
+      CALL promote_member(${memberId}, ${teamId})
     `;
   }
 

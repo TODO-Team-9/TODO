@@ -78,17 +78,17 @@ export const removeMember = async (req: Request, res: Response): Promise<void> =
 
 export const promoteMember = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { memberId } = req.params;
+    const { memberId, teamId } = req.params;
 
     // Input validation
-    if (!memberId) {
+    if (!memberId || !teamId) {
       res.status(HTTP_Status.BAD_REQUEST).json({ 
-        error: "Member ID is required" 
+        error: "Member ID and team ID are required" 
       });
       return;
     }
 
-    await memberService.promoteMember(Number(memberId));
+    await memberService.promoteMember(Number(memberId), Number(teamId));
     res.status(HTTP_Status.OK).json({ 
       message: "Member promoted successfully" 
     });
@@ -96,8 +96,10 @@ export const promoteMember = async (req: Request, res: Response): Promise<void> 
     // Handle specific validation errors
     if (error.message && (
       error.message.includes("Invalid member ID") ||
-      error.message.includes("Member does not exist") ||
-      error.message.includes("already been promoted")
+      error.message.includes("Invalid team ID") ||
+      error.message.includes("Member does not exist in the specified team") ||
+      error.message.includes("already been promoted") ||
+      error.message.includes("has been removed")
     )) {
       res.status(HTTP_Status.BAD_REQUEST).json({ error: error.message });
       return;

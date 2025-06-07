@@ -1,6 +1,18 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html, css } from "lit";
+import { getApiUrl } from "../../utils/config.js";
+import "./TwoFactorVerification.js";
 
 class LoginForm extends LitElement {
+  static properties = {
+    loading: { type: Boolean },
+    errorMessage: { type: String },
+  };
+
+  constructor() {
+    super();
+    this.loading = false;
+    this.errorMessage = "";
+  }
   static styles = css`
     :host {
       display: block;
@@ -58,29 +70,106 @@ class LoginForm extends LitElement {
       font-weight: bold;
       text-decoration: none;
     }
-
     .helper a:hover {
       text-decoration: underline;
     }
-  `;
 
+    .error {
+      color: #d32f2f;
+      background-color: #ffebee;
+      padding: 0.75rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      text-align: center;
+      font-size: 11pt;
+    }
+
+    .loading {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  `;
   render() {
     return html`
       <h2>Login</h2>
-      <form @submit=${this.handleLogin}>
-        <input type="email" placeholder="Email" required />
-        <input type="password" placeholder="Password" required />
-        <button type="submit">Login</button>
+      ${this.errorMessage
+        ? html`<div class="error">${this.errorMessage}</div>`
+        : ""}
+      <form @submit=${this.handleLogin} class=${this.loading ? "loading" : ""}>
+        <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          required
+          ?disabled=${this.loading}
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+          ?disabled=${this.loading}
+        />
+        <button type="submit" ?disabled=${this.loading}>
+          ${this.loading ? "Signing in..." : "Login"}
+        </button>
       </form>
       <article class="helper">
         Don't have an account? <a href="/register">Register</a>
       </article>
     `;
   }
+  async handleLogin(e) {
+    e.preventDefault();
+    this.loading = true;
+    this.errorMessage = "";
 
-  handleLogin(e) {
-    console.log("Login")
+    const formData = new FormData(e.target);
+    const username = formData.get("username");
+    const password = formData.get("password");
+    try {
+      const response = await fetch(getApiUrl("api/auth/login"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        window.location.href = "/home";
+      } else if (data.error === "TOTP token required") {
+        const twoFactorVerification = document.createElement(
+          "two-factor-verification"
+        );
+        twoFactorVerification.username = username;
+        twoFactorVerification.password = password;
+
+        const app = document.querySelector("#app");
+        app.replaceChildren(twoFactorVerification);
+      } else {
+        this.errorMessage = data.error || "Login failed";
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      this.errorMessage = "Network error. Please try again.";
+    } finally {
+      this.loading = false;
+    }
   }
 }
 
-customElements.define('login-form', LoginForm);
+customElements.define("login-form", LoginForm);

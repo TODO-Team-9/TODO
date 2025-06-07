@@ -2,18 +2,24 @@ import express from "express";
 import path from "path";
 import dotenv from "dotenv";
 
-import apiRouter from "./routes/apiRouter";
+dotenv.config({ path: path.join(__dirname, "../.env") });
 
-dotenv.config();
+import authRoutes from "./routes/auth.routes";
+import userRoutes from "./routes/user.routes";
+import corsMiddleware from "./middleware/cors.middleware";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT ?? 3000;
+
+// CORS middleware
+app.use(corsMiddleware);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/", express.static(path.join(__dirname, "../public")));
 
-app.use("/api", apiRouter);
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 
 app.get("/{*any}", (_request, response) => {
   response.sendFile(path.join(__dirname, "../public/index.html"));

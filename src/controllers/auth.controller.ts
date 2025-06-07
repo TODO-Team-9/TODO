@@ -2,36 +2,60 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { UserService } from "../services/user.service";
 import { generateTOTPSecret, verifyTOTPToken } from "../services/totp.service";
+import { validatePassword } from "../utils/password.utils";
 import { HTTP_Status } from "../enums/HTTP_Status";
 
 const userService = new UserService();
 
-export async function register(req: Request, res: Response): Promise<void> {
+export async function register(
+  request: Request,
+  response: Response
+): Promise<void> {
   try {
-    const { username, emailAddress, password } = req.body;
+    const { username, emailAddress, password } = request.body;
 
     if (!username || !emailAddress || !password) {
-      res.status(HTTP_Status.BAD_REQUEST).json({ error: "All fields are required" });
+      response
+        .status(HTTP_Status.BAD_REQUEST)
+        .json({ error: "All fields are required" });
+      return;
+    }
+
+    // Validate password complexity
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      response.status(HTTP_Status.BAD_REQUEST).json({
+        error: "Password does not meet complexity requirements",
+        details: passwordValidation.errors,
+      });
       return;
     }
 
     const existingUsername = await userService.findByUsername(username);
     if (existingUsername) {
-      res.status(HTTP_Status.CONFLICT).json({ error: "Username already exists" });
+      response
+        .status(HTTP_Status.CONFLICT)
+        .json({ error: "Username already exists" });
       return;
     }
 
     const existingEmail = await userService.findByEmail(emailAddress);
     if (existingEmail) {
-      res.status(HTTP_Status.CONFLICT).json({ error: "Email already exists" });
+      response
+        .status(HTTP_Status.CONFLICT)
+        .json({ error: "Email already exists" });
       return;
     }
 
-    const newUser = await userService.createUser({ username, emailAddress, password });
+    const newUser = await userService.createUser({
+      username,
+      emailAddress,
+      password,
+    });
     const totp = await generateTOTPSecret(newUser.username);
     const { passwordHash, ...userWithoutSensitiveData } = newUser;
 
-    res.status(HTTP_Status.CREATED).json({
+    response.status(HTTP_Status.CREATED).json({
       message: "User registered successfully",
       user: userWithoutSensitiveData,
       twoFactor: {
@@ -41,46 +65,66 @@ export async function register(req: Request, res: Response): Promise<void> {
     });
   } catch (error) {
     console.error("Registration error:", error);
-    res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: "Failed to register user" });
+    response
+      .status(HTTP_Status.INTERNAL_SERVER_ERROR)
+      .json({ error: "Failed to register user" });
   }
 }
 
-export async function login(req: Request, res: Response): Promise<void> {
+export async function login(
+  request: Request,
+  response: Response
+): Promise<void> {
   try {
-    const { username, password } = req.body;
+    const { username, password } = request.body;
 
     if (!username || !password) {
-      res.status(HTTP_Status.BAD_REQUEST).json({ error: "Username and password are required" });
+      response
+        .status(HTTP_Status.BAD_REQUEST)
+        .json({ error: "Username and password are required" });
       return;
     }
 
     const user = await userService.findByUsername(username);
     if (!user) {
-      res.status(HTTP_Status.UNAUTHORIZED).json({ error: "Invalid credentials" });
+      response
+        .status(HTTP_Status.UNAUTHORIZED)
+        .json({ error: "Invalid credentials" });
       return;
     }
 
-    const isPasswordValid = await userService.verifyPassword(password, user.passwordHash);
+    const isPasswordValid = await userService.verifyPassword(
+      password,
+      user.passwordHash
+    );
     if (!isPasswordValid) {
-      res.status(HTTP_Status.UNAUTHORIZED).json({ error: "Invalid credentials" });
+      response
+        .status(HTTP_Status.UNAUTHORIZED)
+        .json({ error: "Invalid credentials" });
       return;
     }
 
     if (user.twoFactorSecret) {
-      const { token } = req.body;
+      const { token } = request.body;
       if (!token) {
-        res.status(HTTP_Status.UNAUTHORIZED).json({ error: "TOTP token required" });
+        response
+          .status(HTTP_Status.UNAUTHORIZED)
+          .json({ error: "TOTP token required" });
         return;
       }
       const isTokenValid = verifyTOTPToken(user.twoFactorSecret, token);
       if (!isTokenValid) {
-        res.status(HTTP_Status.UNAUTHORIZED).json({ error: "Invalid TOTP token" });
+        response
+          .status(HTTP_Status.UNAUTHORIZED)
+          .json({ error: "Invalid TOTP token" });
         return;
       }
     }
 
     if (!process.env.JWT_SECRET) {
-      res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: "JWT secret is not configured" });
+      response
+        .status(HTTP_Status.INTERNAL_SERVER_ERROR)
+        .json({ error: "JWT secret is not configured" });
       return;
     }
 
@@ -94,7 +138,7 @@ export async function login(req: Request, res: Response): Promise<void> {
       { expiresIn: "24h" }
     );
 
-    res.status(HTTP_Status.OK).json({
+    response.status(HTTP_Status.OK).json({
       message: "Login successful",
       token: tokenJwt,
       user: {
@@ -107,22 +151,29 @@ export async function login(req: Request, res: Response): Promise<void> {
     });
   } catch (error) {
     console.error("Login error:", error);
-    res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: "Failed to login" });
+    response
+      .status(HTTP_Status.INTERNAL_SERVER_ERROR)
+      .json({ error: "Failed to login" });
   }
 }
 
-export async function generate2FA(req: Request, res: Response): Promise<void> {
-  const userId = req.user?.userId;
-  const username = req.user?.username;
+export async function generate2FA(
+  request: Request,
+  response: Response
+): Promise<void> {
+  const userId = request.user?.userId;
+  const username = request.user?.username;
 
   if (!userId || !username) {
-    res.status(HTTP_Status.UNAUTHORIZED).json({ error: "User not authenticated" });
+    response
+      .status(HTTP_Status.UNAUTHORIZED)
+      .json({ error: "User not authenticated" });
     return;
   }
 
   try {
     const totp = await generateTOTPSecret(username);
-    res.status(HTTP_Status.OK).json({
+    response.status(HTTP_Status.OK).json({
       message: "2FA setup generated",
       twoFactor: {
         secret: totp.base32,
@@ -131,47 +182,69 @@ export async function generate2FA(req: Request, res: Response): Promise<void> {
     });
   } catch (error) {
     console.error("Generate 2FA error:", error);
-    res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: "Failed to generate 2FA setup" });
+    response
+      .status(HTTP_Status.INTERNAL_SERVER_ERROR)
+      .json({ error: "Failed to generate 2FA setup" });
   }
 }
 
-export async function enable2FA(req: Request, res: Response): Promise<void> {
-  const userId = req.user?.userId;
-  const { secret, token } = req.body;
+export async function enable2FA(
+  request: Request,
+  response: Response
+): Promise<void> {
+  const userId = request.user?.userId;
+  const { secret, token } = request.body;
 
   if (!userId || !secret || !token) {
-    res.status(HTTP_Status.BAD_REQUEST).json({ error: "Missing user, secret, or token" });
+    response
+      .status(HTTP_Status.BAD_REQUEST)
+      .json({ error: "Missing user, secret, or token" });
     return;
   }
 
   try {
     const isTokenValid = verifyTOTPToken(secret, token);
     if (!isTokenValid) {
-      res.status(HTTP_Status.BAD_REQUEST).json({ error: "Invalid verification code" });
+      response
+        .status(HTTP_Status.BAD_REQUEST)
+        .json({ error: "Invalid verification code" });
       return;
     }
 
     await userService.setTwoFactorSecret(userId, secret);
-    res.status(HTTP_Status.OK).json({ message: "2FA enabled successfully" });
+    response
+      .status(HTTP_Status.OK)
+      .json({ message: "2FA enabled successfully" });
   } catch (error) {
     console.error("Enable 2FA error:", error);
-    res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: "Failed to enable 2FA" });
+    response
+      .status(HTTP_Status.INTERNAL_SERVER_ERROR)
+      .json({ error: "Failed to enable 2FA" });
   }
 }
 
-export async function disable2FA(req: Request, res: Response): Promise<void> {
-  const userId = req.user?.userId;
+export async function disable2FA(
+  request: Request,
+  response: Response
+): Promise<void> {
+  const userId = request.user?.userId;
 
   if (!userId) {
-    res.status(HTTP_Status.UNAUTHORIZED).json({ error: "User not authenticated" });
+    response
+      .status(HTTP_Status.UNAUTHORIZED)
+      .json({ error: "User not authenticated" });
     return;
   }
 
   try {
     await userService.setTwoFactorSecret(userId, "");
-    res.status(HTTP_Status.OK).json({ message: "2FA disabled successfully" });
+    response
+      .status(HTTP_Status.OK)
+      .json({ message: "2FA disabled successfully" });
   } catch (error) {
     console.error("Disable 2FA error:", error);
-    res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ error: "Failed to disable 2FA" });
+    response
+      .status(HTTP_Status.INTERNAL_SERVER_ERROR)
+      .json({ error: "Failed to disable 2FA" });
   }
 }

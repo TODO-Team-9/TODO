@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
-import { User, UserRegistration } from "../models/User";
-import { SALT_ROUNDS } from "../constants/bcrypt.constants";
 import sql from "../config/db";
+import { User, UserRegistration } from "../models/User";
 import { EncryptionService } from "./encryption.service";
+import { SALT_ROUNDS } from "../constants/bcrypt.constants";
 
 export class UserService {
   private validatePepper(): void {

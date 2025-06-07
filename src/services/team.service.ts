@@ -1,17 +1,17 @@
-import sql from '../db';
-import { Team } from '../models/Team';
+import sql from "../config/db";
+import { Team } from "../models/Team";
 
 export class TeamService {
   async createTeam(teamName: string, teamDescription?: string): Promise<Team> {
     // Validate input
     if (!teamName || teamName.trim().length === 0) {
-      throw new Error('Team name is required');
+      throw new Error("Team name is required");
     }
     if (teamName.length > 32) {
-      throw new Error('Team name must be less than 32 characters');
+      throw new Error("Team name must be less than 32 characters");
     }
     if (teamDescription && teamDescription.length > 128) {
-      throw new Error('Team description must be less than 128 characters');
+      throw new Error("Team description must be less than 128 characters");
     }
 
     // Call create_team stored procedure
@@ -28,7 +28,7 @@ export class TeamService {
     `;
 
     if (!team) {
-      throw new Error('Team creation failed');
+      throw new Error("Team creation failed");
     }
 
     return team;
@@ -47,7 +47,7 @@ export class TeamService {
   async getTeamById(teamId: number): Promise<Team | null> {
     // Validate input
     if (!teamId || isNaN(teamId) || teamId <= 0) {
-      throw new Error('Invalid team ID');
+      throw new Error("Invalid team ID");
     }
 
     // Query teams table with proper type casting and validation
@@ -58,4 +58,4 @@ export class TeamService {
 
     return team || null;
   }
-} 
+}

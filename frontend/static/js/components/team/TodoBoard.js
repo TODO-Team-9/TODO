@@ -63,6 +63,7 @@ class TodoBoard extends LitElement {
     this.tasks = this.tasks.map((t) =>
       t.title === ticket.title ? { ...t, status: newStatus } : t
     );
+    //update Status here.
   }
 
   render() {

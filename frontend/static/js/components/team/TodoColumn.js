@@ -44,6 +44,7 @@ class TodoColumn extends LitElement {
   _onDrop(e) {
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData('application/json'));
+    console.log(data);
     this.dispatchEvent(new CustomEvent('ticket-dropped', {
       detail: {
         ticket: data,

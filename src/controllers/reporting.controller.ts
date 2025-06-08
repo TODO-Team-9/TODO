@@ -4,34 +4,52 @@ import { HTTP_Status } from "../enums/HTTP_Status";
 
 const reportingService = new ReportingService();
 
+function isValidDateString(dateStr: unknown): dateStr is string {
+  return typeof dateStr === 'string' && !isNaN(Date.parse(dateStr));
+}
+
+function parseDate(dateStr: unknown): Date | null {
+  if (!isValidDateString(dateStr)) {
+    return null;
+  }
+  const date = new Date(dateStr);
+  return isNaN(date.getTime()) ? null : date;
+}
+
 export async function getTeamTaskActivityReport(
   request: Request,
   response: Response
 ): Promise<void> {
   try {
-    const { teamId } = request.params;
+    const teamId = Number(request.params.teamId);
     const { startDate, endDate } = request.query;
 
-    if (!teamId || !startDate || !endDate) {
+    if (!teamId || isNaN(teamId)) {
       response.status(HTTP_Status.BAD_REQUEST).json({
-        error: "Team ID, start date, and end date are required",
+        error: "Valid team ID is required"
       });
       return;
     }
 
-    // Validate dates
-    const parsedStartDate = new Date(startDate as string);
-    const parsedEndDate = new Date(endDate as string);
+    const parsedStartDate = parseDate(startDate);
+    const parsedEndDate = parseDate(endDate);
 
-    if (isNaN(parsedStartDate.getTime()) || isNaN(parsedEndDate.getTime())) {
+    if (!parsedStartDate || !parsedEndDate) {
       response.status(HTTP_Status.BAD_REQUEST).json({
-        error: "Invalid date format. Use ISO 8601 format (e.g., 2024-01-01)",
+        error: "Valid startDate and endDate are required (ISO 8601 format, e.g., 2025-01-01)"
+      });
+      return;
+    }
+
+    if (parsedEndDate < parsedStartDate) {
+      response.status(HTTP_Status.BAD_REQUEST).json({
+        error: "endDate must be after startDate"
       });
       return;
     }
 
     const report = await reportingService.getTeamTaskActivityReport(
-      Number(teamId),
+      teamId,
       parsedStartDate,
       parsedEndDate
     );
@@ -40,7 +58,7 @@ export async function getTeamTaskActivityReport(
   } catch (error) {
     console.error("Error in getTeamTaskActivityReport:", error);
     response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({
-      error: "Failed to generate task activity report",
+      error: "Failed to generate task activity report"
     });
   }
 }
@@ -50,29 +68,35 @@ export async function getTeamDailyTaskStats(
   response: Response
 ): Promise<void> {
   try {
-    const { teamId } = request.params;
+    const teamId = Number(request.params.teamId);
     const { startDate, endDate } = request.query;
 
-    if (!teamId || !startDate || !endDate) {
+    if (!teamId || isNaN(teamId)) {
       response.status(HTTP_Status.BAD_REQUEST).json({
-        error: "Team ID, start date, and end date are required",
+        error: "Valid team ID is required"
       });
       return;
     }
 
-    // Validate dates
-    const parsedStartDate = new Date(startDate as string);
-    const parsedEndDate = new Date(endDate as string);
+    const parsedStartDate = parseDate(startDate);
+    const parsedEndDate = parseDate(endDate);
 
-    if (isNaN(parsedStartDate.getTime()) || isNaN(parsedEndDate.getTime())) {
+    if (!parsedStartDate || !parsedEndDate) {
       response.status(HTTP_Status.BAD_REQUEST).json({
-        error: "Invalid date format. Use ISO 8601 format (e.g., 2024-01-01)",
+        error: "Valid startDate and endDate are required (ISO 8601 format, e.g., 2025-01-01)"
+      });
+      return;
+    }
+
+    if (parsedEndDate < parsedStartDate) {
+      response.status(HTTP_Status.BAD_REQUEST).json({
+        error: "endDate must be after startDate"
       });
       return;
     }
 
     const stats = await reportingService.getTeamDailyTaskStats(
-      Number(teamId),
+      teamId,
       parsedStartDate,
       parsedEndDate
     );
@@ -81,7 +105,7 @@ export async function getTeamDailyTaskStats(
   } catch (error) {
     console.error("Error in getTeamDailyTaskStats:", error);
     response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({
-      error: "Failed to generate daily task statistics",
+      error: "Failed to generate daily task statistics"
     });
   }
 } 

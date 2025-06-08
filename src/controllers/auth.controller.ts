@@ -121,6 +121,7 @@ export async function login(
           error: "TOTP token required",
           requiresTotpToken: true,
         });
+
         return;
       }
 

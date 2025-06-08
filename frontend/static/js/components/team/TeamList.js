@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { navigator } from '../../index.js';
+import teamService from '../../services/TeamService.js';
 
 class TeamList extends LitElement {
     static properties = {
@@ -62,39 +63,74 @@ class TeamList extends LitElement {
 
   constructor() {
         super();
-        this.teams = [{name: "Team A"}, {name: "Team B"}];
-        this.members = [{name: "Alice"}, {name: "Bob"}, {name: "Charlie"}];
+        this.teams = [];
+        this.members = [];
   }
 
+    connectedCallback(){
+        super.connectedCallback();
+        this.loadTeamsAndMembers();
+    }
 
-    _navigate(e) {
+    async loadTeamsAndMembers() {
+        try {
+            const teams = await teamService.getTeams();
+            this.teams = Array.isArray(teams) ? teams : [];
+
+            if(this.teams.length !== 0){
+                localStorage.setItem('currentTeam', this.teams[0].team_id);
+                const members = await teamService.getTeamMembers(this.teams[0].team_id);
+                this.members = Array.isArray(members) ? members : [];
+            }
+        } catch (error) {
+            this.teams = [];
+            this.members = [];
+        }
+    }
+
+
+    navigate(e) {
         const url = e.currentTarget.dataset.id;
         navigator(url);
     }
 
+    async updateSelectedTeam(e){
+        const selectedTeamName = e.target.value;
+        const selectedTeam = this.teams.find(team => team.team_name === selectedTeamName);
+        
+        localStorage.setItem('currentTeam', selectedTeam.team_id);
+        const members = await teamService.getTeamMembers(selectedTeam.team_id);
+        this.members = Array.isArray(members) ? members : [];
+
+        window.dispatchEvent(new CustomEvent('team-update', {
+            detail: { newTeam: selectedTeam.team_id }
+        }));
+    }
+
+
   render() {
     return html`
         <h3>Your Team</h3>
-        <select name="team">
+        <select name="team" @change="${this.updateSelectedTeam}">
             ${this.teams.map(
             (team) => html`
                 <option>
-                    ${team.name}
+                    ${team.team_name}
                 </option>
             `
             )}
         </select>
         <section class="controls">
-            <button data-id="/team/join" @click="${this._navigate}">Join Team</button>
-            <button data-id="/create/team" @click="${this._navigate}">Create Team</button>
-            <button data-id="/team/report" @click="${this._navigate}">Team Report</button>        
+            <button data-id="/team/join" @click="${this.navigate}">Join Team</button>
+            <button data-id="/create/team" @click="${this.navigate}">Create Team</button>
+            <button data-id="/team/report" @click="${this.navigate}">Team Report</button>        
         </section>
       <h3>Team Members</h3>
       <ul>
         ${this.members.map(
           (member) => html`
             <li class="member">
-                ${member.name}
+                ${member.username}
             </li>
           `
         )}        

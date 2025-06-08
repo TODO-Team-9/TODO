@@ -95,7 +95,6 @@ export class UserService {
       WHERE user_id = ${userId}
     `;
   }
-
   async deactivateUser(userId: number): Promise<void> {
     try {
       await sql`CALL deactivate_user(${userId})`;

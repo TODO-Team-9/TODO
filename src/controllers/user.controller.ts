@@ -28,7 +28,6 @@ export async function createUser(
       });
       return;
     }
-
     const existingUsername = await userService.findByUsername(username);
     if (existingUsername) {
       response

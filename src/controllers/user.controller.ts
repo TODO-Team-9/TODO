@@ -139,3 +139,51 @@ export async function getAllUsers(
       .json({ error: "Failed to fetch users" });
   }
 }
+
+export async function getUserJoinRequests(
+  request: Request,
+  response: Response
+): Promise<void> {
+  try {
+    const userId = request.user?.userId;
+    
+    if (!userId) {
+      response
+        .status(HTTP_Status.UNAUTHORIZED)
+        .json({ error: "User not authenticated" });
+      return;
+    }
+
+    const requests = await userService.getUserJoinRequests(userId);
+    response.status(HTTP_Status.OK).json(requests);
+  } catch (error) {
+    console.error("Error fetching user join requests:", error);
+    response
+      .status(HTTP_Status.INTERNAL_SERVER_ERROR)
+      .json({ error: "Failed to fetch join requests" });
+  }
+}
+
+export async function getUserTeams(
+  request: Request,
+  response: Response
+): Promise<void> {
+  try {
+    const userId = request.user?.userId;
+    
+    if (!userId) {
+      response
+        .status(HTTP_Status.UNAUTHORIZED)
+        .json({ error: "User not authenticated" });
+      return;
+    }
+
+    const teams = await userService.getUserTeams(userId);
+    response.status(HTTP_Status.OK).json(teams);
+  } catch (error) {
+    console.error("Error fetching user teams:", error);
+    response
+      .status(HTTP_Status.INTERNAL_SERVER_ERROR)
+      .json({ error: "Failed to fetch teams" });
+  }
+}

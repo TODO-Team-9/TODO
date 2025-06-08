@@ -3,6 +3,8 @@ import sql from "../config/db";
 import { User, UserRegistration } from "../models/User";
 import { EncryptionService } from "./encryption.service";
 import { SALT_ROUNDS } from "../constants/bcrypt.constants";
+import { UserJoinRequestDetails } from "../models/UserJoinRequestDetails";
+import { UserTeamDetails } from "../models/UserTeamDetails";
 
 export class UserService {
   private validatePepper(): void {
@@ -115,6 +117,30 @@ export class UserService {
       return users.map((user) => this.processUserResult(user));
     } catch (error) {
       console.error("Error getting all users:", error);
+      throw error;
+    }
+  }
+
+  async getUserJoinRequests(userId: number): Promise<UserJoinRequestDetails[]> {
+    try {
+      const requests = await sql<UserJoinRequestDetails[]>`
+        SELECT * FROM get_user_join_requests(${userId})
+      `;
+      return requests;
+    } catch (error) {
+      console.error("Error getting user join requests:", error);
+      throw error;
+    }
+  }
+
+  async getUserTeams(userId: number): Promise<UserTeamDetails[]> {
+    try {
+      const teams = await sql<UserTeamDetails[]>`
+        SELECT * FROM get_user_teams(${userId})
+      `;
+      return teams;
+    } catch (error) {
+      console.error("Error getting user teams:", error);
       throw error;
     }
   }

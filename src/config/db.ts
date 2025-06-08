@@ -11,6 +11,7 @@ const sql = postgres({
   database: process.env.DB_NAME,
   max: 10,
   idle_timeout: 60,
+  transform: postgres.camel,
 });
 
 export default sql;

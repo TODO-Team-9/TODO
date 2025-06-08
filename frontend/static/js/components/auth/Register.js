@@ -462,7 +462,7 @@ class RegisterForm extends LitElement {
       return;
     }
     try {
-      const response = await fetch(getApiUrl("api/auth/register"), {
+      const response = await fetch(getApiUrl("auth/register"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

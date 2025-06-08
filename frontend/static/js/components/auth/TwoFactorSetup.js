@@ -222,7 +222,7 @@ class TwoFactorSetup extends LitElement {
       // Generate TOTP secret by calling the registration endpoint with current user data
       // Since we need to generate a new secret, we'll call a dedicated endpoint
       const response = await AuthManager.makeAuthenticatedRequest(
-        getApiUrl("api/auth/generate-2fa"),
+        getApiUrl("auth/generate-2fa"),
         {
           method: "POST",
         }
@@ -265,7 +265,7 @@ class TwoFactorSetup extends LitElement {
         }
 
         // First, we need to login to get a token
-        const loginResponse = await fetch(getApiUrl("api/auth/login"), {
+        const loginResponse = await fetch(getApiUrl("auth/login"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -281,7 +281,7 @@ class TwoFactorSetup extends LitElement {
         if (loginResponse.ok) {
           // Now enable 2FA with the token
           const enable2FAResponse = await fetch(
-            getApiUrl("api/auth/enable-2fa"),
+            getApiUrl("auth/enable-2fa"),
             {
               method: "POST",
               headers: {
@@ -319,7 +319,7 @@ class TwoFactorSetup extends LitElement {
       } else {
         // For existing user enabling 2FA
         const response = await AuthManager.makeAuthenticatedRequest(
-          getApiUrl("api/auth/enable-2fa"),
+          getApiUrl("auth/enable-2fa"),
           {
             method: "POST",
             body: JSON.stringify({

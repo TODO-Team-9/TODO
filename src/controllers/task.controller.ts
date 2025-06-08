@@ -9,7 +9,6 @@ export const createTask = async (
   response: Response
 ): Promise<void> => {
   try {
-    console.log(request);
     const { taskName, taskDescription, teamId, memberId } = request.body;
     if (!taskName || !teamId) {
       response

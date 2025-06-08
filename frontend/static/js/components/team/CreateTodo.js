@@ -71,7 +71,7 @@ class CreateTodo extends LitElement {
       taskName: form.title.value.trim(),
       taskDescription: form.description.value.trim(),
       memberId: 1, // TODO: map name to ID.
-      teamId: 1, // TODO logic to get current team ID
+      teamId: localStorage.getItem('currentTeam'),
       priority: form.priority.value,
     };
     

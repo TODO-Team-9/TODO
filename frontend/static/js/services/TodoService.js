@@ -6,11 +6,19 @@ class TodoService {
     }
 
     async updateStatus(taskId, data) {
+        return apiService.post(`http://localhost:3000/api/tasks/${taskId}/status`, data);
+    }
+
+    async getMemberTodos(memberName) {
         return apiService.post();
     }
 
-    async getTodos(memberName) {
-        return apiService.post();
+    async getStatuses() {
+        return apiService.get(`http://localhost:3000/api/statuses`);
+    }
+
+    async getTeamTodos(teamId) {
+        return apiService.get(`http://localhost:3000/api/tasks/teams/${teamId}`);
     }
 
     async assignTodo(taskId, data) {

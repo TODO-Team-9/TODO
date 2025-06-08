@@ -2,6 +2,7 @@ import { LitElement, html, css } from 'lit';
 
 class TodoColumn extends LitElement {
   static properties = {
+    id: { type: Number },
     title: { type: String },
     tickets: { type: Array }
   };
@@ -44,11 +45,11 @@ class TodoColumn extends LitElement {
   _onDrop(e) {
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData('application/json'));
-    console.log(data);
+
     this.dispatchEvent(new CustomEvent('ticket-dropped', {
       detail: {
         ticket: data,
-        newStatus: this.title
+        newStatus: this.id
       },
       bubbles: true,
       composed: true
@@ -66,10 +67,11 @@ class TodoColumn extends LitElement {
         ${this.tickets.map(
           (ticket) => html`
             <todo-ticket
-              .title=${ticket.title}
-              .description=${ticket.description}
-              .assignedTo=${ticket.assignedTo}
-              .priority=${ticket.priority}
+                .id=${ticket.task_id}
+                .title=${ticket.task_name}
+                .description=${ticket.task_description}
+                .assignedTo=${ticket.username}
+                .priority=${ticket.priority_name}
             ></todo-ticket>
           `
         )}

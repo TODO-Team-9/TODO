@@ -3,6 +3,7 @@ import { navigator } from '../../index.js';
 
 class TodoTicket extends LitElement {
   static properties = {
+    id: { type: Number },
     title: { type: String },
     description: { type: String },
     assignedTo: { type: String },
@@ -84,10 +85,11 @@ class TodoTicket extends LitElement {
 
   _onDragStart(e) {
     const data = {
-      title: this.title,
-      description: this.description,
-      assignedTo: this.assignedTo,
-      priority: this.priority
+        id: this.id,
+        title: this.title,
+        description: this.description,
+        assignedTo: this.assignedTo,
+        priority: this.priority
     };
     e.dataTransfer.setData('application/json', JSON.stringify(data));
   }

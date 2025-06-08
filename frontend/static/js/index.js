@@ -7,7 +7,6 @@ import RegisterView from "./views/RegisterView.js";
 import RequestView from "./views/RequestView.js";
 import TeamStatsView from "./views/TeamStatsView.js";
 import TwoFactorSetupView from "./views/TwoFactorSetupView.js";
-import UserSettingsView from "./views/UserSettingsView.js";
 import ProfileView from "./views/ProfileView.js";
 import { AuthManager } from "./utils/auth.js";
 

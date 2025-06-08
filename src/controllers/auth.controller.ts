@@ -144,7 +144,6 @@ export async function login(
         {
           userId: user.userId,
           username: user.username,
-          role: user.systemRoleId,
           twoFactorVerified: true,
         },
         process.env.JWT_SECRET,
@@ -158,7 +157,6 @@ export async function login(
           userId: user.userId,
           username: user.username,
           emailAddress: user.emailAddress,
-          systemRoleId: user.systemRoleId,
           twoFactorEnabled: true,
         },
       });
@@ -175,7 +173,6 @@ export async function login(
         {
           userId: user.userId,
           username: user.username,
-          role: user.systemRoleId,
           twoFactorVerified: false,
         },
         process.env.JWT_PROVISIONAL_SECRET,
@@ -190,7 +187,6 @@ export async function login(
           userId: user.userId,
           username: user.username,
           emailAddress: user.emailAddress,
-          systemRoleId: user.systemRoleId,
           twoFactorEnabled: false,
         },
       });

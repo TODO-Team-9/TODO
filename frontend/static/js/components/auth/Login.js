@@ -155,18 +155,18 @@ class LoginForm extends LitElement {
 
           const app = document.querySelector("#app");
           app.replaceChildren(twoFactorSetup);
-        } else if (data.requiresTotpToken) {
-          const twoFactorVerification = document.createElement(
-            "two-factor-verification"
-          );
-          twoFactorVerification.username = username;
-          twoFactorVerification.password = password;
-
-          const app = document.querySelector("#app");
-          app.replaceChildren(twoFactorVerification);
         } else {
           window.location.href = "/home";
         }
+      } else if (data.requiresTotpToken) {
+        const twoFactorVerification = document.createElement(
+          "two-factor-verification"
+        );
+        twoFactorVerification.username = username;
+        twoFactorVerification.password = password;
+
+        const app = document.querySelector("#app");
+        app.replaceChildren(twoFactorVerification);
       } else {
         this.errorMessage = data.error || "Login failed";
       }

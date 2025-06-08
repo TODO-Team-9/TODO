@@ -128,7 +128,7 @@ class TwoFactorVerification extends LitElement {
     const token = formData.get("token");
 
     try {
-      const response = await fetch(getApiUrl("api/auth/login"), {
+      const response = await fetch(getApiUrl("auth/login"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

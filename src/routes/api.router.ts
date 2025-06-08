@@ -5,14 +5,17 @@ import memberRoutes from "./member.routes";
 import taskRoutes from "./task.routes";
 import joinRequestRoutes from "./joinRequest.routes";
 import lookupRoutes from "./lookup.routes";
+import reportingRoutes from "./reporting.routes";
 
 const apiRouter = Router();
 
-apiRouter.use(userRoutes);
-apiRouter.use(teamRoutes);
-apiRouter.use(memberRoutes);
-apiRouter.use(taskRoutes);
-apiRouter.use(joinRequestRoutes);
-apiRouter.use(lookupRoutes);
+apiRouter.use("/users", userRoutes);
+apiRouter.use("/teams", teamRoutes);
+apiRouter.use("/members", memberRoutes);
+apiRouter.use("/tasks", taskRoutes);
+apiRouter.use("/join-requests", joinRequestRoutes);
+apiRouter.use("/reports", reportingRoutes);
+
+apiRouter.use("/", lookupRoutes);
 
 export default apiRouter;

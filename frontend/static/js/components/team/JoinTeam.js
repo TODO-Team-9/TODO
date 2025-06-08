@@ -4,10 +4,13 @@ import { navigator } from '../../index.js';
 import "./Header.js";
 import "../shared/Table.js";
 
+import teamService from "../../services/TeamService.js";
+
 class JoinTeam extends LitElement {
     static properties = {
         onCreate: { type: Function },
-        teams: { type: Array }
+        teams: { type: Array },
+        currentRequests: { type: Array }
     }
 
   static styles = css`
@@ -77,11 +80,50 @@ class JoinTeam extends LitElement {
   constructor() {
     super();
     this.onCreate = null;
-    this.teams = [{name: "Team A"}, {name: "Team B"}];
+    this.teams = [];
+    this.currentRequests = [];
   }
 
-  handleSubmit(e) {
+    connectedCallback(){
+        super.connectedCallback();
+        this.loadTeams();
+        this.loadRequests();
+    }
+
+    async loadRequests(){
+        this.currentRequests = [];
+        // try {
+        //     const teams = await teamService.getTeamRequests();
+        //     this.teams = Array.isArray(teams) ? teams : [];
+        // } catch (error) {
+        //     this.teams = [];
+        // }
+    }
+
+    async loadTeams() {
+        try {
+            const teams = await teamService.getTeams();
+            this.teams = Array.isArray(teams) ? teams : [];
+        } catch (error) {
+            this.teams = [];
+        }
+    }
+
+
+  async handleSubmit(e) {
     e.preventDefault();
+    const form = e.target;
+    const selectedTeam = this.teams.find(team => team.team_name === form.team.value);
+
+    const request = {
+      teamId: selectedTeam.team_id,
+      userId: JSON.parse(localStorage.getItem('tempUser')).user_id
+    };
+
+    await teamService.requestTeam(request);
+    alert('Request to join: ' + selectedTeam.team_name + ' sent');
+    await this.loadRequests();
+    form.reset();
   }
 
   render() {
@@ -95,11 +137,7 @@ class JoinTeam extends LitElement {
                     { key: 'status', header: 'Status' }
                 ]}"
             
-                .data = "${[
-                    { team: 'Team C', status: 'Pending' },
-                    { team: 'Team B', status: 'Approved' },
-                    { team: 'Team A', status: 'Approved' }
-                ]}"
+                .data = "${this.currentRequests}"
             >
             </custom-table>
         </section>
@@ -110,8 +148,8 @@ class JoinTeam extends LitElement {
                 <option disabled selected value="">Select Team</option>
                 ${this.teams.map(
                     (team) => html`
-                        <option>
-                            ${team.name}
+                        <option value="${team.team_name}">
+                            ${team.team_name}
                         </option>
                 `
                 )}

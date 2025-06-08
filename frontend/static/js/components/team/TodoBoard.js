@@ -2,11 +2,16 @@ import { LitElement, html, css } from 'lit';
 import './TodoColumn.js';
 import './TodoTicket.js';
 import './Header.js';
+
+import todoService from '../../services/TodoService.js';
+import teamService from '../../services/TeamService.js';
+
 class TodoBoard extends LitElement {
-    static properties = {
-        teamName: { type: String },
-        tasks: { type: Array }
-    } 
+  static properties = {
+    statuses: { type: Array },
+    teamName: { type: String },
+    tasks: { type: Array }
+  };
 
   static styles = css`
     :host {
@@ -22,48 +27,65 @@ class TodoBoard extends LitElement {
     }
   `;
 
+  constructor() {
+    super();
+    this.teamName = '';
+    this.tasks = [];
+    this.statuses = [];
+  }
+
+  connectedCallback(){
+    super.connectedCallback();
+    this.loadTodosAndTeam();    
+    window.addEventListener('team-update', this._onTeamUpdate.bind(this));
+  }
+
+  async loadTodosAndTeam(){
+    try {
+        const status = await todoService.getStatuses();
+        this.statuses = Array.isArray(status) ? status : [];
+
+        const currentTeam = localStorage.getItem('currentTeam');
+        const todos = await todoService.getTeamTodos(currentTeam);
+        this.tasks = Array.isArray(todos) ? todos : [];
+
+        const team = await teamService.getTeam(currentTeam);
+        this.teamName = team.team_name;
+    } catch (error) {
+        this.tasks = [];
+        this.members = [];
+        this.statuses = [];
+    }
+  }
+
+    async _onTicketDropped(e) {
+        const { ticket, newStatus } = e.detail;
+        const newStatusObj = this.statuses.find(s => s.status_id === newStatus);
+
+        this.tasks = this.tasks.map((t) =>
+            t.task_id === ticket.id
+            ? { ...t, status_id: newStatus, status_name: newStatusObj.status_name }
+            : t
+        );
+
+        await todoService.updateStatus(ticket.id, { statusId: newStatus });
+    }
+
+    async _onTeamUpdate(e){
+        await this.loadTodosAndTeam();
+    }
+
   render() {
-    const tasks = [
-      {
-        title: 'Implement login',
-        description: 'Build Google OAuth2 login flow',
-        assignedTo: 'Alice',
-        priority: 'High',
-        status: 'Backlog'
-      },
-      {
-        title: 'Create ticket component',
-        description: 'Make it look like a physical card',
-        assignedTo: 'Bob',
-        priority: 'Medium',
-        status: 'In Progress'
-      },
-      {
-        title: 'Setup API',
-        description: 'Add CRUD endpoints',
-        assignedTo: 'Charlie',
-        priority: 'Medium',
-        status: 'Done'
-      },
-      {
-        title: 'Setup database schema',
-        description: 'Add tables for projects and tasks',
-        assignedTo: 'Charlie',
-        priority: 'Low',
-        status: 'Done'
-      }
-    ];
-
-    const statuses = ['Backlog', 'In Progress','In Review' ,'Done'];
-
     return html`
-    <team-header .title=${this.teamName} .buttonCaption=${'Create Todo'} .route=${'/create/todo'}></team-header>
+      <team-header .title=${this.teamName} .buttonCaption=${'Create Todo'} .route=${'/create/todo'}></team-header>
       <section class="board">
-        ${statuses.map(
+        ${this.statuses.map(
           (status) => html`
             <todo-column
-              .title=${status}
-              .tickets=${tasks.filter((t) => t.status === status)}>
+              .title=${status.status_name}
+              .id=${status.status_id}
+              .tickets=${this.tasks.filter((t) => t.status_name === status.status_name)}
+              @ticket-dropped=${this._onTicketDropped}>
             </todo-column>
           `
         )}
@@ -73,3 +95,5 @@ class TodoBoard extends LitElement {
 }
 
 customElements.define('todo-board', TodoBoard);
+
+export default TodoBoard;

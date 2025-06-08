@@ -1,0 +1,7 @@
+Endpoints needed:
+Reporting Endpoints
+
+Get all member requests
+Get all requests
+
+Get all teams a member is in

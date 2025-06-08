@@ -6,6 +6,7 @@ import LoginView from "./views/LoginView.js";
 import RegisterView from "./views/RegisterView.js";
 import RequestView from "./views/RequestView.js";
 import TeamStatsView from "./views/TeamStatsView.js";
+import FullTodoView from "./views/FullTodoView.js";
 import TwoFactorSetupView from "./views/TwoFactorSetupView.js";
 import UserSettingsView from "./views/UserSettingsView.js";
 import ProfileView from "./views/ProfileView.js";
@@ -34,6 +35,7 @@ export const router = async () => {
     { path: "/team/join", view: JoinTeamView, requiresAuth: true },
     { path: "/team/report", view: TeamStatsView, requiresAuth: true },
     { path: "/requests", view: RequestView, requiresAuth: true },
+    { path: "/todo", view: FullTodoView, requiresAuth: true }
   ];
 
   const pathToRegex = (path) =>

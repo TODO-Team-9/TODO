@@ -7,8 +7,9 @@ import {
 
 const router = express.Router();
 
-router.post("/joinRequests", createJoinRequest);
-router.post("/joinRequests/:requestId/status", updateJoinRequestStatus);
-router.get("/teams/:teamId/joinRequests", getJoinRequestsForTeam);
+router.post("/", createJoinRequest);
+router.post("/:requestId/status", updateJoinRequestStatus);
+router.get("/teams/:teamId", getJoinRequestsForTeam);
 
 export default router;
+    

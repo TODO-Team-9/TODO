@@ -1,7 +1,9 @@
 import { LitElement, html, css } from 'lit';
+import { navigator } from '../../index.js';
 
 class TodoTicket extends LitElement {
   static properties = {
+    id: { type: Number },
     title: { type: String },
     description: { type: String },
     assignedTo: { type: String },
@@ -17,9 +19,10 @@ class TodoTicket extends LitElement {
       padding: 1rem;
       margin: 0.5rem 0;
       font-family: sans-serif;
-      max-width: 300px;
+      max-width: 15rem;
       border-left: 6px solid var(--priority-color, gray);
       transition: box-shadow 0.2s ease;
+      cursor: grab;
     }
 
     :host(:hover) {
@@ -59,11 +62,6 @@ class TodoTicket extends LitElement {
       justify-content: space-between;
     }
 
-    .status {
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-
     .assigned {
       font-style: italic;
     }
@@ -81,20 +79,40 @@ class TodoTicket extends LitElement {
     }
   }
 
+  _navigate() {
+    navigator('/todo');
+  }
+
+  _onDragStart(e) {
+    const data = {
+        id: this.id,
+        title: this.title,
+        description: this.description,
+        assignedTo: this.assignedTo,
+        priority: this.priority
+    };
+    e.dataTransfer.setData('application/json', JSON.stringify(data));
+  }
+
   render() {
     return html`
-      <header class="header">
-        <section class="title">${this.title}</section>
-        <section class="priority">${this.priority}</section>
-      </header>
-      <p class="description">${this.description}</p>
-      <footer class="footer">
-        <section class="assigned">👤 ${this.assignedTo}</section>
-      </footer>
+      <section
+        draggable="true"
+        @dragstart=${this._onDragStart}
+        @click=${this._navigate}
+      >
+        <header class="header">
+          <section class="title">${this.title}</section>
+          <section class="priority">${this.priority}</section>
+        </header>
+        <p class="description">${this.description}</p>
+        <footer class="footer">
+          <section class="assigned">👤 ${this.assignedTo}</section>
+        </footer>
+      </section>
     `;
   }
 }
-
 customElements.define('todo-ticket', TodoTicket);
 
 export default TodoTicket;

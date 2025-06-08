@@ -142,7 +142,7 @@ class CustomTable extends LitElement {
                     </td>` : ''}
                 </tr>
             `)
-            : html`<tr><td class="empty" colspan="${colSpan}">No data available</td></tr>`}
+            : html`<tr><td class="empty" colspan="4">No data available</td></tr>`}
         </tbody>
       </table>
     `;

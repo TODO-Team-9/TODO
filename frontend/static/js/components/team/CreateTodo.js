@@ -70,7 +70,7 @@ class CreateTodo extends LitElement {
     const todo = {
       taskName: form.title.value.trim(),
       taskDescription: form.description.value.trim(),
-      memberId: 1, // TODO: map name to ID.
+      memberId: form.assignedTo.value.trim(),
       teamId: localStorage.getItem('currentTeam'),
       priority: form.priority.value,
     };

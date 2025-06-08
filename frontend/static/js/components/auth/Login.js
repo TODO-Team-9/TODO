@@ -1,6 +1,7 @@
 import { LitElement, html, css } from "lit";
 import { getApiUrl } from "../../utils/config.js";
 import "./TwoFactorVerification.js";
+import "./TwoFactorSetup.js";
 
 class LoginForm extends LitElement {
   static properties = {
@@ -143,15 +144,21 @@ class LoginForm extends LitElement {
           password,
         }),
       });
-
       const data = await response.json();
-
       if (response.ok) {
+        // Store the token (could be provisional or full JWT)
         localStorage.setItem("authToken", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
-        window.location.href = "/home";
-      } else if (data.error === "TOTP token required") {
+        if (data.requiresTwoFactorSetup) {
+          const twoFactorSetup = document.createElement("two-factor-setup");
+
+          const app = document.querySelector("#app");
+          app.replaceChildren(twoFactorSetup);
+        } else {
+          window.location.href = "/home";
+        }
+      } else if (data.requiresTotpToken) {
         const twoFactorVerification = document.createElement(
           "two-factor-verification"
         );

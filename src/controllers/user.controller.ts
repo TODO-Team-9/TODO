@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/user.service";
+import { validateUsername } from "../utils/username.utils";
 import { HTTP_Status } from "../enums/HTTP_Status";
 import { Role } from "../enums/Role";
 
@@ -11,7 +12,6 @@ export async function createUser(
 ): Promise<void> {
   try {
     const { username, emailAddress, password } = request.body;
-
     if (!username || !emailAddress || !password) {
       response
         .status(HTTP_Status.BAD_REQUEST)
@@ -19,6 +19,15 @@ export async function createUser(
       return;
     }
 
+    // Validate username format
+    const usernameValidation = validateUsername(username);
+    if (!usernameValidation.isValid) {
+      response.status(HTTP_Status.BAD_REQUEST).json({
+        error: "Username does not meet requirements",
+        details: usernameValidation.errors,
+      });
+      return;
+    }
     const existingUsername = await userService.findByUsername(username);
     if (existingUsername) {
       response

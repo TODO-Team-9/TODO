@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { UserService } from "../services/user.service";
 import { generateTOTPSecret, verifyTOTPToken } from "../services/totp.service";
 import { validatePassword } from "../utils/password.utils";
+import { validateUsername } from "../utils/username.utils";
 import { HTTP_Status } from "../enums/HTTP_Status";
 
 const userService = new UserService();
@@ -19,14 +20,22 @@ export async function register(
         .status(HTTP_Status.BAD_REQUEST)
         .json({ error: "All fields are required" });
       return;
-    }
-
-    // Validate password complexity
+    } // Validate password complexity
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
       response.status(HTTP_Status.BAD_REQUEST).json({
         error: "Password does not meet complexity requirements",
         details: passwordValidation.errors,
+      });
+      return;
+    }
+
+    // Validate username format
+    const usernameValidation = validateUsername(username);
+    if (!usernameValidation.isValid) {
+      response.status(HTTP_Status.BAD_REQUEST).json({
+        error: "Username does not meet requirements",
+        details: usernameValidation.errors,
       });
       return;
     }
@@ -46,7 +55,6 @@ export async function register(
         .json({ error: "Email already exists" });
       return;
     }
-
     const newUser = await userService.createUser({
       username,
       emailAddress,
@@ -56,7 +64,8 @@ export async function register(
     const { passwordHash, ...userWithoutSensitiveData } = newUser;
 
     response.status(HTTP_Status.CREATED).json({
-      message: "User registered successfully",
+      message:
+        "User registered successfully. Please complete 2FA setup to access your account.",
       user: userWithoutSensitiveData,
       twoFactor: {
         secret: totp.base32,
@@ -102,16 +111,20 @@ export async function login(
         .status(HTTP_Status.UNAUTHORIZED)
         .json({ error: "Invalid credentials" });
       return;
-    }
+    } // Check if user has 2FA enabled
+    const has2FA = !!user.twoFactorSecret;
 
-    if (user.twoFactorSecret) {
+    if (has2FA) {
       const { token } = request.body;
       if (!token) {
-        response
-          .status(HTTP_Status.UNAUTHORIZED)
-          .json({ error: "TOTP token required" });
+        response.status(HTTP_Status.UNAUTHORIZED).json({
+          error: "TOTP token required",
+          requiresTotpToken: true,
+        });
+
         return;
       }
+
       const isTokenValid = verifyTOTPToken(user.twoFactorSecret, token);
       if (!isTokenValid) {
         response
@@ -119,36 +132,66 @@ export async function login(
           .json({ error: "Invalid TOTP token" });
         return;
       }
+
+      // 2FA verified - issue full JWT
+      if (!process.env.JWT_SECRET) {
+        response
+          .status(HTTP_Status.INTERNAL_SERVER_ERROR)
+          .json({ error: "JWT secret is not configured" });
+        return;
+      }
+
+      const tokenJwt = jwt.sign(
+        {
+          userId: user.userId,
+          username: user.username,
+          twoFactorVerified: true,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+
+      response.status(HTTP_Status.OK).json({
+        message: "Login successful",
+        token: tokenJwt,
+        user: {
+          userId: user.userId,
+          username: user.username,
+          emailAddress: user.emailAddress,
+          twoFactorEnabled: true,
+        },
+      });
+    } else {
+      // User doesn't have 2FA - issue provisional JWT and require 2FA setup
+      if (!process.env.JWT_PROVISIONAL_SECRET) {
+        response
+          .status(HTTP_Status.INTERNAL_SERVER_ERROR)
+          .json({ error: "JWT provisional secret is not configured" });
+        return;
+      }
+
+      const provisionalToken = jwt.sign(
+        {
+          userId: user.userId,
+          username: user.username,
+          twoFactorVerified: false,
+        },
+        process.env.JWT_PROVISIONAL_SECRET,
+        { expiresIn: "1h" }
+      );
+
+      response.status(HTTP_Status.OK).json({
+        message: "2FA setup required",
+        token: provisionalToken,
+        requiresTwoFactorSetup: true,
+        user: {
+          userId: user.userId,
+          username: user.username,
+          emailAddress: user.emailAddress,
+          twoFactorEnabled: false,
+        },
+      });
     }
-
-    if (!process.env.JWT_SECRET) {
-      response
-        .status(HTTP_Status.INTERNAL_SERVER_ERROR)
-        .json({ error: "JWT secret is not configured" });
-      return;
-    }
-
-    const tokenJwt = jwt.sign(
-      {
-        userId: user.userId,
-        username: user.username,
-        role: user.systemRoleId,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "24h" }
-    );
-
-    response.status(HTTP_Status.OK).json({
-      message: "Login successful",
-      token: tokenJwt,
-      user: {
-        userId: user.userId,
-        username: user.username,
-        emailAddress: user.emailAddress,
-        systemRoleId: user.systemRoleId,
-        twoFactorEnabled: !!user.twoFactorSecret,
-      },
-    });
   } catch (error) {
     console.error("Login error:", error);
     response
@@ -201,7 +244,6 @@ export async function enable2FA(
       .json({ error: "Missing user, secret, or token" });
     return;
   }
-
   try {
     const isTokenValid = verifyTOTPToken(secret, token);
     if (!isTokenValid) {
@@ -212,39 +254,33 @@ export async function enable2FA(
     }
 
     await userService.setTwoFactorSecret(userId, secret);
-    response
-      .status(HTTP_Status.OK)
-      .json({ message: "2FA enabled successfully" });
+
+    if (!process.env.JWT_SECRET) {
+      response
+        .status(HTTP_Status.INTERNAL_SERVER_ERROR)
+        .json({ error: "JWT secret is not configured" });
+      return;
+    }
+
+    const fullToken = jwt.sign(
+      {
+        userId: request.user?.userId,
+        username: request.user?.username,
+        role: request.user?.role,
+        twoFactorVerified: true,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
+    response.status(HTTP_Status.OK).json({
+      message: "2FA enabled successfully",
+      token: fullToken,
+    });
   } catch (error) {
     console.error("Enable 2FA error:", error);
     response
       .status(HTTP_Status.INTERNAL_SERVER_ERROR)
       .json({ error: "Failed to enable 2FA" });
-  }
-}
-
-export async function disable2FA(
-  request: Request,
-  response: Response
-): Promise<void> {
-  const userId = request.user?.userId;
-
-  if (!userId) {
-    response
-      .status(HTTP_Status.UNAUTHORIZED)
-      .json({ error: "User not authenticated" });
-    return;
-  }
-
-  try {
-    await userService.setTwoFactorSecret(userId, "");
-    response
-      .status(HTTP_Status.OK)
-      .json({ message: "2FA disabled successfully" });
-  } catch (error) {
-    console.error("Disable 2FA error:", error);
-    response
-      .status(HTTP_Status.INTERNAL_SERVER_ERROR)
-      .json({ error: "Failed to disable 2FA" });
   }
 }

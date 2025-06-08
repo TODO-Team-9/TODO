@@ -8,7 +8,6 @@ import RequestView from "./views/RequestView.js";
 import TeamStatsView from "./views/TeamStatsView.js";
 import FullTodoView from "./views/FullTodoView.js";
 import TwoFactorSetupView from "./views/TwoFactorSetupView.js";
-import UserSettingsView from "./views/UserSettingsView.js";
 import ProfileView from "./views/ProfileView.js";
 import { AuthManager } from "./utils/auth.js";
 
@@ -27,7 +26,6 @@ export const router = async () => {
     { path: "/", view: LoginView, requiresAuth: false },
     { path: "/register", view: RegisterView, requiresAuth: false },
     { path: "/setup-2fa", view: TwoFactorSetupView, requiresAuth: true },
-    { path: "/settings", view: UserSettingsView, requiresAuth: true },
     { path: "/profile", view: ProfileView, requiresAuth: true },
     { path: "/home", view: HomeView, requiresAuth: true },
     { path: "/create/todo", view: CreateTodoView, requiresAuth: true },

@@ -8,16 +8,28 @@ import {
   deactivateUser,
   getUserById,
   getAllUsers,
+  getUserJoinRequests,
+  getUserTeams,
 } from "../controllers/user.controller";
 
 const router = Router();
 
 // Admin routes
-router.get("/users", authenticate, isAccessAdministrator, getAllUsers as RequestHandler);
-router.post("/users/:id/deactivate", authenticate, isAccessAdministrator, deactivateUser as RequestHandler);
+router.get("/", authenticate, isAccessAdministrator, getAllUsers as RequestHandler);
+router.post("/:id/deactivate", authenticate, isAccessAdministrator, deactivateUser as RequestHandler);
 
 // User routes
-router.post("/users", createUser as RequestHandler);
-router.get("/users/:id", authenticate, getUserById as RequestHandler);
+router.post("/", createUser as RequestHandler);
+router.get("/:id", authenticate, getUserById as RequestHandler);
+router.get(
+  "/:userId/join-requests",
+  // authenticate,
+  getUserJoinRequests as RequestHandler
+);
+router.get(
+  "/:userId/teams",
+  // authenticate,
+  getUserTeams as RequestHandler
+);
 
 export default router;

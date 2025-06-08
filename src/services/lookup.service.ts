@@ -1,4 +1,4 @@
-import sql from "../db";
+import sql from "../config/db";
 import { SystemRole } from "../models/SystemRole";
 import { TeamRole } from "../models/TeamRole";
 import { Status } from "../models/Status";

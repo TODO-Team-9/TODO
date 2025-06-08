@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { getApiUrl } from "../../utils/config.js";
+import { validatePassword, passwordRules } from "../../utils/password.js";
 import "./TwoFactorSetup.js";
 
 class RegisterForm extends LitElement {
@@ -9,8 +10,12 @@ class RegisterForm extends LitElement {
     successMessage: { type: String },
     showTwoFactorSetup: { type: Boolean },
     twoFactorData: { type: Object },
+    passwordMismatch: { type: Boolean },
+    tempUserData: { type: Object },
+    tempPassword: { type: String },
+    passwordValidationErrors: { type: Array },
+    showPasswordRequirements: { type: Boolean },
   };
-
   constructor() {
     super();
     this.loading = false;
@@ -18,6 +23,11 @@ class RegisterForm extends LitElement {
     this.successMessage = "";
     this.showTwoFactorSetup = false;
     this.twoFactorData = null;
+    this.passwordMismatch = false;
+    this.tempUserData = null;
+    this.tempPassword = "";
+    this.passwordValidationErrors = [];
+    this.showPasswordRequirements = false;
   }
   static styles = css`
     :host {
@@ -43,12 +53,71 @@ class RegisterForm extends LitElement {
       flex-direction: column;
       gap: 1rem;
     }
-
     input {
       padding: 0.75rem;
       font-size: 12pt;
       border-radius: 4px;
       border: 1px solid #ccc;
+    }
+    input.password-mismatch {
+      border-color: #d32f2f;
+      background-color: #ffebee;
+    }
+
+    input.password-invalid {
+      border-color: #d32f2f;
+      background-color: #ffebee;
+    }
+
+    input.password-valid {
+      border-color: #2e7d32;
+      background-color: #e8f5e8;
+    }
+
+    .password-error {
+      color: #d32f2f;
+      font-size: 10pt;
+      margin-top: -0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .password-requirements {
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+      font-size: 10pt;
+    }
+
+    .password-requirements h4 {
+      margin: 0 0 0.5rem 0;
+      color: #333;
+      font-size: 11pt;
+    }
+
+    .password-requirements ul {
+      margin: 0;
+      padding-left: 1rem;
+      list-style: none;
+    }
+
+    .password-requirements li {
+      margin: 0.25rem 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-requirements .check {
+      color: #2e7d32;
+      margin-right: 0.5rem;
+      font-weight: bold;
+    }
+
+    .password-requirements .cross {
+      color: #d32f2f;
+      margin-right: 0.5rem;
+      font-weight: bold;
     }
 
     button {
@@ -122,6 +191,8 @@ class RegisterForm extends LitElement {
           .qrCodeDataURL=${this.twoFactorData?.qrCodeDataURL}
           .secret=${this.twoFactorData?.secret}
           .isRegistrationFlow=${true}
+          .tempUserData=${this.tempUserData}
+          .tempPassword=${this.tempPassword}
         >
         </two-factor-setup>
       `;
@@ -159,7 +230,27 @@ class RegisterForm extends LitElement {
           placeholder="Password"
           required
           ?disabled=${this.loading}
+          class=${this.getPasswordInputClass()}
+          @input=${this.validatePasswords}
+          @focus=${() => (this.showPasswordRequirements = true)}
+          @blur=${() => (this.showPasswordRequirements = false)}
         />
+        ${this.showPasswordRequirements ||
+        this.passwordValidationErrors.length > 0
+          ? this.renderPasswordRequirements()
+          : ""}
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          required
+          ?disabled=${this.loading}
+          class=${this.passwordMismatch ? "password-mismatch" : ""}
+          @input=${this.validatePasswords}
+        />
+        ${this.passwordMismatch
+          ? html`<div class="password-error">Passwords do not match</div>`
+          : ""}
         <button type="submit" ?disabled=${this.loading}>
           ${this.loading ? "Creating account..." : "Register"}
         </button>
@@ -169,7 +260,56 @@ class RegisterForm extends LitElement {
       </article>
     `;
   }
+  validatePasswords() {
+    const password = this.shadowRoot.querySelector(
+      'input[name="password"]'
+    ).value;
+    const confirmPassword = this.shadowRoot.querySelector(
+      'input[name="confirmPassword"]'
+    ).value;
 
+    // Validate password complexity
+    const passwordValidation = validatePassword(password);
+    this.passwordValidationErrors = passwordValidation.errors;
+
+    // Check if passwords match
+    if (confirmPassword && password !== confirmPassword) {
+      this.passwordMismatch = true;
+    } else {
+      this.passwordMismatch = false;
+    }
+  }
+
+  getPasswordInputClass() {
+    const password =
+      this.shadowRoot?.querySelector('input[name="password"]')?.value || "";
+    if (!password) return "";
+
+    const validation = validatePassword(password);
+    return validation.isValid ? "password-valid" : "password-invalid";
+  }
+  renderPasswordRequirements() {
+    const password =
+      this.shadowRoot?.querySelector('input[name="password"]')?.value || "";
+
+    return html`
+      <div class="password-requirements">
+        <h4>Password Requirements:</h4>
+        <ul>
+          ${passwordRules.map(
+            (rule) => html`
+              <li>
+                <span class=${rule.test(password) ? "check" : "cross"}>
+                  ${rule.test(password) ? "✓" : "✗"}
+                </span>
+                ${rule.text}
+              </li>
+            `
+          )}
+        </ul>
+      </div>
+    `;
+  }
   async handleRegister(e) {
     e.preventDefault();
     this.loading = true;
@@ -180,6 +320,23 @@ class RegisterForm extends LitElement {
     const username = formData.get("username");
     const emailAddress = formData.get("emailAddress");
     const password = formData.get("password");
+    const confirmPassword = formData.get("confirmPassword"); // Validate passwords match
+    if (password !== confirmPassword) {
+      this.errorMessage = "Passwords do not match";
+      this.passwordMismatch = true;
+      this.loading = false;
+      return;
+    }
+
+    // Validate password complexity
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      this.errorMessage =
+        "Password does not meet complexity requirements:\n" +
+        passwordValidation.errors.join("\n");
+      this.loading = false;
+      return;
+    }
     try {
       const response = await fetch(getApiUrl("api/auth/register"), {
         method: "POST",
@@ -194,14 +351,13 @@ class RegisterForm extends LitElement {
       });
 
       const data = await response.json();
-
       if (response.ok) {
         // Store user data temporarily and show 2FA setup
         this.twoFactorData = data.twoFactor;
 
-        // Store the user data and password temporarily (for 2FA completion)
-        localStorage.setItem("tempUser", JSON.stringify(data.user));
-        localStorage.setItem("tempPassword", password);
+        // Store the user data and password temporarily (in component state, not localStorage)
+        this.tempUserData = data.user;
+        this.tempPassword = password;
 
         this.showTwoFactorSetup = true;
         this.successMessage =

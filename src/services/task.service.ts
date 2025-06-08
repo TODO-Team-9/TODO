@@ -1,4 +1,4 @@
-import sql from "../db";
+import sql from "../config/db";
 import { Task } from "../models/Task";
 
 export class TaskService {

@@ -12,8 +12,9 @@ class TwoFactorSetup extends LitElement {
     setupComplete: { type: Boolean },
     verificationToken: { type: String },
     isRegistrationFlow: { type: Boolean },
+    tempUserData: { type: Object },
+    tempPassword: { type: String },
   };
-
   constructor() {
     super();
     this.loading = false;
@@ -24,6 +25,8 @@ class TwoFactorSetup extends LitElement {
     this.setupComplete = false;
     this.verificationToken = "";
     this.isRegistrationFlow = false;
+    this.tempUserData = null;
+    this.tempPassword = "";
   }
 
   static styles = css`
@@ -202,8 +205,6 @@ class TwoFactorSetup extends LitElement {
     // If we already have QR code data (from registration), don't generate new one
     if (!this.qrCodeDataURL && !this.secret) {
       await this.generateQRCode();
-    } else {
-      this.isRegistrationFlow = true;
     }
   }
 
@@ -256,9 +257,12 @@ class TwoFactorSetup extends LitElement {
     const token = formData.get("token");
     try {
       if (this.isRegistrationFlow) {
-        // For registration flow, we need to enable 2FA using the temporary user data
-        const tempUser = JSON.parse(localStorage.getItem("tempUser") || "{}");
-        const tempPassword = localStorage.getItem("tempPassword");
+        // For registration flow, we need to enable 2FA using the passed user data
+        if (!this.tempUserData || !this.tempPassword) {
+          this.errorMessage =
+            "Registration data missing. Please try registering again.";
+          return;
+        }
 
         // First, we need to login to get a token
         const loginResponse = await fetch(getApiUrl("api/auth/login"), {
@@ -267,8 +271,8 @@ class TwoFactorSetup extends LitElement {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            username: tempUser.username,
-            password: tempPassword,
+            username: this.tempUserData.username,
+            password: this.tempPassword,
           }),
         });
 
@@ -301,11 +305,7 @@ class TwoFactorSetup extends LitElement {
                 ...loginData.user,
                 twoFactorEnabled: true,
               })
-            );
-
-            // Clean up temporary data
-            localStorage.removeItem("tempUser");
-            localStorage.removeItem("tempPassword");
+            ); // Clean up temporary data - no longer needed since data is not stored in localStorage
 
             this.setupComplete = true;
             this.successMessage =

@@ -1,4 +1,4 @@
-import sql from "../db";
+import sql from "../config/db";
 import { JoinRequest } from "../models/JoinRequest";
 import { PendingJoinRequest } from "../models/PendingJoinRequest";
 

@@ -45,13 +45,12 @@ export class UserService {
       throw error;
     }
   }
-
   async findByUsername(username: string): Promise<User | null> {
     try {
       const result = await sql<User[]>`
         SELECT user_id, username, email_address, password_hash, two_factor_secret, system_role_id, deactivated_at 
         FROM users 
-        WHERE username = ${username}
+        WHERE LOWER(username) = LOWER(${username})
       `;
       return result.length ? this.processUserResult(result[0]) : null;
     } catch (error) {

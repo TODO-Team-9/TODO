@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { UserService } from "../services/user.service";
 import { generateTOTPSecret, verifyTOTPToken } from "../services/totp.service";
 import { validatePassword } from "../utils/password.utils";
+import { validateUsername } from "../utils/username.utils";
 import { HTTP_Status } from "../enums/HTTP_Status";
 
 const userService = new UserService();
@@ -19,14 +20,22 @@ export async function register(
         .status(HTTP_Status.BAD_REQUEST)
         .json({ error: "All fields are required" });
       return;
-    }
-
-    // Validate password complexity
+    } // Validate password complexity
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
       response.status(HTTP_Status.BAD_REQUEST).json({
         error: "Password does not meet complexity requirements",
         details: passwordValidation.errors,
+      });
+      return;
+    }
+
+    // Validate username format
+    const usernameValidation = validateUsername(username);
+    if (!usernameValidation.isValid) {
+      response.status(HTTP_Status.BAD_REQUEST).json({
+        error: "Username does not meet requirements",
+        details: usernameValidation.errors,
       });
       return;
     }

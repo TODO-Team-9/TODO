@@ -287,29 +287,3 @@ export async function enable2FA(
       .json({ error: "Failed to enable 2FA" });
   }
 }
-
-export async function disable2FA(
-  request: Request,
-  response: Response
-): Promise<void> {
-  const userId = request.user?.userId;
-
-  if (!userId) {
-    response
-      .status(HTTP_Status.UNAUTHORIZED)
-      .json({ error: "User not authenticated" });
-    return;
-  }
-
-  try {
-    await userService.setTwoFactorSecret(userId, "");
-    response
-      .status(HTTP_Status.OK)
-      .json({ message: "2FA disabled successfully" });
-  } catch (error) {
-    console.error("Disable 2FA error:", error);
-    response
-      .status(HTTP_Status.INTERNAL_SERVER_ERROR)
-      .json({ error: "Failed to disable 2FA" });
-  }
-}

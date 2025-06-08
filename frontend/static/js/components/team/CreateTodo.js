@@ -77,7 +77,7 @@ class CreateTodo extends LitElement {
     
     todoService.createTodo(todo);
     alert('Todo Created');
-    // form.reset();
+    form.reset();
   }
 
   render() {

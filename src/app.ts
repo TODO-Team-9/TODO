@@ -7,6 +7,7 @@ dotenv.config({ path: path.join(__dirname, "../.env") });
 import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
 import taskRoutes from "./routes/task.routes";
+import teamRoutes from "./routes/team.routes";
 import corsMiddleware from "./middleware/cors.middleware";
 
 const app = express();
@@ -21,6 +22,7 @@ app.use("/", express.static(path.join(__dirname, "../public")));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/teams", teamRoutes);
 app.use("/api/tasks", taskRoutes);
 
 // app.get("/{*any}", (_request, response) => {

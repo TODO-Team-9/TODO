@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { navigator } from '../../index.js';
+import teamService from '../../services/TeamService.js';
 
 class TeamList extends LitElement {
     static properties = {
@@ -62,9 +63,29 @@ class TeamList extends LitElement {
 
   constructor() {
         super();
-        this.teams = [{name: "Team A"}, {name: "Team B"}];
-        this.members = [{name: "Alice"}, {name: "Bob"}, {name: "Charlie"}];
+        this.teams = [];
+        this.members = [];
   }
+
+    connectedCallback(){
+        super.connectedCallback();
+        this.loadTeamsAndMembers();
+    }
+
+    async loadTeamsAndMembers() {
+        try {
+            const teams = await teamService.getTeams();
+            this.teams = Array.isArray(teams) ? teams : [];
+
+            if(this.teams.length !== 0){
+                const members = await teamService.getTeamMembers(this.teams[0].team_id);
+                this.members = Array.isArray(members) ? members : [];
+            }
+        } catch (error) {
+            this.teams = [];
+            this.members = [];
+        }
+    }
 
 
     _navigate(e) {
@@ -79,7 +100,7 @@ class TeamList extends LitElement {
             ${this.teams.map(
             (team) => html`
                 <option>
-                    ${team.name}
+                    ${team.team_name}
                 </option>
             `
             )}

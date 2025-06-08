@@ -1,12 +1,16 @@
 import apiService from './ApiRequestService.js';
 
 class TeamService {
-    async createTeam() {
-        return apiService.post();
+    async createTeam(data) {
+        return apiService.post(`http://localhost:3000/api/teams`, data);
     }
 
-    async getTeamMembers() {
-        return apiService.get();
+    async getTeams() {
+        return apiService.get(`http://localhost:3000/api/teams`);
+    }
+
+    async getTeamMembers(teamId) {
+        return apiService.get(`http://localhost:3000/api/teams/${teamId}/members`);
     }
 
     async assignTeamMember() {
@@ -18,5 +22,5 @@ class TeamService {
     }
 }
 
-const categoryService = new CategoryService();
-export default categoryService;
+const teamService = new TeamService();
+export default teamService;

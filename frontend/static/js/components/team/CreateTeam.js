@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { navigator } from '../../index.js';
+import teamService from '../../services/TeamService.js';
 
 import "./Header.js";
 
@@ -66,6 +67,15 @@ class CreateTeam extends LitElement {
 
   handleSubmit(e) {
     e.preventDefault();
+    const form = e.target;
+    const team = {
+      teamName: form.name.value.trim(),
+      teamDescription: form.description.value.trim()
+    };
+    
+    teamService.createTeam(team);
+    alert('Team:' + form.name.value.trim() + ' Created');
+    form.reset();
   }
 
   render() {

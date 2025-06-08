@@ -10,6 +10,7 @@ import taskRoutes from "./routes/task.routes";
 import teamRoutes from "./routes/team.routes";
 import lookupRoutes from "./routes/lookup.routes";
 import joinRequestsRoutes from "./routes/joinRequest.routes";
+import reportingRoutes from "./routes/reporting.routes";
 
 import corsMiddleware from "./middleware/cors.middleware";
 
@@ -28,7 +29,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/teams", teamRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api", lookupRoutes);
-app.use("/api/join", joinRequestsRoutes)
+app.use("/api/join", joinRequestsRoutes);
+app.use("/api/reports", reportingRoutes);
 
 // app.get("/{*any}", (_request, response) => {
 //   response.sendFile(path.join(__dirname, "../public/index.html"));

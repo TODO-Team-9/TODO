@@ -145,12 +145,12 @@ export async function getUserJoinRequests(
   response: Response
 ): Promise<void> {
   try {
-    const userId = request.user?.userId;
+    const userId = Number(request.params.userId);
     
-    if (!userId) {
+    if (!userId || isNaN(userId)) {
       response
-        .status(HTTP_Status.UNAUTHORIZED)
-        .json({ error: "User not authenticated" });
+        .status(HTTP_Status.BAD_REQUEST)
+        .json({ error: "Valid user ID is required" });
       return;
     }
 
@@ -169,12 +169,12 @@ export async function getUserTeams(
   response: Response
 ): Promise<void> {
   try {
-    const userId = request.user?.userId;
+    const userId = Number(request.params.userId);
     
-    if (!userId) {
+    if (!userId || isNaN(userId)) {
       response
-        .status(HTTP_Status.UNAUTHORIZED)
-        .json({ error: "User not authenticated" });
+        .status(HTTP_Status.BAD_REQUEST)
+        .json({ error: "Valid user ID is required" });
       return;
     }
 

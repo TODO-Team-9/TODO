@@ -25,7 +25,7 @@ export const router = async () => {
   const routes = [
     { path: "/", view: LoginView, requiresAuth: false },
     { path: "/register", view: RegisterView, requiresAuth: false },
-    { path: "/setup-2fa", view: TwoFactorSetupView, requiresAuth: false },
+    { path: "/setup-2fa", view: TwoFactorSetupView, requiresAuth: true },
     { path: "/profile", view: ProfileView, requiresAuth: true },
     { path: "/home", view: HomeView, requiresAuth: true },
     { path: "/create/todo", view: CreateTodoView, requiresAuth: true },

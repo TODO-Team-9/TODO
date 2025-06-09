@@ -9,17 +9,18 @@ export const createTask = async (
   response: Response
 ): Promise<void> => {
   try {
-    const { taskName, taskDescription, teamId, memberId } = request.body;
-    if (!taskName || !teamId) {
+    const { taskName, taskDescription, teamId, memberId, priorityId } = request.body;
+    if (!taskName || !teamId || !priorityId) {
       response
         .status(HTTP_Status.BAD_REQUEST)
-        .json({ error: "taskName and teamId are required" });
+        .json({ error: "taskName, teamId, and priorityId are required" });
       return;
     }
     const task = await taskService.createTask(
       taskName,
       taskDescription ?? null,
       teamId,
+      priorityId,
       memberId
     );
     response.status(HTTP_Status.CREATED).json(task);

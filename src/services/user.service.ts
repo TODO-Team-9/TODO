@@ -24,8 +24,10 @@ export class UserService {
   }
 
   private processUserResult(user: User): User {
-    if (user.twoFactorSecret) {
-      user.twoFactorSecret = EncryptionService.decrypt(user.twoFactorSecret);
+    if (user.two_factor_secret) {
+      user.two_factor_secret = EncryptionService.decrypt(
+        user.two_factor_secret
+      );
     }
     return user;
   }

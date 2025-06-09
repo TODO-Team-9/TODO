@@ -61,7 +61,7 @@ export async function register(
       password,
     });
     const totp = await generateTOTPSecret(newUser.username);
-    const { passwordHash, ...userWithoutSensitiveData } = newUser;
+    const { password_hash, ...userWithoutSensitiveData } = newUser;
 
     response.status(HTTP_Status.CREATED).json({
       message:
@@ -104,7 +104,7 @@ export async function login(
 
     const isPasswordValid = await userService.verifyPassword(
       password,
-      user.passwordHash
+      user.password_hash
     );
     if (!isPasswordValid) {
       response
@@ -112,7 +112,7 @@ export async function login(
         .json({ error: "Invalid credentials" });
       return;
     } // Check if user has 2FA enabled
-    const has2FA = !!user.twoFactorSecret;
+    const has2FA = !!user.two_factor_secret;
 
     if (has2FA) {
       const { token } = request.body;
@@ -125,7 +125,7 @@ export async function login(
         return;
       }
 
-      const isTokenValid = verifyTOTPToken(user.twoFactorSecret, token);
+      const isTokenValid = verifyTOTPToken(user.two_factor_secret, token);
       if (!isTokenValid) {
         response
           .status(HTTP_Status.UNAUTHORIZED)
@@ -143,7 +143,7 @@ export async function login(
 
       const tokenJwt = jwt.sign(
         {
-          userId: user.userId,
+          userId: user.user_id,
           username: user.username,
           twoFactorVerified: true,
         },
@@ -155,9 +155,9 @@ export async function login(
         message: "Login successful",
         token: tokenJwt,
         user: {
-          userId: user.userId,
+          userId: user.user_id,
           username: user.username,
-          emailAddress: user.emailAddress,
+          emailAddress: user.email_address,
           twoFactorEnabled: true,
         },
       });
@@ -172,7 +172,7 @@ export async function login(
 
       const provisionalToken = jwt.sign(
         {
-          userId: user.userId,
+          userId: user.user_id,
           username: user.username,
           twoFactorVerified: false,
         },
@@ -185,9 +185,9 @@ export async function login(
         token: provisionalToken,
         requiresTwoFactorSetup: true,
         user: {
-          userId: user.userId,
+          userId: user.user_id,
           username: user.username,
-          emailAddress: user.emailAddress,
+          emailAddress: user.email_address,
           twoFactorEnabled: false,
         },
       });

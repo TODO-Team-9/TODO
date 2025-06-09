@@ -60,7 +60,24 @@ export async function register(
       emailAddress,
       password,
     });
-    const totp = await generateTOTPSecret(newUser.username);
+
+    if (!process.env.JWT_PROVISIONAL_SECRET) {
+      response
+        .status(HTTP_Status.INTERNAL_SERVER_ERROR)
+        .json({ error: "JWT provisional secret is not configured" });
+      return;
+    }
+
+    const provisionalToken = jwt.sign(
+      {
+        userId: newUser.user_id,
+        username: newUser.username,
+        twoFactorVerified: false,
+      },
+      process.env.JWT_PROVISIONAL_SECRET,
+      { expiresIn: "1h" }
+    );
+
     const { password_hash, two_factor_secret, ...userWithoutSensitiveData } =
       newUser;
 
@@ -68,10 +85,8 @@ export async function register(
       message:
         "User registered successfully. Please complete 2FA setup to access your account.",
       user: userWithoutSensitiveData,
-      twoFactor: {
-        secret: totp.base32,
-        qrCodeDataURL: totp.qrCodeDataURL,
-      },
+      token: provisionalToken,
+      requiresTwoFactorSetup: true,
     });
   } catch (error) {
     console.error("Registration error:", error);

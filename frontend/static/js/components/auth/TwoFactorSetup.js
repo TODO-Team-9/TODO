@@ -10,10 +10,6 @@ class TwoFactorSetup extends LitElement {
     qrCodeDataURL: { type: String },
     secret: { type: String },
     setupComplete: { type: Boolean },
-    verificationToken: { type: String },
-    isRegistrationFlow: { type: Boolean },
-    tempUserData: { type: Object },
-    tempPassword: { type: String },
   };
   constructor() {
     super();
@@ -23,10 +19,6 @@ class TwoFactorSetup extends LitElement {
     this.qrCodeDataURL = "";
     this.secret = "";
     this.setupComplete = false;
-    this.verificationToken = "";
-    this.isRegistrationFlow = false;
-    this.tempUserData = null;
-    this.tempPassword = "";
   }
 
   static styles = css`
@@ -202,10 +194,7 @@ class TwoFactorSetup extends LitElement {
   `;
   async connectedCallback() {
     super.connectedCallback();
-    // If we already have QR code data (from registration), don't generate new one
-    if (!this.qrCodeDataURL && !this.secret) {
-      await this.generateQRCode();
-    }
+    await this.generateQRCode();
   }
 
   async generateQRCode() {
@@ -255,94 +244,34 @@ class TwoFactorSetup extends LitElement {
 
     const formData = new FormData(e.target);
     const token = formData.get("token");
+
     try {
-      if (this.isRegistrationFlow) {
-        // For registration flow, we need to enable 2FA using the passed user data
-        if (!this.tempUserData || !this.tempPassword) {
-          this.errorMessage =
-            "Registration data missing. Please try registering again.";
-          return;
-        }
-
-        // First, we need to login to get a token
-        const loginResponse = await fetch(getApiUrl("auth/login"), {
+      const response = await AuthManager.makeAuthenticatedRequest(
+        getApiUrl("auth/enable-2fa"),
+        {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify({
-            username: this.tempUserData.username,
-            password: this.tempPassword,
+            secret: this.secret,
+            token: token,
           }),
-        });
-
-        const loginData = await loginResponse.json();
-
-        if (loginResponse.ok) {
-          // Now enable 2FA with the token
-          const enable2FAResponse = await fetch(
-            getApiUrl("auth/enable-2fa"),
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${loginData.token}`,
-              },
-              body: JSON.stringify({
-                secret: this.secret,
-                token: token,
-              }),
-            }
-          );
-
-          const enable2FAData = await enable2FAResponse.json();
-
-          if (enable2FAResponse.ok) {
-            localStorage.setItem("authToken", loginData.token);
-            localStorage.setItem(
-              "user",
-              JSON.stringify({
-                ...loginData.user,
-                twoFactorEnabled: true,
-              })
-            ); // Clean up temporary data - no longer needed since data is not stored in localStorage
-
-            this.setupComplete = true;
-            this.successMessage =
-              "Two-Factor Authentication has been successfully enabled!";
-          } else {
-            this.errorMessage = enable2FAData.error || "Failed to enable 2FA";
-          }
-        } else {
-          this.errorMessage = loginData.error || "Authentication failed";
         }
+      );
+
+      if (!response) {
+        this.errorMessage = "Authentication failed";
+        return;
+      }
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("authToken", data.token);
+
+        this.setupComplete = true;
+        this.successMessage =
+          "Two-Factor Authentication has been successfully enabled!";
       } else {
-        // For existing user enabling 2FA
-        const response = await AuthManager.makeAuthenticatedRequest(
-          getApiUrl("auth/enable-2fa"),
-          {
-            method: "POST",
-            body: JSON.stringify({
-              secret: this.secret,
-              token: token,
-            }),
-          }
-        );
-
-        if (!response) {
-          this.errorMessage = "Authentication failed";
-          return;
-        }
-
-        const data = await response.json();
-
-        if (response.ok) {
-          this.setupComplete = true;
-          this.successMessage =
-            "Two-Factor Authentication has been successfully enabled!";
-        } else {
-          this.errorMessage = data.error || "Invalid verification code";
-        }
+        this.errorMessage = data.error || "Invalid verification code";
       }
     } catch (error) {
       console.error("2FA enable error:", error);

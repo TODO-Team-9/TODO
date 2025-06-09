@@ -33,7 +33,7 @@ export const router = async () => {
     { path: "/team/join", view: JoinTeamView, requiresAuth: true },
     { path: "/team/report", view: TeamStatsView, requiresAuth: true },
     { path: "/requests", view: RequestView, requiresAuth: true },
-    { path: "/todo", view: FullTodoView, requiresAuth: true }
+    { path: "/todo", view: FullTodoView, requiresAuth: true },
   ];
 
   const pathToRegex = (path) =>

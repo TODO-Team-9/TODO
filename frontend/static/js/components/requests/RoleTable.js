@@ -73,6 +73,7 @@ class RoleTable extends LitElement {
 
             this.teamMembers = members.map((member) => ({
                 member_id: member.member_id,
+                user_id: member.user_id,
                 team_id: member.team_id,
                 username: member.username,
                 team_name: this.teams.find(team => team.team_id === member.team_id).team_name,
@@ -106,6 +107,13 @@ class RoleTable extends LitElement {
         const selectedTeam = this.teams.find(team => team.team_id == selectedTeamId);
 
         await this.loadMembers(selectedTeam.team_id);
+    }
+
+    async removeMember(row){
+        const response = await teamService.removeMember(row.team_id, row.user_id);  
+        alert(response.message);
+
+        await this.loadMembers(row.team_id);
     }
 
     async updateRole(row, newRole){
@@ -155,7 +163,8 @@ class RoleTable extends LitElement {
 
                     .actions = "${[
                         { label: "Promote", color: 'green', callback: (row) => this.updateRole(row, 1) },
-                        { label: "Demote", color: 'red', callback: (row) => this.updateRole(row, 2) },
+                        { label: "Demote", color: 'orange', callback: (row) => this.updateRole(row, 2) },
+                        { label: "Remove", color: 'red', callback: (row) => this.removeMember(row) }
                     ]}"
                 >
                 </custom-table>

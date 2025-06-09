@@ -4,6 +4,8 @@ import "./Header.js";
 import "./MemberStats.js";
 import "../shared/StatCard.js";
 
+import teamService from '../../services/TeamService.js';
+
 class TeamStats extends LitElement {
   static properties = {
     backlog: { type: Number },
@@ -35,6 +37,23 @@ class TeamStats extends LitElement {
     this.done = 0;
     this.inProgress = 0;
     this.inReview = 0;
+  }
+
+  connectedCallback(){
+    super.connectedCallback();
+    this.getStats();
+  }
+
+  async getStats(){
+    try{
+        const stats = await teamService.getTeamStats(localStorage.getItem('selectedTeam'));
+        console.log(stats);
+    }catch (error){
+        this.backlog = 0;
+        this.done = 0;
+        this.inProgress = 0;
+        this.inReview = 0;        
+    }
   }
 
   render() {

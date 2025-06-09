@@ -40,6 +40,14 @@ class TeamService {
     async updateMemberRole(memberId, data) {
         return apiService.post(`/members/${memberId}/updateRole`, data);
     }
+
+    async removeMember(teamId, userId) {
+        return apiService.delete(`/teams/${teamId}/members/${userId}`);
+    }
+
+    async getTeamStats(teamId){
+        return apiService.get(`/reports/teams/${teamId}/stats?startDate=2025-06-01&endDate=2025-06-25`);
+    }
 }
 
 const teamService = new TeamService();

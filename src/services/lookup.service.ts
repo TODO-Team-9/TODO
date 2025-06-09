@@ -14,7 +14,9 @@ export class LookupService {
   }
 
   async getTeamRoles(): Promise<TeamRole[]> {
-    const roles = await sql<TeamRole[]>`SELECT * FROM team_roles`;
+    const roles = await sql<
+      TeamRole[]
+    >`SELECT team_role_id, team_role_name FROM team_roles`;
     return roles;
   }
 

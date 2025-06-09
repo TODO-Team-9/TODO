@@ -7,7 +7,9 @@ import { RequestStatus } from "../models/RequestStatus";
 
 export class LookupService {
   async getSystemRoles(): Promise<SystemRole[]> {
-    const roles = await sql<SystemRole[]>`SELECT * FROM system_roles`;
+    const roles = await sql<
+      SystemRole[]
+    >`SELECT system_role_id, system_role_name FROM system_roles`;
     return roles;
   }
 

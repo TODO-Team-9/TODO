@@ -27,15 +27,15 @@ export const router = async () => {
     { path: "/", view: LoginView, requiresAuth: false },
     { path: "/register", view: RegisterView, requiresAuth: false },
     { path: "/setup-2fa", view: TwoFactorSetupView, requiresAuth: true },
-    { path: "/profile", view: ProfileView, requiresAuth: true },
-    { path: "/home", view: HomeView, requiresAuth: true },
-    { path: "/create/todo", view: CreateTodoView, requiresAuth: true },
-    { path: "/create/team", view: CreateTeamView, requiresAuth: true },
-    { path: "/team/join", view: JoinTeamView, requiresAuth: true },
-    { path: "/team/report", view: TeamStatsView, requiresAuth: true },
-    { path: "/requests", view: RequestView, requiresAuth: true },
-    { path: "/roles", view: RoleView, requiresAuth: true },
-    { path: "/todo", view: FullTodoView, requiresAuth: true }
+    { path: "/profile", view: ProfileView, requiresAuth: false },
+    { path: "/home", view: HomeView, requiresAuth: false },
+    { path: "/create/todo", view: CreateTodoView, requiresAuth: false },
+    { path: "/create/team", view: CreateTeamView, requiresAuth: false },
+    { path: "/team/join", view: JoinTeamView, requiresAuth: false },
+    { path: "/team/report", view: TeamStatsView, requiresAuth: false },
+    { path: "/requests", view: RequestView, requiresAuth: false },
+    { path: "/roles", view: RoleView, requiresAuth: false },
+    { path: "/todo", view: FullTodoView, requiresAuth: false }
   ];
 
   const pathToRegex = (path) =>
@@ -74,9 +74,17 @@ export const router = async () => {
 
   // Check authentication
   const isAuthenticated = AuthManager.isAuthenticated();
-  const isNormalUser = await AuthManager.isNormalUser();
 
   const route = currentRoute.route;
+
+    let isNormalUser = true;
+    let isTeamLead = false;
+
+    if(route.path != '/' || route.path != '/register' || route.path != '/setup-2fa'){
+        isNormalUser = await AuthManager.isNormalUser();
+        const teamLeadTeams = await AuthManager.teamLeadTeams();
+        isTeamLead = teamLeadTeams != 0;
+    }
 
   // Redirect unauthenticated users to login
   if (route.requiresAuth && !isAuthenticated) {
@@ -84,7 +92,7 @@ export const router = async () => {
     return;
   }
 
-  if((route.path === '/requests' || route.path === '/roles') && isNormalUser){
+  if((route.path === '/requests' || route.path === '/roles') && isNormalUser && !isTeamLead){
     navigator('/home');
     return;
   }

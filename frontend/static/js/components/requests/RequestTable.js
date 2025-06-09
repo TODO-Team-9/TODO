@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { navigator } from '../../index.js';
+import { AuthManager } from '../../utils/auth.js';
 
 import "../shared/Table.js";
 
@@ -76,8 +77,13 @@ class RequestTable extends LitElement {
 
     async loadTeams() {
         try {
-            const teams = await teamService.getTeams();
-            this.teams = Array.isArray(teams) ? teams : [];
+            const teamLeadTeams = await AuthManager.teamLeadTeams();
+            if(await AuthManager.isNormalUser() && teamLeadTeams.length != 0){
+                this.teams = Array.isArray(teamLeadTeams) ? teamLeadTeams : [];
+            }else if(!await AuthManager.isNormalUser()){
+                const teams = await teamService.getTeams();
+                this.teams = Array.isArray(teams) ? teams : [];
+            }
         } catch (error) {
             this.teams = [];
         }

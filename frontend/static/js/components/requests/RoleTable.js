@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { navigator } from '../../index.js';
+import { AuthManager } from '../../utils/auth.js';
 
 import "../shared/Table.js";
 
@@ -84,8 +85,13 @@ class RoleTable extends LitElement {
 
     async loadTeams() {
         try {
-            const teams = await teamService.getTeams();
-            this.teams = Array.isArray(teams) ? teams : [];
+            const teamLeadTeams = await AuthManager.teamLeadTeams();
+            if(await AuthManager.isNormalUser() && teamLeadTeams.length != 0){
+                this.teams = Array.isArray(teamLeadTeams) ? teamLeadTeams : [];
+            }else if(!await AuthManager.isNormalUser()){
+                const teams = await teamService.getTeams();
+                this.teams = Array.isArray(teams) ? teams : [];
+            }
         } catch (error) {
             this.teams = [];
         }
@@ -114,7 +120,11 @@ class RoleTable extends LitElement {
         }
 
         //Handle Role Update;
-        const response = await teamService.promoteMember(row.member_id, row.team_id);
+        const body = {
+            teamId: row.team_id,
+            teamRoleId: newRole
+        }
+        const response = await teamService.updateMemberRole(row.member_id, body);
         alert(response.message);
 
         await this.loadMembers(row.team_id);

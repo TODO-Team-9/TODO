@@ -33,12 +33,8 @@ class TeamService {
         return apiService.post(`/join-requests/${requestId}/status`, data);
     }
 
-    async promoteMember(memberId, teamId) {
-        return apiService.post(`/teams/${teamId}/members/${memberId}/promote`);
-    }
-
-    async demoteMember(memberId, teamId) {
-        return apiService.post(`/teams/${teamId}/members/${memberId}/demote`);
+    async updateMemberRole(memberId, data) {
+        return apiService.post(`/members/${memberId}/updateRole`, data);
     }
 }
 

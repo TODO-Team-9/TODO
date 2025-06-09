@@ -127,6 +127,48 @@ export const promoteMember = async (
   }
 };
 
+export const updateMember = async (
+  request: Request,
+  response: Response
+): Promise<void> => {
+  try {
+    const { memberId } = request.params;
+    const { teamId, teamRoleId } = request.body;
+
+    if (!memberId || !teamId || !teamRoleId) {
+      response.status(HTTP_Status.BAD_REQUEST).json({
+        error: "memberId, teamId, and teamRoleId are required",
+      });
+      return;
+    }
+
+    await memberService.updateMemberTeamRole(
+      Number(memberId),
+      Number(teamId),
+      Number(teamRoleId)
+    );
+    response.status(HTTP_Status.OK).json({
+      message: "Member updated successfully",
+    });
+  } catch (error: any) {
+    if (
+      error.message &&
+      (error.message.includes("Invalid member ID") ||
+        error.message.includes("Invalid team ID") ||
+        error.message.includes("Invalid team role ID") ||
+        error.message.includes("Member does not exist in the specified team") ||
+        error.message.includes("has been removed"))
+    ) {
+      response.status(HTTP_Status.BAD_REQUEST).json({ error: error.message });
+      return;
+    }
+
+    response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({
+      error: "Failed to update member",
+    });
+  }
+};
+
 export const getTeamMembers = async (
   request: Request,
   response: Response

@@ -1,4 +1,5 @@
 import { LitElement, html, css } from 'lit';
+import { AuthManager } from '../../utils/auth';
 
 class TodoColumn extends LitElement {
   static properties = {
@@ -42,19 +43,42 @@ class TodoColumn extends LitElement {
     e.preventDefault();
   }
 
-  _onDrop(e) {
-    e.preventDefault();
-    const data = JSON.parse(e.dataTransfer.getData('application/json'));
+  async canUpdate(user){
+    const isAssignedUser = AuthManager.getUser().username === user;
+    const selectedTeam = localStorage.getItem('selectedTeam');
+    let isTeamLead = false;
 
-    this.dispatchEvent(new CustomEvent('ticket-dropped', {
-      detail: {
-        ticket: data,
-        newStatus: this.id
-      },
-      bubbles: true,
-      composed: true
-    }));
+    let teamLeadTeams = await AuthManager.teamLeadTeams();
+    teamLeadTeams = teamLeadTeams.filter((team) => team.team_id == selectedTeam);
+
+    if(teamLeadTeams.length == 0){
+        isTeamLead = false;
+    }else{
+        isTeamLead = true;
+    }
+
+    return isAssignedUser || isTeamLead;
   }
+
+    async _onDrop(e) {
+        e.preventDefault();
+        const data = JSON.parse(e.dataTransfer.getData('application/json'));
+        const allowed = await this.canUpdate(data.assignedTo);
+        
+        if(allowed){
+            this.dispatchEvent(new CustomEvent('ticket-dropped', {
+                detail: {
+                    ticket: data,
+                    newStatus: this.id
+                },
+                bubbles: true,
+                composed: true
+            }));        
+        }else{
+            alert('You can only update tickets assigned to you');
+        }
+
+    }
 
   render() {
     return html`

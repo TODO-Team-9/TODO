@@ -16,6 +16,7 @@ export const createJoinRequest = async (
         .json({ error: "teamId and userId are required" });
       return;
     }
+
     const joinRequest = await joinRequestService.createJoinRequest(
       Number(teamId),
       Number(userId)
@@ -69,5 +70,20 @@ export const getJoinRequestsForTeam = async (
     response
       .status(HTTP_Status.INTERNAL_SERVER_ERROR)
       .json({ error: error.message });
+  }
+};
+
+export const getAllJoinRequests = async (
+  _request: Request,
+  response: Response
+): Promise<void> => {
+  try {
+    const requests = await joinRequestService.getAllJoinRequests();
+    response.status(HTTP_Status.OK).json(requests);
+  } catch (error: any) {
+    console.error("Error getting all join requests:", error);
+    response
+      .status(HTTP_Status.INTERNAL_SERVER_ERROR)
+      .json({ error: "Failed to retrieve join requests" });
   }
 };

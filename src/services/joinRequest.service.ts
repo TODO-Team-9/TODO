@@ -1,6 +1,7 @@
 import sql from "../config/db";
 import { JoinRequest } from "../models/JoinRequest";
 import { PendingJoinRequest } from "../models/PendingJoinRequest";
+import { AllJoinRequest } from "../models/AllJoinRequest";
 
 export class JoinRequestService {
   async createJoinRequest(
@@ -31,5 +32,18 @@ export class JoinRequestService {
       SELECT * FROM get_pending_join_requests_for_team(${teamId})
     `;
     return requests;
+  }
+
+  async getAllJoinRequests(): Promise<AllJoinRequest[]> {
+    try {
+      const requests = await sql<AllJoinRequest[]>`
+        SELECT * FROM all_join_requests
+        ORDER BY requested_at DESC
+      `;
+      return requests;
+    } catch (error) {
+      console.error("Error getting all join requests:", error);
+      throw error;
+    }
   }
 }

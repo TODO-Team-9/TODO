@@ -241,7 +241,7 @@ class UserProfile extends LitElement {
 
       // Fetch detailed user profile from API
       const response = await AuthManager.makeAuthenticatedRequest(
-        getApiUrl(`api/users/${currentUser.userId}`)
+        getApiUrl(`api/users/${currentUser.user_id}`)
       );
 
       if (!response) {

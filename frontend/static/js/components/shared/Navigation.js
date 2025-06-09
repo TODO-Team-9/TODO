@@ -68,9 +68,9 @@ class NavigationSidebar extends LitElement {
     }
   `;
 
-  connectedCallback(){
+  async connectedCallback(){
     super.connectedCallback();
-    this.isNormalUser = this.isNormal();
+    this.isNormalUser = await this.isNormal();
   }
 
   async isNormal(){

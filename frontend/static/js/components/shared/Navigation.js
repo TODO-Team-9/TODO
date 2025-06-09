@@ -4,11 +4,13 @@ import { AuthManager } from "../../utils/auth.js";
 class NavigationSidebar extends LitElement {
   static properties = {
     user: { type: Object },
+    isNormalUser: { type: Boolean }
   };
 
   constructor() {
     super();
     this.user = AuthManager.getUser();
+    this.isNormalUser = true;
   }
   static styles = css`
     :host {
@@ -66,6 +68,15 @@ class NavigationSidebar extends LitElement {
     }
   `;
 
+  connectedCallback(){
+    super.connectedCallback();
+    this.isNormalUser = this.isNormal();
+  }
+
+  async isNormal(){
+    return AuthManager.isNormalUser();
+  }
+
   get currentPath() {
     return window.location.pathname.replace(/\/$/, "");
   }
@@ -84,11 +95,14 @@ class NavigationSidebar extends LitElement {
               : ""}
             >Home</a
           >
-          <a
-            href="/requests"
-            class=${this.currentPath === "/requests" || this.currentPath === "/roles" ? "active" : ""}
-            >Requests</a
-          >
+          ${!this.isNormalUser ? 
+            html`<a
+                href="/requests"
+                class=${this.currentPath === "/requests" || this.currentPath === "/roles" ? "active" : ""}
+                >Requests</a
+            >` : ''
+          }
+
           <a
             href="/settings"
             class=${this.currentPath === "/settings" ? "active" : ""}

@@ -1,7 +1,20 @@
+import userService from "../services/UserService";
+
 // Authentication utility functions
 export class AuthManager {
   static getToken() {
     return localStorage.getItem("authToken");
+  }
+
+  static async isNormalUser(){
+    const response = await userService.getUser(JSON.parse(localStorage.getItem('user')).user_id);
+    const user = response.user;
+
+    if(user && user.system_role_id === 2){
+        return true;
+    }else{
+        return false;
+    }
   }
 
   static getUser() {

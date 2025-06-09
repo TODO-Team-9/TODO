@@ -74,11 +74,18 @@ export const router = async () => {
 
   // Check authentication
   const isAuthenticated = AuthManager.isAuthenticated();
+  const isNormalUser = await AuthManager.isNormalUser();
+
   const route = currentRoute.route;
 
   // Redirect unauthenticated users to login
   if (route.requiresAuth && !isAuthenticated) {
     navigator("/");
+    return;
+  }
+
+  if((route.path === '/requests' || route.path === '/roles') && isNormalUser){
+    navigator('/home');
     return;
   }
 

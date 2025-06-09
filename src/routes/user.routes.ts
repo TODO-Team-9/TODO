@@ -20,7 +20,12 @@ router.post("/:id/deactivate", authenticate, isAccessAdministrator, deactivateUs
 
 // User routes
 router.post("/", createUser as RequestHandler);
-router.get("/:id", authenticate, getUserById as RequestHandler);
+router.get(
+    "/:id", 
+    // authenticate, 
+    getUserById as RequestHandler
+);
+
 router.get(
   "/:userId/join-requests",
   // authenticate,

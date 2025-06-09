@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit';
 
 import '../shared/Navigation.js';
+import './RequestNavigation.js';
 
 class RequestLayout extends LitElement {
   static styles = css`
@@ -21,6 +22,14 @@ class RequestLayout extends LitElement {
       overflow: hidden;
     }
 
+    .navigation {
+        width: 15rem;
+        background-color: #f3f3f3;
+        padding: 1rem;
+        overflow-y: auto;
+        box-shadow: inset 0 0 1px rgba(0,0,0,0.1);
+    }
+
     .main {
       flex: 1;
       padding: 1rem;
@@ -35,12 +44,15 @@ class RequestLayout extends LitElement {
 
   render() {
     return html`
-      <nav-bar></nav-bar>
-      <section class="page">
-        <section class="main">
-          <slot></slot>
+        <nav-bar></nav-bar>
+        <section class="page">
+            <section class="navigation">
+                <request-navigation></request-navigation>
+            </section>
+            <section class="main">
+            <slot></slot>
+            </section>
         </section>
-      </section>
     `;
   }
 }

@@ -32,6 +32,14 @@ class TeamService {
     async updateRequest(requestId, data) {
         return apiService.post(`/join-requests/${requestId}/status`, data);
     }
+
+    async promoteMember(memberId, teamId) {
+        return apiService.post(`/teams/${teamId}/members/${memberId}/promote`);
+    }
+
+    async demoteMember(memberId, teamId) {
+        return apiService.post(`/teams/${teamId}/members/${memberId}/demote`);
+    }
 }
 
 const teamService = new TeamService();

@@ -97,12 +97,12 @@ class CustomTable extends LitElement {
         font-weight: 600;
     }
     
-    .btn.decline{
+    .btn.red{
         background-color: #e74c3c;
         font-weight: 500;
     }
 
-    .btn.approve{
+    .btn.green{
         background-color: #2ecc71;
         font-weight: 500;
     }
@@ -133,8 +133,8 @@ class CustomTable extends LitElement {
                 `)}
                 ${this.actions.length ? html`
                     <td class="actions">
-                    ${this.actions.map(action => html`
-                        <button class="${action.label === 'Decline' || action.label === 'Approve' ? 'btn ' + action.label.toLowerCase() : ''}"
+                    ${this.actions.map(action => html`  
+                        <button class="${action.color === 'green' || action.color === 'red' ? 'btn ' + action.color : ''}"
                          @click=${() => action.callback(row)}>
                         ${action.label}
                         </button>

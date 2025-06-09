@@ -10,6 +10,7 @@ import FullTodoView from "./views/FullTodoView.js";
 import TwoFactorSetupView from "./views/TwoFactorSetupView.js";
 import ProfileView from "./views/ProfileView.js";
 import { AuthManager } from "./utils/auth.js";
+import RoleView from "./views/RoleView.js";
 
 let currentView = null;
 
@@ -33,6 +34,7 @@ export const router = async () => {
     { path: "/team/join", view: JoinTeamView, requiresAuth: false },
     { path: "/team/report", view: TeamStatsView, requiresAuth: false },
     { path: "/requests", view: RequestView, requiresAuth: false },
+    { path: "/roles", view: RoleView, requiresAuth: false },
     { path: "/todo", view: FullTodoView, requiresAuth: false }
   ];
 

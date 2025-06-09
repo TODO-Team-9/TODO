@@ -76,27 +76,23 @@ class NavigationSidebar extends LitElement {
         <section class="links">
           <a
             href="/home"
-            class=${this.currentPath !== "/profile" &&
+            class=${
             this.currentPath !== "/requests" &&
-            this.currentPath !== "/settings"
+            this.currentPath !== "/settings" &&
+            this.currentPath !== "/roles"
               ? "active"
               : ""}
             >Home</a
           >
           <a
             href="/requests"
-            class=${this.currentPath === "/requests" ? "active" : ""}
+            class=${this.currentPath === "/requests" || this.currentPath === "/roles" ? "active" : ""}
             >Requests</a
           >
           <a
             href="/settings"
             class=${this.currentPath === "/settings" ? "active" : ""}
             >Settings</a
-          >
-          <a
-            href="/profile"
-            class=${this.currentPath === "/profile" ? "active" : ""}
-            >Profile</a
           >
         </section>
         ${this.user

@@ -134,8 +134,8 @@ class RequestTable extends LitElement {
                     .data = "${this.currentRequests}"
 
                     .actions = "${[
-                        { label: "Approve", callback: (row) => this.updateRequest(row, 3) },
-                        { label: "Decline", callback: (row) => this.updateRequest(row, 2) },
+                        { label: "Approve", color: 'green', callback: (row) => this.updateRequest(row, 3) },
+                        { label: "Decline", color: 'red', callback: (row) => this.updateRequest(row, 2) },
                     ]}"
                 >
                 </custom-table>

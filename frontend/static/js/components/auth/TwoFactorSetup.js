@@ -28,7 +28,7 @@ class TwoFactorSetup extends LitElement {
       padding: 2rem;
       border-radius: 0.5rem;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      max-width: 30rem;
+      max-width: 80rem;
       margin: auto;
       margin-top: 2rem;
       font-family: sans-serif;
@@ -49,7 +49,7 @@ class TwoFactorSetup extends LitElement {
 
     .setup-steps {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       gap: 1.5rem;
     }
 

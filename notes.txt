@@ -1,10 +1,3 @@
-Endpoints needed:
-Reporting Endpoints
-
-Get all member requests
-Get all requests
-
-Get all teams a member is in
-
 Accept Join request should create a member
 Views for empty data
+Priority when creating task (You can use id)

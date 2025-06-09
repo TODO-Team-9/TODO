@@ -17,6 +17,11 @@ class TodoService {
         return apiService.get(`/statuses`);
     }
 
+
+    async getPriorities() {
+        return apiService.get(`/priorities`);
+    }
+
     async getTeamTodos(teamId) {
         return apiService.get(`/tasks/teams/${teamId}`);
     }

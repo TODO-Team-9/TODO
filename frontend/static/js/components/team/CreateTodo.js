@@ -2,8 +2,15 @@ import { LitElement, html, css } from 'lit';
 
 import "./Header.js";
 import  todoService  from '../../services/TodoService.js';
+import teamService from '../../services/TeamService.js';
 
 class CreateTodo extends LitElement {
+    static properties = {
+        onCreate: { type: Function },
+        priorities: { type: Array },
+        teamMembers: { type: Array }
+    }
+
   static styles = css`
     :host {
       display: block;
@@ -55,30 +62,52 @@ class CreateTodo extends LitElement {
     }
   `;
 
-  static properties = {
-    onCreate: { type: Function },
-  };
-
   constructor() {
     super();
     this.onCreate = null;
+    this.priorities = [];   
+    this.teamMembers = [];
+  }
+
+  connectedCallback(){
+    super.connectedCallback();
+    this.loadPriorities();
+    this.loadMembers();
   }
 
   handleSubmit(e) {
     e.preventDefault();
     const form = e.target;
     const todo = {
-      taskName: form.title.value.trim(),
-      taskDescription: form.description.value.trim(),
-      memberId: form.assignedTo.value.trim(),
-      teamId: localStorage.getItem('selectedTeam'),
-      priority: form.priority.value,
+        taskName: form.title.value.trim(),
+        taskDescription: form.description.value.trim(),
+        teamId: localStorage.getItem('selectedTeam'),
+        memberId: 1,
+        priority: form.priority.value
     };
     
     todoService.createTodo(todo);
     alert('Todo Created');
     form.reset();
   }
+
+  async loadPriorities(){
+    try{
+        const priorities = await todoService.getPriorities();
+        this.priorities = Array.isArray(priorities) ? priorities : [];
+    }catch (error){
+        this.priorities = [];
+    }
+  }
+
+    async loadMembers(){
+        try{
+            const members = await teamService.getTeamMembers(localStorage.getItem('selectedTeam'));
+            this.teamMembers = Array.isArray(members) ? members : [];
+        }catch (error){
+            this.teamMembers = [];
+        }
+    }
 
   render() {
     return html`
@@ -87,23 +116,27 @@ class CreateTodo extends LitElement {
         <form @submit=${this.handleSubmit}>
             <input name="title" placeholder="Title" required />
             <textarea name="description" placeholder="Description" rows="3" required></textarea>
-            <input name="assignedTo" placeholder="Assigned To" required />
+            <select name="assignedTo" required>
+                <option disabled selected value="">Assign To</option>
+                ${this.teamMembers.map(
+                (member) => html`
+                    <option value="${member.member_id}">
+                        ${member.username}
+                    </option>
+                `
+                )}
+            </select>
             
             <select name="priority" required>
                 <option disabled selected value="">Priority</option>
-                <option>Low</option>
-                <option>Medium</option>
-                <option>High</option>
+                ${this.priorities.map(
+                (priority) => html`
+                    <option value="${priority.priority_id}">
+                        ${priority.priority_name}
+                    </option>
+                `
+                )}
             </select>
-
-            <select name="status" required>
-                <option disabled selected value="">Status</option>
-                <option>Backlog</option>
-                <option>In Progress</option>
-                <option>In Review</option>
-                <option>Done</option>
-            </select>
-
             <button type="submit">Create Todo</button>
         </form>
     </section>

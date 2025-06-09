@@ -62,6 +62,27 @@ export class MemberService {
     `;
   }
 
+  async updateMemberTeamRole(
+    memberId: number,
+    teamId: number,
+    teamRoleId: number
+  ): Promise<void> {
+    // Input validation
+    if (!memberId || isNaN(memberId) || memberId <= 0) {
+      throw new Error("Invalid member ID");
+    }
+    if (!teamId || isNaN(teamId) || teamId <= 0) {
+      throw new Error("Invalid team ID");
+    }
+    if (!teamRoleId || isNaN(teamRoleId) || teamRoleId <= 0) {
+      throw new Error("Invalid team role ID");
+    }
+
+    await sql`
+      CALL update_member(${memberId}, ${teamId}, ${teamRoleId})
+    `;
+  }
+
   async getTeamMembers(
     teamId: number
   ): Promise<(Member & { username: string })[]> {

@@ -21,17 +21,23 @@ export class LookupService {
   }
 
   async getStatuses(): Promise<Status[]> {
-    const statuses = await sql<Status[]>`SELECT * FROM statuses`;
+    const statuses = await sql<
+      Status[]
+    >`SELECT status_id, status_name FROM statuses`;
     return statuses;
   }
 
   async getPriorities(): Promise<Priority[]> {
-    const priorities = await sql<Priority[]>`SELECT * FROM priorities`;
+    const priorities = await sql<
+      Priority[]
+    >`SELECT priority_id, priority_name FROM priorities`;
     return priorities;
   }
 
   async getRequestStatuses(): Promise<RequestStatus[]> {
-    const statuses = await sql<RequestStatus[]>`SELECT * FROM request_statuses`;
+    const statuses = await sql<
+      RequestStatus[]
+    >`SELECT request_status_id, request_status_name FROM request_statuses`;
     return statuses;
   }
 }

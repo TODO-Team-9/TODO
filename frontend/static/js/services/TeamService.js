@@ -2,31 +2,35 @@ import apiService from './ApiRequestService.js';
 
 class TeamService {
     async createTeam(data) {
-        return apiService.post(`http://localhost:3000/api/teams`, data);
+        return apiService.post(`/teams`, data);
     }
 
     async getTeams() {
-        return apiService.get(`http://localhost:3000/api/teams`);
+        return apiService.get(`/teams`);
+    }
+
+    async getUserTeams(userId) {
+        return apiService.get(`/users/${userId}/teams`);
     }
 
     async getTeam(teamId) {
-        return apiService.get(`http://localhost:3000/api/teams/${teamId}`);
+        return apiService.get(`/teams/${teamId}`);
     }
 
     async getTeamMembers(teamId) {
-        return apiService.get(`http://localhost:3000/api/teams/${teamId}/members`);
+        return apiService.get(`/teams/${teamId}/members`);
     }
 
     async requestTeam(data){
-        return apiService.post(`http://localhost:3000/api/join`, data);
+        return apiService.post(`/join-requests`, data);
     }
 
     async getTeamRequests(teamId){
-        return apiService.get(`http://localhost:3000/api/join/teams/${teamId}`);
+        return apiService.get(`/join-requests/teams/${teamId}`);
     }
 
     async updateRequest(requestId, data) {
-        return apiService.post(`http://localhost:3000/api/join/${requestId}/status`, data);
+        return apiService.post(`/join-requests/${requestId}/status`, data);
     }
 }
 

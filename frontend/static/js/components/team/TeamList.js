@@ -74,15 +74,16 @@ class TeamList extends LitElement {
 
     async loadTeamsAndMembers() {
         try {
-            const teams = await teamService.getTeams();
+            const teams = await teamService.getUserTeams(JSON.parse(localStorage.getItem('user')).user_id);
             this.teams = Array.isArray(teams) ? teams : [];
 
             if(this.teams.length !== 0){
-                localStorage.setItem('currentTeam', this.teams[0].team_id);
+                localStorage.setItem('selectedTeam', this.teams[0].team_id);
                 const members = await teamService.getTeamMembers(this.teams[0].team_id);
                 this.members = Array.isArray(members) ? members : [];
             }
         } catch (error) {
+            console.log(error);
             this.teams = [];
             this.members = [];
         }
@@ -98,7 +99,7 @@ class TeamList extends LitElement {
         const selectedTeamName = e.target.value;
         const selectedTeam = this.teams.find(team => team.team_name === selectedTeamName);
         
-        localStorage.setItem('currentTeam', selectedTeam.team_id);
+        localStorage.setItem('selectedTeam', selectedTeam.team_id);
         const members = await teamService.getTeamMembers(selectedTeam.team_id);
         this.members = Array.isArray(members) ? members : [];
 

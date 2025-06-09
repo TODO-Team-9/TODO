@@ -2,11 +2,11 @@ import apiService from './ApiRequestService.js';
 
 class TodoService {
     async createTodo(data){
-        return apiService.post(`http://localhost:3000/api/tasks`, data);
+        return apiService.post(`/tasks`, data);
     }
 
     async updateStatus(taskId, data) {
-        return apiService.post(`http://localhost:3000/api/tasks/${taskId}/status`, data);
+        return apiService.post(`/tasks/${taskId}/status`, data);
     }
 
     async getMemberTodos(memberName) {
@@ -14,11 +14,11 @@ class TodoService {
     }
 
     async getStatuses() {
-        return apiService.get(`http://localhost:3000/api/statuses`);
+        return apiService.get(`/statuses`);
     }
 
     async getTeamTodos(teamId) {
-        return apiService.get(`http://localhost:3000/api/tasks/teams/${teamId}`);
+        return apiService.get(`/tasks/teams/${teamId}`);
     }
 
     async assignTodo(taskId, data) {

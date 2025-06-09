@@ -4,11 +4,13 @@ import { AuthManager } from "../../utils/auth.js";
 class NavigationSidebar extends LitElement {
   static properties = {
     user: { type: Object },
+    isNormalUser: { type: Boolean }
   };
 
   constructor() {
     super();
     this.user = AuthManager.getUser();
+    this.isNormalUser = true;
   }
   static styles = css`
     :host {
@@ -66,6 +68,15 @@ class NavigationSidebar extends LitElement {
     }
   `;
 
+  async connectedCallback(){
+    super.connectedCallback();
+    this.isNormalUser = await this.isNormal();
+  }
+
+  async isNormal(){
+    return AuthManager.isNormalUser();
+  }
+
   get currentPath() {
     return window.location.pathname.replace(/\/$/, "");
   }
@@ -76,27 +87,26 @@ class NavigationSidebar extends LitElement {
         <section class="links">
           <a
             href="/home"
-            class=${this.currentPath !== "/profile" &&
+            class=${
             this.currentPath !== "/requests" &&
-            this.currentPath !== "/settings"
+            this.currentPath !== "/settings" &&
+            this.currentPath !== "/roles"
               ? "active"
               : ""}
             >Home</a
           >
-          <a
-            href="/requests"
-            class=${this.currentPath === "/requests" ? "active" : ""}
-            >Requests</a
-          >
+          ${!this.isNormalUser ? 
+            html`<a
+                href="/requests"
+                class=${this.currentPath === "/requests" || this.currentPath === "/roles" ? "active" : ""}
+                >Requests</a
+            >` : ''
+          }
+
           <a
             href="/settings"
             class=${this.currentPath === "/settings" ? "active" : ""}
             >Settings</a
-          >
-          <a
-            href="/profile"
-            class=${this.currentPath === "/profile" ? "active" : ""}
-            >Profile</a
           >
         </section>
         ${this.user

@@ -117,7 +117,7 @@ class JoinTeam extends LitElement {
 
     const request = {
       teamId: selectedTeam.team_id,
-      userId: JSON.parse(localStorage.getItem('tempUser')).user_id
+      userId: JSON.parse(localStorage.getItem('user')).user_id
     };
 
     await teamService.requestTeam(request);

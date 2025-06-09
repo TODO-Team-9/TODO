@@ -1,7 +1,7 @@
-Endpoints needed:
-Reporting Endpoints
+Accept Join request should create a member
+Views for empty data
+Priority when creating task (You can use id)
 
-Get all member requests
-Get all requests
+Demote a member
 
-Get all teams a member is in
+Removing members?

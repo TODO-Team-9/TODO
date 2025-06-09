@@ -44,12 +44,14 @@ export class TaskService {
     taskName: string,
     taskDescription: string | null,
     teamId: number,
+    priorityId: number,
     memberId?: number | null
   ): Promise<Task> {
     await sql`
       CALL create_task(
         ${taskName},
         ${teamId},
+        ${priorityId},
         ${taskDescription},
         ${memberId ?? null}
       )

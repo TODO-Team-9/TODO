@@ -1,4 +1,5 @@
 import authService from './AuthService.js';
+import config from '../../../config.js';
 
 class ApiService {
     async request(url, options = {}) {
@@ -8,7 +9,7 @@ class ApiService {
                 'Content-Type': 'application/json'
             };
 
-            const response = await fetch(url, options);
+            const response = await fetch(config.API_URL + url, options);
             
             if (response.status === 401 && authService.isAuthenticated()) {
                 authService.logout();

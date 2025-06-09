@@ -49,7 +49,8 @@ export async function createUser(
       emailAddress,
       password,
     });
-    const { password_hash, ...userWithoutSensitiveData } = newUser;
+    const { password_hash, two_factor_secret, ...userWithoutSensitiveData } =
+      newUser;
 
     response.status(HTTP_Status.CREATED).json({
       message: "User created successfully",
@@ -114,7 +115,8 @@ export async function getUserById(
       return;
     }
 
-    const { password_hash, ...userWithoutSensitiveData } = user;
+    const { password_hash, two_factor_secret, ...userWithoutSensitiveData } =
+      user;
     response.status(HTTP_Status.OK).json({ user: userWithoutSensitiveData });
   } catch (error) {
     console.error("Error fetching user:", error);
@@ -136,7 +138,8 @@ export async function getAllUsers(
 
     const users = await userService.getAllUsers();
     const usersWithoutSensitiveData = users.map((user) => {
-      const { password_hash, ...userWithoutSensitiveData } = user;
+      const { password_hash, two_factor_secret, ...userWithoutSensitiveData } =
+        user;
       return userWithoutSensitiveData;
     });
 

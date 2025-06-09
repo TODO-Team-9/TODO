@@ -61,7 +61,8 @@ export async function register(
       password,
     });
     const totp = await generateTOTPSecret(newUser.username);
-    const { password_hash, ...userWithoutSensitiveData } = newUser;
+    const { password_hash, two_factor_secret, ...userWithoutSensitiveData } =
+      newUser;
 
     response.status(HTTP_Status.CREATED).json({
       message:

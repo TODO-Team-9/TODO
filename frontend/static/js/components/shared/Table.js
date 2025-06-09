@@ -87,7 +87,7 @@ class CustomTable extends LitElement {
         font-weight: 600;
     }
 
-    .status-cell.approved {
+    .status-cell.accepted {
         color: #2ecc71;
         font-weight: 600;
     }
@@ -127,7 +127,7 @@ class CustomTable extends LitElement {
             ? this.data.map(row => html`
                 <tr>
                 ${this.columns.map(col => html`
-                    <td class="${col.key === 'status' ? 'status-cell ' + row[col.key].toLowerCase() : ''}">
+                    <td class="${col.key === 'request_status_name' ? 'status-cell ' + row[col.key].toLowerCase() : ''}">
                     ${row[col.key]}
                     </td>
                 `)}

@@ -29,6 +29,10 @@ class TeamService {
         return apiService.get(`/join-requests/teams/${teamId}`);
     }
 
+    async getAllRequests(){
+        return apiService.get(`/join-requests`);
+    }
+
     async updateRequest(requestId, data) {
         return apiService.post(`/join-requests/${requestId}/status`, data);
     }

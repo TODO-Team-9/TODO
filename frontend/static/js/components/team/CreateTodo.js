@@ -1,4 +1,5 @@
 import { LitElement, html, css } from 'lit';
+import { AuthManager } from '../../utils/auth.js';
 
 import "./Header.js";
 import  todoService  from '../../services/TodoService.js';
@@ -102,8 +103,18 @@ class CreateTodo extends LitElement {
 
     async loadMembers(){
         try{
-            const members = await teamService.getTeamMembers(localStorage.getItem('selectedTeam'));
-            this.teamMembers = Array.isArray(members) ? members : [];
+            let teamLeadTeams = await AuthManager.teamLeadTeams();
+            const selectedTeam = localStorage.getItem('selectedTeam');
+            const members = await teamService.getTeamMembers(selectedTeam);
+
+            teamLeadTeams = teamLeadTeams.filter((team) => team.team_id == selectedTeam);
+
+            if(teamLeadTeams.length == 0){
+                const member = members.find((member) => member.user_id === JSON.parse(localStorage.getItem('user')).user_id);
+                this.teamMembers = [member];
+            }else{
+                this.teamMembers = Array.isArray(members) ? members : [];
+            }
         }catch (error){
             this.teamMembers = [];
         }

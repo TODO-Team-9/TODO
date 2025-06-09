@@ -11,7 +11,8 @@ class RequestTable extends LitElement {
     static properties = {
         onCreate: { type: Function },
         teams: { type: Array },
-        currentRequests: { type: Array }
+        currentRequests: { type: Array },
+        isAccessAdmin: { type: Boolean }
     };
 
     static styles = css`
@@ -57,6 +58,7 @@ class RequestTable extends LitElement {
         super();
         this.onCreate = null;
         this.teams = [];
+        this.isAccessAdmin = false;
     }
 
     connectedCallback(){
@@ -67,20 +69,15 @@ class RequestTable extends LitElement {
 
     async loadRequests(){
         this.currentRequests = [];
-        // try {
-        //     const teams = await teamService.getTeamRequests();
-        //     this.teams = Array.isArray(teams) ? teams : [];
-        // } catch (error) {
-        //     this.teams = [];
-        // }
     }
 
     async loadTeams() {
         try {
+            this.isAccessAdmin = !await AuthManager.isNormalUser();
             const teamLeadTeams = await AuthManager.teamLeadTeams();
             if(await AuthManager.isNormalUser() && teamLeadTeams.length != 0){
                 this.teams = Array.isArray(teamLeadTeams) ? teamLeadTeams : [];
-            }else if(!await AuthManager.isNormalUser()){
+            }else if(this.isAccessAdmin){
                 const teams = await teamService.getTeams();
                 this.teams = Array.isArray(teams) ? teams : [];
             }
@@ -89,23 +86,28 @@ class RequestTable extends LitElement {
         }
     }
 
-    handleSubmit(e) {
-        e.preventDefault();
+    filterPending(requests){
+        this.currentRequests = requests.filter((request) => request.request_status === 1).map((request) => ({
+            id: request.request_id,
+            username: request.username,
+            team_name: this.teams.find(team => team.team_id === request.team_id).team_name
+        }));
     }
 
     async getTeamRequests(e){
         const selectedTeamName = e.target.value;
-        const selectedTeam = this.teams.find(team => team.team_name === selectedTeamName);
 
-        try {
-            const requests = await teamService.getTeamRequests(selectedTeam.team_id);
-            this.currentRequests = requests.filter((request) => request.request_status === 1).map((request) => ({
-                id: request.request_id,
-                username: request.username,
-                team_name: this.teams.find(team => team.team_id === request.team_id).team_name
-            }));
-        } catch (error) {
-            this.currentRequests = [];
+        if(selectedTeamName == 0){
+            const requests = await teamService.getAllRequests();
+            this.filterPending(requests);
+        }else{
+            const selectedTeam = this.teams.find(team => team.team_name === selectedTeamName);
+            try {
+                const requests = await teamService.getTeamRequests(selectedTeam.team_id);
+                this.filterPending(requests);
+            } catch (error) {
+                this.currentRequests = [];
+            }
         }
     }
 
@@ -123,6 +125,11 @@ class RequestTable extends LitElement {
                 <h2>Current Requests<h2>
                 <select @change="${this.getTeamRequests}" name="team" required>
                     <option disabled selected value="">Select Team</option>
+                    ${this.isAccessAdmin ? 
+                        html`<option value="0">
+                                All
+                            </option>` : ""
+                    }
                     ${this.teams.map(
                         (team) => html`
                             <option value="${team.team_name}">

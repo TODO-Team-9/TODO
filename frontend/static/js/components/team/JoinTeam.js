@@ -5,6 +5,7 @@ import "./Header.js";
 import "../shared/Table.js";
 
 import teamService from "../../services/TeamService.js";
+import userService from '../../services/UserService.js';
 
 class JoinTeam extends LitElement {
     static properties = {
@@ -91,13 +92,13 @@ class JoinTeam extends LitElement {
     }
 
     async loadRequests(){
-        this.currentRequests = [];
-        // try {
-        //     const teams = await teamService.getTeamRequests();
-        //     this.teams = Array.isArray(teams) ? teams : [];
-        // } catch (error) {
-        //     this.teams = [];
-        // }
+        try {
+            const requests = await userService.getUserRequests(JSON.parse(localStorage.getItem('user')).user_id);
+            console.log(requests);
+            this.currentRequests = Array.isArray(requests) ? requests : [];
+        } catch (error) {
+            this.currentRequests = [];
+        }
     }
 
     async loadTeams() {
@@ -133,8 +134,8 @@ class JoinTeam extends LitElement {
             <h2>Current Requests<h2>
             <custom-table
                 .columns = "${[
-                    { key: 'team', header: 'Team Name' },
-                    { key: 'status', header: 'Status' }
+                    { key: 'team_name', header: 'Team Name' },
+                    { key: 'request_status_name', header: 'Status' }
                 ]}"
             
                 .data = "${this.currentRequests}"

@@ -49,7 +49,7 @@ export async function createUser(
       emailAddress,
       password,
     });
-    const { passwordHash, ...userWithoutSensitiveData } = newUser;
+    const { password_hash, ...userWithoutSensitiveData } = newUser;
 
     response.status(HTTP_Status.CREATED).json({
       message: "User created successfully",
@@ -114,7 +114,7 @@ export async function getUserById(
       return;
     }
 
-    const { passwordHash, ...userWithoutSensitiveData } = user;
+    const { password_hash, ...userWithoutSensitiveData } = user;
     response.status(HTTP_Status.OK).json({ user: userWithoutSensitiveData });
   } catch (error) {
     console.error("Error fetching user:", error);
@@ -136,7 +136,7 @@ export async function getAllUsers(
 
     const users = await userService.getAllUsers();
     const usersWithoutSensitiveData = users.map((user) => {
-      const { passwordHash, ...userWithoutSensitiveData } = user;
+      const { password_hash, ...userWithoutSensitiveData } = user;
       return userWithoutSensitiveData;
     });
 
@@ -155,7 +155,7 @@ export async function getUserJoinRequests(
 ): Promise<void> {
   try {
     const userId = Number(request.params.userId);
-    
+
     if (!userId || isNaN(userId)) {
       response
         .status(HTTP_Status.BAD_REQUEST)
@@ -179,7 +179,7 @@ export async function getUserTeams(
 ): Promise<void> {
   try {
     const userId = Number(request.params.userId);
-    
+
     if (!userId || isNaN(userId)) {
       response
         .status(HTTP_Status.BAD_REQUEST)

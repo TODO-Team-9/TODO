@@ -1,15 +1,15 @@
 export interface User {
-  userId: number;
+  user_id: number;
   username: string;
-  emailAddress: string;
-  passwordHash: string;
-  twoFactorSecret: string;
-  systemRoleId: number;
-  deactivatedAt: string | null; // ISO timestamp or null
+  email_address: string;
+  password_hash: string;
+  two_factor_secret: string;
+  system_role_id: number;
+  deactivated_at: string | null; // ISO timestamp or null
 }
 
 export interface UserRegistration {
   username: string;
   emailAddress: string;
   password: string;
-} 
+}

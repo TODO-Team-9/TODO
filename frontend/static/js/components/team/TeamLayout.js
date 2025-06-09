@@ -22,7 +22,6 @@ class TeamLayout extends LitElement {
       overflow: hidden;
     }
 
-    .sidebar,
     .teamlist {
       width: 15rem;
       background-color: #f3f3f3;

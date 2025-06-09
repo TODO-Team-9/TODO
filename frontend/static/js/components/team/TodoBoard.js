@@ -45,7 +45,7 @@ class TodoBoard extends LitElement {
         const status = await todoService.getStatuses();
         this.statuses = Array.isArray(status) ? status : [];
 
-        const currentTeam = localStorage.getItem('currentTeam');
+        const currentTeam = localStorage.getItem('selectedTeam');
         const todos = await todoService.getTeamTodos(currentTeam);
         this.tasks = Array.isArray(todos) ? todos : [];
 

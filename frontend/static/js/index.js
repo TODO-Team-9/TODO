@@ -10,6 +10,7 @@ import FullTodoView from "./views/FullTodoView.js";
 import TwoFactorSetupView from "./views/TwoFactorSetupView.js";
 import ProfileView from "./views/ProfileView.js";
 import { AuthManager } from "./utils/auth.js";
+import RoleView from "./views/RoleView.js";
 
 let currentView = null;
 
@@ -33,6 +34,7 @@ export const router = async () => {
     { path: "/team/join", view: JoinTeamView, requiresAuth: true },
     { path: "/team/report", view: TeamStatsView, requiresAuth: true },
     { path: "/requests", view: RequestView, requiresAuth: true },
+    { path: "/roles", view: RoleView, requiresAuth: true },
     { path: "/todo", view: FullTodoView, requiresAuth: true }
   ];
 
@@ -72,11 +74,18 @@ export const router = async () => {
 
   // Check authentication
   const isAuthenticated = AuthManager.isAuthenticated();
+  const isNormalUser = await AuthManager.isNormalUser();
+
   const route = currentRoute.route;
 
   // Redirect unauthenticated users to login
   if (route.requiresAuth && !isAuthenticated) {
     navigator("/");
+    return;
+  }
+
+  if((route.path === '/requests' || route.path === '/roles') && isNormalUser){
+    navigator('/home');
     return;
   }
 

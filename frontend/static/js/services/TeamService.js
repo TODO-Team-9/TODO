@@ -50,7 +50,7 @@ class TeamService {
     }
 
     async getTeamActivity(teamId,startDate, endDate){
-        return apiService.get(`/reports/teams/${teamId}/stats?startDate=${startDate}&endDate=${endDate}`);
+        return apiService.get(`/reports/teams/${teamId}/activity?startDate=${startDate}&endDate=${endDate}`);
     }
 }
 

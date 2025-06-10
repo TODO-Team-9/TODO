@@ -3,6 +3,7 @@ import { navigator } from '../../index.js';
 import { AuthManager } from '../../utils/auth.js';
 
 import "../shared/Table.js";
+import '../shared/Toast.js';
 
 import teamService from '../../services/TeamService.js';
 
@@ -114,7 +115,13 @@ class RequestTable extends LitElement {
     updateRequest(row, status){
         teamService.updateRequest(row.id, {newStatus: status});
         const updatedStatus = status == 2 ? 'Declined' : 'Approved';
-        alert(updatedStatus + ' request of ' + row.username + ' to join ' + row.team_name);
+        const toast = this.renderRoot.querySelector('#toast');
+        const message = updatedStatus + ' request of ' + row.username + ' to join ' + row.team_name;
+        if(status == 2){
+            toast.show(message, 'error');
+        }else{
+            toast.show(message, 'success');
+        }
         this.currentRequests = this.currentRequests.filter((request) => request.request_id === row.id);
     }
 
@@ -123,6 +130,7 @@ class RequestTable extends LitElement {
         return html`
             <section class="requests">
                 <h2>Current Requests<h2>
+                <toast-message id="toast"></toast-message>
                 <select @change="${this.getTeamRequests}" name="team" required>
                     <option disabled selected value="">Select Team</option>
                     ${this.isAccessAdmin ? 

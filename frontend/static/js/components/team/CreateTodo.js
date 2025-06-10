@@ -4,6 +4,7 @@ import { InputValidator } from '../../utils/inputValidator.js';
 import DOMPurify from 'dompurify';
 
 import "./Header.js";
+
 import  todoService  from '../../services/TodoService.js';
 import teamService from '../../services/TeamService.js';
 
@@ -11,7 +12,9 @@ class CreateTodo extends LitElement {
     static properties = {
         onCreate: { type: Function },
         priorities: { type: Array },
-        teamMembers: { type: Array }
+        teamMembers: { type: Array },
+        errorMessage: { type: String },
+        successMessage: { type: String }
     }
 
   static styles = css`
@@ -46,6 +49,26 @@ class CreateTodo extends LitElement {
       gap: 1.5rem;
     }
 
+    .error {
+      color: #d32f2f;
+      background-color: #ffebee;
+      padding: 0.75rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      text-align: center;
+      font-size: 11pt;
+    }
+
+    .success {
+      color: #2e7d32;
+      background-color: #e8f5e8;
+      padding: 0.75rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      text-align: center;
+      font-size: 11pt;
+    }
+
     input, textarea, select, button {
       padding: 0.5rem;
       font-size: 12pt;
@@ -70,6 +93,8 @@ class CreateTodo extends LitElement {
     this.onCreate = null;
     this.priorities = [];   
     this.teamMembers = [];
+    this.errorMessage = '';
+    this.successMessage = '';
   }
 
   connectedCallback(){
@@ -78,11 +103,12 @@ class CreateTodo extends LitElement {
     this.loadMembers();
   }
 
-  handleSubmit(e) {
+  async handleSubmit(e) {
     e.preventDefault();
     const form = e.target;
+    const toast = this.renderRoot.querySelector('#toast');
     if(InputValidator.validate(form.title.value.trim()) || InputValidator.validate(form.description.value.trim())){
-        alert("Input not allowed!");
+        this.errorMessage = 'Input not allowed!';
         form.reset();
         return;
     }else{
@@ -94,8 +120,14 @@ class CreateTodo extends LitElement {
             priorityId: form.priority.value
         };
         
-        todoService.createTodo(todo);
-        alert('Todo Created');
+        const response = await todoService.createTodo(todo);
+        if(response.error){
+            this.successMessage = '';
+            this.errorMessage = response.error; 
+        }else{
+            this.errorMessage = '';
+            this.successMessage = 'TODO created succesfully';
+        }
         form.reset();
     }
   }
@@ -132,6 +164,12 @@ class CreateTodo extends LitElement {
     return html`
       <team-header .title=${'Create Todo'} .buttonCaption=${'Team Board'} .route=${'/home'}></team-header>
       <section class="form-container">
+        ${this.errorMessage
+        ? html`<section class="error">${this.errorMessage}</section>`
+        : ""}
+        ${this.successMessage
+        ? html`<section class="success">${this.successMessage}</section>`
+        : ""}
         <form @submit=${this.handleSubmit}>
             <input name="title" 
             placeholder="Title" 

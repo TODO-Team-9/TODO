@@ -28,12 +28,14 @@
     "vite": "^6.3.5"
   },
   "dependencies": {
+    "@types/cookie-parser": "^1.4.9",
     "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "dompurify": "^3.2.6",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "helmet": "^8.1.0",
     "express-rate-limit": "^7.5.0",
+    "helmet": "^8.1.0",
     "jose": "^6.0.10",
     "jsonwebtoken": "^9.0.2",
     "lit": "^3.3.0",

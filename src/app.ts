@@ -21,9 +21,9 @@ app.use("/", express.static(path.join(__dirname, "../public")));
 app.use("/auth", authRoutes);
 app.use("/api", apiRouter);
 
-// app.get("/{*any}", (_request, response) => {
-//   response.sendFile(path.join(__dirname, "../public/index.html"));
-// });
+app.get("/{*any}", (_request, response) => {
+  response.sendFile(path.join(__dirname, "../public/index.html"));
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

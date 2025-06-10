@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { AuthManager } from '../../utils/auth.js';
+import { InputValidator } from '../../utils/inputValidator.js';
 
 import "./Header.js";
 import  todoService  from '../../services/TodoService.js';
@@ -79,17 +80,23 @@ class CreateTodo extends LitElement {
   handleSubmit(e) {
     e.preventDefault();
     const form = e.target;
-    const todo = {
-        taskName: form.title.value.trim(),
-        taskDescription: form.description.value.trim(),
-        teamId: localStorage.getItem('selectedTeam'),
-        memberId: 1,
-        priority: form.priority.value
-    };
-    
-    todoService.createTodo(todo);
-    alert('Todo Created');
-    form.reset();
+    if(InputValidator.validate(form.title.value.trim()) || InputValidator.validate(form.description.value.trim())){
+        alert("Input not allowed! Contains malicious characters");
+        form.reset();
+        return;
+    }else{
+        const todo = {
+            taskName: form.title.value.trim(),
+            taskDescription: form.description.value.trim(),
+            teamId: localStorage.getItem('selectedTeam'),
+            memberId: parseInt(form.assignedTo.value),
+            priority: form.priority.value
+        };
+        
+        todoService.createTodo(todo);
+        alert('Todo Created');
+        form.reset();
+    }
   }
 
   async loadPriorities(){
@@ -125,8 +132,17 @@ class CreateTodo extends LitElement {
       <team-header .title=${'Create Todo'} .buttonCaption=${'Team Board'} .route=${'/home'}></team-header>
       <section class="form-container">
         <form @submit=${this.handleSubmit}>
-            <input name="title" placeholder="Title" required />
-            <textarea name="description" placeholder="Description" rows="3" required></textarea>
+            <input name="title" 
+            placeholder="Title" 
+            maxlength="32" 
+            required
+            />
+            <textarea name="description" 
+            placeholder="Description" 
+            rows="3" required 
+            maxlength="256"
+            required
+            ></textarea>
             <select name="assignedTo" required>
                 <option disabled selected value="">Assign To</option>
                 ${this.teamMembers.map(

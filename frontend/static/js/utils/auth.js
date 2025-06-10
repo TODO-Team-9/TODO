@@ -61,6 +61,7 @@ export class AuthManager {
   static logout() {
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
+    localStorage.removeItem("selectedTeam");
     window.location.href = "/";
   }
 

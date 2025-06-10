@@ -75,15 +75,7 @@ export const router = async () => {
   const isAuthenticated = AuthManager.isAuthenticated();
 
   const route = currentRoute.route;
-
-    let isNormalUser = true;
-    let isTeamLead = false;
-
-    if(route.path != '/' || route.path != '/register' || route.path != '/setup-2fa'){
-        isNormalUser = await AuthManager.isNormalUser();
-        const teamLeadTeams = await AuthManager.teamLeadTeams();
-        isTeamLead = teamLeadTeams != 0;
-    }
+    
   const hasProvisionalToken = AuthManager.hasProvisionalToken();
 
   if (route.path === "/setup-2fa") {
@@ -102,6 +94,15 @@ export const router = async () => {
     navigator("/");
     return;
   }
+
+    let isNormalUser = true;
+    let isTeamLead = false;
+
+    if(route.path == '/requests'|| route.path == '/roles'){
+        isNormalUser = await AuthManager.isNormalUser();
+        const teamLeadTeams = await AuthManager.teamLeadTeams();
+        isTeamLead = teamLeadTeams != 0;
+    }
 
   if((route.path === '/requests' || route.path === '/roles') && isNormalUser && !isTeamLead){
     navigator('/home');

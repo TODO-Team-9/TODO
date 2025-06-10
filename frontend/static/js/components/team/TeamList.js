@@ -79,6 +79,10 @@ class TeamList extends LitElement {
 
             if(this.teams.length !== 0){
                 localStorage.setItem('selectedTeam', this.teams[0].team_id);
+                window.dispatchEvent(new CustomEvent('team-update', {
+                    detail: { newTeam: this.teams[0].team_id }
+                }));
+
                 const members = await teamService.getTeamMembers(this.teams[0].team_id);
                 this.members = Array.isArray(members) ? members : [];
             }

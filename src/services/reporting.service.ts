@@ -1,6 +1,6 @@
 import sql from "../config/db";
 import { TaskActivityReport } from "../models/TaskActivityReport";
-import { TaskDailyStats } from "../models/TaskDailyStats";
+import { TaskMemberStats } from "../models/TaskMemberStats";
 
 export class ReportingService {
   async getTeamTaskActivityReport(
@@ -23,9 +23,9 @@ export class ReportingService {
     teamId: number,
     startDate: Date,
     endDate: Date
-  ): Promise<TaskDailyStats[]> {
+  ): Promise<TaskMemberStats[]> {
     try {
-      const stats = await sql<TaskDailyStats[]>`
+      const stats = await sql<TaskMemberStats[]>`
         SELECT * FROM get_team_daily_task_stats(${teamId}, ${startDate}, ${endDate})
       `;
       return stats;

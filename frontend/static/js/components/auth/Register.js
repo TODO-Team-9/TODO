@@ -452,6 +452,13 @@ class RegisterForm extends LitElement {
         localStorage.setItem("user", JSON.stringify(data.user));
 
         window.location.href = "/setup-2fa";
+      } else if (response.status === 429) {
+        this.errorMessage =
+          data.error ||
+          "Too many registration attempts. Please try again later.";
+        if (data.retryAfter) {
+          this.errorMessage += ` You can try again in ${data.retryAfter}.`;
+        }
       } else {
         this.errorMessage = data.error || "Registration failed";
       }

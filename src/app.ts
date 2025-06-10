@@ -9,6 +9,7 @@ import authRoutes from "./routes/auth.routes";
 import apiRouter from "./routes/api.router";
 import corsMiddleware from "./middleware/cors.middleware";
 import cspMiddleware, { staticCspHeaders } from "./middleware/csp.middleware";
+import { generalLimiter } from "./middleware/rateLimiter.middleware";
 
 const app = express();
 const PORT = process.env.PORT ?? 3000;
@@ -23,6 +24,8 @@ app.use(cspMiddleware);
 
 // CORS middleware
 app.use(corsMiddleware);
+
+app.use(generalLimiter);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

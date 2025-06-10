@@ -1,6 +1,7 @@
 import { LitElement, html, css } from "lit";
 import { getApiUrl } from "../../utils/config.js";
 import { AuthManager } from "../../utils/auth.js";
+import { navigator } from "../../index.js";
 
 class TwoFactorSetup extends LitElement {
   static properties = {
@@ -341,7 +342,7 @@ class TwoFactorSetup extends LitElement {
             You will now need to provide a code from your authenticator app each
             time you log in.
           </p>
-          <button @click=${() => (window.location.href = "/home")}>
+          <button @click=${() => (navigator('/home'))}>
             Continue to Dashboard
           </button>
         </div>

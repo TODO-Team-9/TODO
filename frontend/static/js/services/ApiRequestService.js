@@ -1,15 +1,15 @@
 import authService from './AuthService.js';
 import config from '../../../config.js';
 
-// import { AuthManager } from '../utils/auth.js';
+import { AuthManager } from '../utils/auth.js';
 
 class ApiService {
     async request(url, options = {}) {
         try {  
-            // const token = AuthManager.getToken();
+            const token = AuthManager.getToken();
             options.headers = {
                 'Content-Type': 'application/json',
-                // ...(token && { Authorization: `Bearer ${token}` }),
+                ...(token && { Authorization: `Bearer ${token}` }),
             };
 
             const response = await fetch(config.API_URL + url, options);

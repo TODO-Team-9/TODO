@@ -44,6 +44,9 @@ class TodoBoard extends LitElement {
     const selectedTeam = localStorage.getItem('selectedTeam');
     if (selectedTeam) {
         this.loadTodosAndTeam();
+    }else{
+        navigator('/team/join');
+        return;    
     }
   }
 
@@ -54,8 +57,6 @@ class TodoBoard extends LitElement {
         const currentTeam = localStorage.getItem('selectedTeam');
 
         if(currentTeam == null){
-            const toast = this.renderRoot.querySelector('#toast');
-            toast.show('Join a team first', 'error');
             navigator('/team/join');
             return;
         }else{

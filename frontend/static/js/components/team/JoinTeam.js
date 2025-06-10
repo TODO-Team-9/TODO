@@ -95,7 +95,6 @@ class JoinTeam extends LitElement {
     async loadRequests(){
         try {
             const requests = await userService.getUserRequests(JSON.parse(localStorage.getItem('user')).user_id);
-            console.log(requests);
             this.currentRequests = Array.isArray(requests) ? requests : [];
         } catch (error) {
             this.currentRequests = [];

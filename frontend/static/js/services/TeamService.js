@@ -45,12 +45,12 @@ class TeamService {
         return apiService.delete(`/teams/${teamId}/members/${userId}`);
     }
 
-    async getTeamStats(teamId,startDate, endDate){
-        return apiService.get(`/reports/teams/${teamId}/stats?startDate=${startDate}&endDate=${endDate}`);
+    async getTeamStats(teamId){
+        return apiService.get(`/reports/teams/${teamId}/statuses`);
     }
 
-    async getTeamActivity(teamId,startDate, endDate){
-        return apiService.get(`/reports/teams/${teamId}/activity?startDate=${startDate}&endDate=${endDate}`);
+    async getTeamMemberStats(teamId,startDate, endDate){
+        return apiService.get(`/reports/teams/${teamId}/stats?startDate=${startDate}&endDate=${endDate}`);
     }
 }
 

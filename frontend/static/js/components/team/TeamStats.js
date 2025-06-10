@@ -10,8 +10,7 @@ class TeamStats extends LitElement {
   static properties = {
     backlog: { type: Number },
     done: { type: Number },
-    inProgress: { type: Number },
-    inReview: { type: Number }
+    inProgress: { type: Number }
   };
 
   static styles = css`
@@ -36,7 +35,6 @@ class TeamStats extends LitElement {
     this.backlog = 0;
     this.done = 0;
     this.inProgress = 0;
-    this.inReview = 0;
   }
 
   connectedCallback(){
@@ -47,12 +45,13 @@ class TeamStats extends LitElement {
   async getStats(){
     try{
         const stats = await teamService.getTeamStats(localStorage.getItem('selectedTeam'));
-        console.log(stats);
+        this.backlog = stats.backlog;
+        this.inProgress = stats.in_progress;
+        this.done = stats.completed;
     }catch (error){
         this.backlog = 0;
         this.done = 0;
-        this.inProgress = 0;
-        this.inReview = 0;        
+        this.inProgress = 0;       
     }
   }
 
@@ -62,7 +61,6 @@ class TeamStats extends LitElement {
         <section class="stats">
             <stat-card .label="${'Backlog'}" .stat=${this.backlog}></stat-card>
             <stat-card .label="${'In Progress'}" .stat=${this.inProgress}></stat-card>
-            <stat-card .label="${'In Review'}" .stat=${this.inReview}></stat-card>
             <stat-card .label="${'Done'}" .stat=${this.done}></stat-card>
         </section>
         <member-stats></member-stats>

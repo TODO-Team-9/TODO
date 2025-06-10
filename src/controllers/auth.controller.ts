@@ -171,7 +171,7 @@ export async function login(
         message: "Login successful",
         token: tokenJwt,
         user: {
-          userId: user.user_id,
+          user_id: user.user_id,
           username: user.username,
           emailAddress: user.email_address,
           twoFactorEnabled: true,
@@ -280,7 +280,7 @@ export async function enable2FA(
 
     const fullToken = jwt.sign(
       {
-        userId: request.user?.userId,
+        user_id: request.user?.userId,
         username: request.user?.username,
         role: request.user?.role,
         twoFactorVerified: true,

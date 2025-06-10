@@ -1,6 +1,7 @@
 import sql from "../config/db";
 import { TaskActivityReport } from "../models/TaskActivityReport";
 import { TaskMemberStats } from "../models/TaskMemberStats";
+import { TaskStatusCounts } from "../models/TaskStatusCounts";
 
 export class ReportingService {
   async getTeamTaskActivityReport(
@@ -31,6 +32,20 @@ export class ReportingService {
       return stats;
     } catch (error) {
       console.error("Error getting team daily task stats:", error);
+      throw error;
+    }
+  }
+
+  async getTeamTaskStatusCounts(
+    teamId: number
+  ): Promise<TaskStatusCounts> {
+    try {
+      const [counts] = await sql<TaskStatusCounts[]>`
+        SELECT backlog, in_progress, completed FROM get_team_task_status_counts(${teamId})
+      `;
+      return counts;
+    } catch (error) {
+      console.error("Error getting team task status counts:", error);
       throw error;
     }
   }

@@ -35,7 +35,7 @@ export const router = async () => {
     { path: "/team/report", view: TeamStatsView, requiresAuth: true },
     { path: "/requests", view: RequestView, requiresAuth: true },
     { path: "/roles", view: RoleView, requiresAuth: true },
-    { path: "/todo", view: FullTodoView, requiresAuth: true }
+    { path: "/todo", view: FullTodoView, requiresAuth: true },
   ];
 
   const pathToRegex = (path) =>
@@ -74,7 +74,7 @@ export const router = async () => {
   // Check authentication
   const isAuthenticated = AuthManager.isAuthenticated();
   const hasProvisionalToken = AuthManager.hasProvisionalToken();
-  const isNormalUser = await AuthManager.isNormalUser();
+  // const isNormalUser = await AuthManager.isNormalUser();
   const route = currentRoute.route;
 
   if (route.path === "/setup-2fa") {
@@ -94,8 +94,8 @@ export const router = async () => {
     return;
   }
 
-  if((route.path === '/requests' || route.path === '/roles') && isNormalUser){
-    navigator('/home');
+  if ((route.path === "/requests" || route.path === "/roles") && isNormalUser) {
+    navigator("/home");
     return;
   }
 

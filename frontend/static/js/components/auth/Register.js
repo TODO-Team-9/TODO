@@ -2,18 +2,13 @@ import { LitElement, html, css } from "lit";
 import { getApiUrl } from "../../utils/config.js";
 import { validatePassword, passwordRules } from "../../utils/password.js";
 import { validateUsername, usernameRules } from "../../utils/username.js";
-import "./TwoFactorSetup.js";
 
 class RegisterForm extends LitElement {
   static properties = {
     loading: { type: Boolean },
     errorMessage: { type: String },
     successMessage: { type: String },
-    showTwoFactorSetup: { type: Boolean },
-    twoFactorData: { type: Object },
     passwordMismatch: { type: Boolean },
-    tempUserData: { type: Object },
-    tempPassword: { type: String },
     passwordValidationErrors: { type: Array },
     showPasswordRequirements: { type: Boolean },
     usernameValidationErrors: { type: Array },
@@ -24,11 +19,7 @@ class RegisterForm extends LitElement {
     this.loading = false;
     this.errorMessage = "";
     this.successMessage = "";
-    this.showTwoFactorSetup = false;
-    this.twoFactorData = null;
     this.passwordMismatch = false;
-    this.tempUserData = null;
-    this.tempPassword = "";
     this.passwordValidationErrors = [];
     this.showPasswordRequirements = false;
     this.usernameValidationErrors = [];
@@ -238,25 +229,7 @@ class RegisterForm extends LitElement {
       cursor: not-allowed;
     }
   `;
-
   render() {
-    if (this.showTwoFactorSetup) {
-      return html`
-        <h2>Complete Your Registration</h2>
-        ${this.successMessage
-          ? html`<div class="success">${this.successMessage}</div>`
-          : ""}
-        <two-factor-setup
-          .qrCodeDataURL=${this.twoFactorData?.qrCodeDataURL}
-          .secret=${this.twoFactorData?.secret}
-          .isRegistrationFlow=${true}
-          .tempUserData=${this.tempUserData}
-          .tempPassword=${this.tempPassword}
-        >
-        </two-factor-setup>
-      `;
-    }
-
     return html`
       <h2>Register</h2>
       ${this.errorMessage
@@ -473,19 +446,12 @@ class RegisterForm extends LitElement {
           password,
         }),
       });
-
       const data = await response.json();
       if (response.ok) {
-        // Store user data temporarily and show 2FA setup
-        this.twoFactorData = data.twoFactor;
+        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
 
-        // Store the user data and password temporarily (in component state, not localStorage)
-        this.tempUserData = data.user;
-        this.tempPassword = password;
-
-        this.showTwoFactorSetup = true;
-        this.successMessage =
-          "Registration successful! Now set up Two-Factor Authentication.";
+        window.location.href = "/setup-2fa";
       } else {
         this.errorMessage = data.error || "Registration failed";
       }

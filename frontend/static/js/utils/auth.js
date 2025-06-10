@@ -31,16 +31,29 @@ export class AuthManager {
     const user = localStorage.getItem("user");
     return user ? JSON.parse(user) : null;
   }
-
   static isAuthenticated() {
     const token = this.getToken();
     if (!token) return false;
 
     try {
-      // Basic JWT token validation (you might want to add expiry check)
       const payload = JSON.parse(atob(token.split(".")[1]));
-      return payload.exp * 1000 > Date.now();
+      return (
+        payload.exp * 1000 > Date.now() && payload.twoFactorVerified === true
+      );
     } catch (error) {
+      return false;
+    }
+  }
+
+  static hasProvisionalToken() {
+    const token = this.getToken();
+    if (!token) return false;
+
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return payload.exp * 1000 > Date.now() && !payload.twoFactorVerified;
+    } catch (error) {
+      console.warn("Token validation error:", error);
       return false;
     }
   }

@@ -71,7 +71,6 @@ export const router = async () => {
       result: [location.pathname],
     };
   }
-
   // Check authentication
   const isAuthenticated = AuthManager.isAuthenticated();
 
@@ -85,6 +84,18 @@ export const router = async () => {
         const teamLeadTeams = await AuthManager.teamLeadTeams();
         isTeamLead = teamLeadTeams != 0;
     }
+  const hasProvisionalToken = AuthManager.hasProvisionalToken();
+
+  if (route.path === "/setup-2fa") {
+    if (!hasProvisionalToken) {
+      navigator("/");
+      return;
+    }
+    if (isAuthenticated) {
+      navigator("/home");
+      return;
+    }
+  }
 
   // Redirect unauthenticated users to login
   if (route.requiresAuth && !isAuthenticated) {

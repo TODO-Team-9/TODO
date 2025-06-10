@@ -60,17 +60,33 @@ export async function register(
       emailAddress,
       password,
     });
-    const totp = await generateTOTPSecret(newUser.username);
-    const { password_hash, ...userWithoutSensitiveData } = newUser;
+
+    if (!process.env.JWT_PROVISIONAL_SECRET) {
+      response
+        .status(HTTP_Status.INTERNAL_SERVER_ERROR)
+        .json({ error: "JWT provisional secret is not configured" });
+      return;
+    }
+
+    const provisionalToken = jwt.sign(
+      {
+        userId: newUser.user_id,
+        username: newUser.username,
+        twoFactorVerified: false,
+      },
+      process.env.JWT_PROVISIONAL_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    const { password_hash, two_factor_secret, ...userWithoutSensitiveData } =
+      newUser;
 
     response.status(HTTP_Status.CREATED).json({
       message:
         "User registered successfully. Please complete 2FA setup to access your account.",
       user: userWithoutSensitiveData,
-      twoFactor: {
-        secret: totp.base32,
-        qrCodeDataURL: totp.qrCodeDataURL,
-      },
+      token: provisionalToken,
+      requiresTwoFactorSetup: true,
     });
   } catch (error) {
     console.error("Registration error:", error);
@@ -155,7 +171,7 @@ export async function login(
         message: "Login successful",
         token: tokenJwt,
         user: {
-          userId: user.user_id,
+          user_id: user.user_id,
           username: user.username,
           emailAddress: user.email_address,
           twoFactorEnabled: true,
@@ -264,7 +280,7 @@ export async function enable2FA(
 
     const fullToken = jwt.sign(
       {
-        userId: request.user?.userId,
+        user_id: request.user?.userId,
         username: request.user?.username,
         role: request.user?.role,
         twoFactorVerified: true,

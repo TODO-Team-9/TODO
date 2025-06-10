@@ -1,12 +1,29 @@
 import { Request, Response, NextFunction } from "express";
 import { HTTP_Status } from "../enums/HTTP_Status";
 
+const getAllowedOrigins = (): string[] => {
+  const origins = process.env.ALLOWED_ORIGINS;
+  if (!origins) {
+    throw new Error(
+      "ALLOWED_ORIGINS environment variable is not set. Please set it to a comma-separated list of allowed origins."
+    );
+  }
+
+  return origins.split(",").map((origin) => origin.trim());
+};
+
 const corsMiddleware = (
   request: Request,
   response: Response,
   next: NextFunction
 ) => {
-  response.header("Access-Control-Allow-Origin", "*");
+  const allowedOrigins = getAllowedOrigins();
+  const origin = request.headers.origin;
+
+  if (origin && allowedOrigins.includes(origin)) {
+    response.header("Access-Control-Allow-Origin", origin);
+  }
+
   response.header(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, OPTIONS, PATCH"

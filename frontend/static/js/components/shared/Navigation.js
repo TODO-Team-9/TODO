@@ -4,14 +4,17 @@ import { AuthManager } from "../../utils/auth.js";
 class NavigationSidebar extends LitElement {
   static properties = {
     user: { type: Object },
-    isNormalUser: { type: Boolean }
+    isNormalUser: { type: Boolean },
+    isTeamLead: { type: Boolean }
   };
 
   constructor() {
     super();
     this.user = AuthManager.getUser();
     this.isNormalUser = true;
+    this.isTeamLead = false;
   }
+
   static styles = css`
     :host {
       display: block;
@@ -71,10 +74,16 @@ class NavigationSidebar extends LitElement {
   async connectedCallback(){
     super.connectedCallback();
     this.isNormalUser = await this.isNormal();
+    this.isTeamLead = await this.isLead();
   }
 
+  async isLead(){
+    const teams = await AuthManager.teamLeadTeams();
+    return teams.length != 0;
+  }
+  
   async isNormal(){
-    return AuthManager.isNormalUser();
+    return await AuthManager.isNormalUser();
   }
 
   get currentPath() {
@@ -95,7 +104,7 @@ class NavigationSidebar extends LitElement {
               : ""}
             >Home</a
           >
-          ${!this.isNormalUser ? 
+          ${!this.isNormalUser || this.isTeamLead ? 
             html`<a
                 href="/requests"
                 class=${this.currentPath === "/requests" || this.currentPath === "/roles" ? "active" : ""}

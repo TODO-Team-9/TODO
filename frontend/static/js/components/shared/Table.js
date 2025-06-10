@@ -87,7 +87,7 @@ class CustomTable extends LitElement {
         font-weight: 600;
     }
 
-    .status-cell.approved {
+    .status-cell.accepted {
         color: #2ecc71;
         font-weight: 600;
     }
@@ -99,6 +99,11 @@ class CustomTable extends LitElement {
     
     .btn.red{
         background-color: #e74c3c;
+        font-weight: 500;
+    }
+
+    .btn.orange{
+        background-color: #f39c12;
         font-weight: 500;
     }
 
@@ -127,14 +132,14 @@ class CustomTable extends LitElement {
             ? this.data.map(row => html`
                 <tr>
                 ${this.columns.map(col => html`
-                    <td class="${col.key === 'status' ? 'status-cell ' + row[col.key].toLowerCase() : ''}">
+                    <td class="${col.key === 'request_status_name' ? 'status-cell ' + row[col.key].toLowerCase() : ''}">
                     ${row[col.key]}
                     </td>
                 `)}
                 ${this.actions.length ? html`
                     <td class="actions">
                     ${this.actions.map(action => html`  
-                        <button class="${action.color === 'green' || action.color === 'red' ? 'btn ' + action.color : ''}"
+                        <button class="${action.color === 'green' || action.color === 'red' || action.color === 'orange' ? 'btn ' + action.color : ''}"
                          @click=${() => action.callback(row)}>
                         ${action.label}
                         </button>

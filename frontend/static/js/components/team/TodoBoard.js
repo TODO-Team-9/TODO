@@ -1,4 +1,6 @@
 import { LitElement, html, css } from 'lit';
+import { navigator } from '../../index.js';
+
 import './TodoColumn.js';
 import './TodoTicket.js';
 import './Header.js';
@@ -35,22 +37,32 @@ class TodoBoard extends LitElement {
   }
 
   connectedCallback(){
-    super.connectedCallback();
-    this.loadTodosAndTeam();    
+    super.connectedCallback();  
     window.addEventListener('team-update', this._onTeamUpdate.bind(this));
+
+    const selectedTeam = localStorage.getItem('selectedTeam');
+    if (selectedTeam) {
+        this.loadTodosAndTeam();
+    }
   }
 
   async loadTodosAndTeam(){
     try {
         const status = await todoService.getStatuses();
         this.statuses = Array.isArray(status) ? status : [];
-
         const currentTeam = localStorage.getItem('selectedTeam');
-        const todos = await todoService.getTeamTodos(currentTeam);
-        this.tasks = Array.isArray(todos) ? todos : [];
 
-        const team = await teamService.getTeam(currentTeam);
-        this.teamName = team.team_name;
+        if(currentTeam == null){
+            alert('Join a team first');
+            navigator('/team/join');
+            return;
+        }else{
+            const todos = await todoService.getTeamTodos(currentTeam);
+            this.tasks = Array.isArray(todos) ? todos : [];
+
+            const team = await teamService.getTeam(currentTeam);
+            this.teamName = team.team_name;
+        }
     } catch (error) {
         this.tasks = [];
         this.members = [];

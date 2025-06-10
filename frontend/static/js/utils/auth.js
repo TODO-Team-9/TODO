@@ -17,6 +17,16 @@ export class AuthManager {
     }
   }
 
+  static async teamLeadTeams(){
+    const response = await userService.getUserTeams(JSON.parse(localStorage.getItem('user')).user_id);
+    const teamLeadTeams = response.filter((team) => team.team_role_id === 1).map((team) => ({
+        team_id: team.team_id,
+        team_name: team.team_name
+    }));
+
+    return teamLeadTeams;
+  }
+
   static getUser() {
     const user = localStorage.getItem("user");
     return user ? JSON.parse(user) : null;
@@ -51,6 +61,7 @@ export class AuthManager {
   static logout() {
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
+    localStorage.removeItem("selectedTeam");
     window.location.href = "/";
   }
 

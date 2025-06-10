@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { navigator } from '../../index.js';
+import { AuthManager } from '../../utils/auth.js';
 
 import "../shared/Table.js";
 
@@ -72,6 +73,7 @@ class RoleTable extends LitElement {
 
             this.teamMembers = members.map((member) => ({
                 member_id: member.member_id,
+                user_id: member.user_id,
                 team_id: member.team_id,
                 username: member.username,
                 team_name: this.teams.find(team => team.team_id === member.team_id).team_name,
@@ -84,8 +86,13 @@ class RoleTable extends LitElement {
 
     async loadTeams() {
         try {
-            const teams = await teamService.getTeams();
-            this.teams = Array.isArray(teams) ? teams : [];
+            const teamLeadTeams = await AuthManager.teamLeadTeams();
+            if(await AuthManager.isNormalUser() && teamLeadTeams.length != 0){
+                this.teams = Array.isArray(teamLeadTeams) ? teamLeadTeams : [];
+            }else if(!await AuthManager.isNormalUser()){
+                const teams = await teamService.getTeams();
+                this.teams = Array.isArray(teams) ? teams : [];
+            }
         } catch (error) {
             this.teams = [];
         }
@@ -102,6 +109,13 @@ class RoleTable extends LitElement {
         await this.loadMembers(selectedTeam.team_id);
     }
 
+    async removeMember(row){
+        const response = await teamService.removeMember(row.team_id, row.user_id);  
+        alert(response.message);
+
+        await this.loadMembers(row.team_id);
+    }
+
     async updateRole(row, newRole){
         if(newRole == 1 && row.team_role == 'Team Lead'){
             alert('User already a Team Lead');
@@ -114,7 +128,11 @@ class RoleTable extends LitElement {
         }
 
         //Handle Role Update;
-        const response = await teamService.promoteMember(row.member_id, row.team_id);
+        const body = {
+            teamId: row.team_id,
+            teamRoleId: newRole
+        }
+        const response = await teamService.updateMemberRole(row.member_id, body);
         alert(response.message);
 
         await this.loadMembers(row.team_id);
@@ -145,7 +163,8 @@ class RoleTable extends LitElement {
 
                     .actions = "${[
                         { label: "Promote", color: 'green', callback: (row) => this.updateRole(row, 1) },
-                        { label: "Demote", color: 'red', callback: (row) => this.updateRole(row, 2) },
+                        { label: "Demote", color: 'orange', callback: (row) => this.updateRole(row, 2) },
+                        { label: "Remove", color: 'red', callback: (row) => this.removeMember(row) }
                     ]}"
                 >
                 </custom-table>

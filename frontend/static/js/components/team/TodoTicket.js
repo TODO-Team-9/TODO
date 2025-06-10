@@ -99,7 +99,6 @@ class TodoTicket extends LitElement {
       <section
         draggable="true"
         @dragstart=${this._onDragStart}
-        @click=${this._navigate}
       >
         <header class="header">
           <section class="title">${this.title}</section>

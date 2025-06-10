@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { navigator } from '../../index.js';
 import teamService from '../../services/TeamService.js';
+import DOMPurify from 'dompurify';
 
 import "./Header.js";
 
@@ -68,23 +69,28 @@ class CreateTeam extends LitElement {
   handleSubmit(e) {
     e.preventDefault();
     const form = e.target;
-    const team = {
-      teamName: form.name.value.trim(),
-      teamDescription: form.description.value.trim()
-    };
+    if(InputValidator.validate(form.name.value.trim()) || InputValidator.validate(form.description.value.trim())){
+        alert("Input not allowed!");
+        form.reset();
+        return;
+    }else{
+        const team = {
+            teamName: DOMPurify.sanitize(form.name.value.trim()),
+            teamDescription: DOMPurify.sanitize(form.description.value.trim())
+        };
     
-    teamService.createTeam(team);
-    alert('Team:' + form.name.value.trim() + ' Created');
-    form.reset();
+        teamService.createTeam(team);
+        alert('Team:' + form.name.value.trim() + ' Created');
+        form.reset();
+    }
   }
-
   render() {
     return html`
       <team-header .title=${'Create Team'} .buttonCaption=${'Team Board'} .route=${'/home'}></team-header>
       <section class="form-container">
         <form @submit=${this.handleSubmit}>
-            <input name="name" placeholder="Name" required />
-            <textarea name="description" placeholder="Description" rows="3" required></textarea>
+            <input name="name" placeholder="Name" maxlength="32"  required />
+            <textarea name="description" placeholder="Description" maxlength="128" rows="3" required></textarea>
             <button type="submit">Create Team</button>
         </form>
     </section>

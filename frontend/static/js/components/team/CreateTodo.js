@@ -1,4 +1,7 @@
 import { LitElement, html, css } from 'lit';
+import { AuthManager } from '../../utils/auth.js';
+import { InputValidator } from '../../utils/inputValidator.js';
+import DOMPurify from 'dompurify';
 
 import "./Header.js";
 import  todoService  from '../../services/TodoService.js';
@@ -78,17 +81,23 @@ class CreateTodo extends LitElement {
   handleSubmit(e) {
     e.preventDefault();
     const form = e.target;
-    const todo = {
-        taskName: form.title.value.trim(),
-        taskDescription: form.description.value.trim(),
-        teamId: localStorage.getItem('selectedTeam'),
-        memberId: 1,
-        priority: form.priority.value
-    };
-    
-    todoService.createTodo(todo);
-    alert('Todo Created');
-    form.reset();
+    if(InputValidator.validate(form.title.value.trim()) || InputValidator.validate(form.description.value.trim())){
+        alert("Input not allowed!");
+        form.reset();
+        return;
+    }else{
+        const todo = {
+            taskName: DOMPurify.sanitize(form.title.value.trim()),
+            taskDescription: DOMPurify.sanitize(form.description.value.trim()),
+            teamId: localStorage.getItem('selectedTeam'),
+            memberId: parseInt(form.assignedTo.value),
+            priorityId: form.priority.value
+        };
+        
+        todoService.createTodo(todo);
+        alert('Todo Created');
+        form.reset();
+    }
   }
 
   async loadPriorities(){
@@ -102,8 +111,18 @@ class CreateTodo extends LitElement {
 
     async loadMembers(){
         try{
-            const members = await teamService.getTeamMembers(localStorage.getItem('selectedTeam'));
-            this.teamMembers = Array.isArray(members) ? members : [];
+            let teamLeadTeams = await AuthManager.teamLeadTeams();
+            const selectedTeam = localStorage.getItem('selectedTeam');
+            const members = await teamService.getTeamMembers(selectedTeam);
+
+            teamLeadTeams = teamLeadTeams.filter((team) => team.team_id == selectedTeam);
+
+            if(teamLeadTeams.length == 0){
+                const member = members.find((member) => member.user_id === JSON.parse(localStorage.getItem('user')).user_id);
+                this.teamMembers = [member];
+            }else{
+                this.teamMembers = Array.isArray(members) ? members : [];
+            }
         }catch (error){
             this.teamMembers = [];
         }
@@ -114,8 +133,17 @@ class CreateTodo extends LitElement {
       <team-header .title=${'Create Todo'} .buttonCaption=${'Team Board'} .route=${'/home'}></team-header>
       <section class="form-container">
         <form @submit=${this.handleSubmit}>
-            <input name="title" placeholder="Title" required />
-            <textarea name="description" placeholder="Description" rows="3" required></textarea>
+            <input name="title" 
+            placeholder="Title" 
+            maxlength="32" 
+            required
+            />
+            <textarea name="description" 
+            placeholder="Description" 
+            rows="3" required 
+            maxlength="256"
+            required
+            ></textarea>
             <select name="assignedTo" required>
                 <option disabled selected value="">Assign To</option>
                 ${this.teamMembers.map(

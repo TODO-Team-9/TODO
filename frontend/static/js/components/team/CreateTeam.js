@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { navigator } from '../../index.js';
 import teamService from '../../services/TeamService.js';
+import DOMPurify from 'dompurify';
 
 import "./Header.js";
 
@@ -69,13 +70,13 @@ class CreateTeam extends LitElement {
     e.preventDefault();
     const form = e.target;
     if(InputValidator.validate(form.name.value.trim()) || InputValidator.validate(form.description.value.trim())){
-        alert("Input not allowed! Contains malicious characters");
+        alert("Input not allowed!");
         form.reset();
         return;
     }else{
         const team = {
-        teamName: form.name.value.trim(),
-        teamDescription: form.description.value.trim()
+            teamName: DOMPurify.sanitize(form.name.value.trim()),
+            teamDescription: DOMPurify.sanitize(form.description.value.trim())
         };
     
         teamService.createTeam(team);

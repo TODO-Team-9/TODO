@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { AuthManager } from '../../utils/auth.js';
 import { InputValidator } from '../../utils/inputValidator.js';
+import DOMPurify from 'dompurify';
 
 import "./Header.js";
 import  todoService  from '../../services/TodoService.js';
@@ -81,16 +82,16 @@ class CreateTodo extends LitElement {
     e.preventDefault();
     const form = e.target;
     if(InputValidator.validate(form.title.value.trim()) || InputValidator.validate(form.description.value.trim())){
-        alert("Input not allowed! Contains malicious characters");
+        alert("Input not allowed!");
         form.reset();
         return;
     }else{
         const todo = {
-            taskName: form.title.value.trim(),
-            taskDescription: form.description.value.trim(),
+            taskName: DOMPurify.sanitize(form.title.value.trim()),
+            taskDescription: DOMPurify.sanitize(form.description.value.trim()),
             teamId: localStorage.getItem('selectedTeam'),
             memberId: parseInt(form.assignedTo.value),
-            priority: form.priority.value
+            priorityId: form.priority.value
         };
         
         todoService.createTodo(todo);

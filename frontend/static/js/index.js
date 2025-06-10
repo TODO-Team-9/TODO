@@ -26,7 +26,7 @@ export const router = async () => {
   const routes = [
     { path: "/", view: LoginView, requiresAuth: false },
     { path: "/register", view: RegisterView, requiresAuth: false },
-    { path: "/setup-2fa", view: TwoFactorSetupView, requiresAuth: true },
+    { path: "/setup-2fa", view: TwoFactorSetupView, requiresAuth: false },
     { path: "/profile", view: ProfileView, requiresAuth: true },
     { path: "/home", view: HomeView, requiresAuth: true },
     { path: "/create/todo", view: CreateTodoView, requiresAuth: true },
@@ -73,10 +73,8 @@ export const router = async () => {
   }
   // Check authentication
   const isAuthenticated = AuthManager.isAuthenticated();
-
-  const route = currentRoute.route;
-    
   const hasProvisionalToken = AuthManager.hasProvisionalToken();
+  const route = currentRoute.route;
 
   if (route.path === "/setup-2fa") {
     if (!hasProvisionalToken) {

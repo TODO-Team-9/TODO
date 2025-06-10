@@ -158,6 +158,12 @@ class LoginForm extends LitElement {
         } else {
           window.location.href = "/home";
         }
+      } else if (response.status === 429) {
+        this.errorMessage =
+          data.error || "Too many login attempts. Please try again later.";
+        if (data.retryAfter) {
+          this.errorMessage += ` You can try again in ${data.retryAfter}.`;
+        }
       } else if (data.requiresTotpToken) {
         const twoFactorVerification = document.createElement(
           "two-factor-verification"

@@ -108,4 +108,26 @@ export async function getTeamDailyTaskStats(
       error: "Failed to generate daily task statistics"
     });
   }
+}
+
+export async function getTeamTaskStatusCounts(
+  request: Request,
+  response: Response
+): Promise<void> {
+  try {
+    const teamId = Number(request.params.teamId);
+    if (!teamId || isNaN(teamId)) {
+      response.status(HTTP_Status.BAD_REQUEST).json({
+        error: "Valid team ID is required"
+      });
+      return;
+    }
+    const counts = await reportingService.getTeamTaskStatusCounts(teamId);
+    response.status(HTTP_Status.OK).json(counts);
+  } catch (error) {
+    console.error("Error in getTeamTaskStatusCounts:", error);
+    response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({
+      error: "Failed to get team task status counts"
+    });
+  }
 } 

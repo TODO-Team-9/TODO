@@ -256,7 +256,8 @@ class RegisterForm extends LitElement {
           @focus=${() => (this.showUsernameRequirements = true)}
           @blur=${() => (this.showUsernameRequirements = false)}
         />
-        ${this.showUsernameRequirements ||        this.usernameValidationErrors.length > 0
+        ${this.showUsernameRequirements ||
+        this.usernameValidationErrors.length > 0
           ? this.renderUsernameRequirements()
           : ""}
         <input
@@ -398,10 +399,11 @@ class RegisterForm extends LitElement {
     e.preventDefault();
     this.loading = true;
     this.errorMessage = "";
-    this.successMessage = "";    const formData = new FormData(e.target);
+    this.successMessage = "";
+    const formData = new FormData(e.target);
     const username = formData.get("username");
     const password = formData.get("password");
-    const confirmPassword = formData.get("confirmPassword");// Validate passwords match
+    const confirmPassword = formData.get("confirmPassword"); // Validate passwords match
     if (password !== confirmPassword) {
       this.errorMessage = "Passwords do not match";
       this.passwordMismatch = true;
@@ -413,16 +415,16 @@ class RegisterForm extends LitElement {
       this.errorMessage =
         "Username does not meet requirements:\n" +
         usernameValidation.errors.join("\n");
+      this.clearPasswordFields();
       this.loading = false;
       return;
-    }
-
-    // Validate password complexity
+    } // Validate password complexity
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
       this.errorMessage =
         "Password does not meet complexity requirements:\n" +
         passwordValidation.errors.join("\n");
+      this.clearPasswordFields();
       this.loading = false;
       return;
     }
@@ -431,7 +433,8 @@ class RegisterForm extends LitElement {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-        },        credentials: "include",
+        },
+        credentials: "include",
         body: JSON.stringify({
           username,
           password,
@@ -450,14 +453,36 @@ class RegisterForm extends LitElement {
         if (data.retryAfter) {
           this.errorMessage += ` You can try again in ${data.retryAfter}.`;
         }
+        // Clear password fields for security
+        this.clearPasswordFields();
       } else {
         this.errorMessage = data.error || "Registration failed";
+        // Clear password fields for security
+        this.clearPasswordFields();
       }
     } catch (error) {
       console.error("Registration error:", error);
       this.errorMessage = "Network error. Please try again.";
+      // Clear password fields for security
+      this.clearPasswordFields();
     } finally {
       this.loading = false;
+    }
+  }
+
+  clearPasswordFields() {
+    const passwordInput = this.shadowRoot.querySelector(
+      'input[name="password"]'
+    );
+    const confirmPasswordInput = this.shadowRoot.querySelector(
+      'input[name="confirmPassword"]'
+    );
+
+    if (passwordInput) {
+      passwordInput.value = "";
+    }
+    if (confirmPasswordInput) {
+      confirmPasswordInput.value = "";
     }
   }
 }

@@ -12,7 +12,6 @@ export const addMember = async (
     const { userId } = request.body;
     const { teamId } = request.params;
 
-    // Input validation
     if (!userId || !teamId) {
       response.status(HTTP_Status.BAD_REQUEST).json({
         error: "User ID and team ID are required",
@@ -26,7 +25,6 @@ export const addMember = async (
     );
     response.status(HTTP_Status.CREATED).json(member);
   } catch (error: any) {
-    // Handle specific validation errors
     if (
       error.message &&
       (error.message.includes("Invalid user ID") ||
@@ -39,7 +37,6 @@ export const addMember = async (
       return;
     }
 
-    // Handle other errors
     response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({
       error: "Failed to add member to team",
     });
@@ -53,7 +50,6 @@ export const removeMember = async (
   try {
     const { userId, teamId } = request.params;
 
-    // Input validation
     if (!userId || !teamId) {
       response.status(HTTP_Status.BAD_REQUEST).json({
         error: "User ID and team ID are required",
@@ -66,7 +62,6 @@ export const removeMember = async (
       message: "Member removed successfully",
     });
   } catch (error: any) {
-    // Handle specific validation errors
     if (
       error.message &&
       (error.message.includes("Invalid user ID") ||
@@ -80,7 +75,6 @@ export const removeMember = async (
       return;
     }
 
-    // Handle other errors
     response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({
       error: "Failed to remove member from team",
     });
@@ -94,7 +88,6 @@ export const promoteMember = async (
   try {
     const { memberId, teamId } = request.params;
 
-    // Input validation
     if (!memberId || !teamId) {
       response.status(HTTP_Status.BAD_REQUEST).json({
         error: "Member ID and team ID are required",
@@ -107,7 +100,6 @@ export const promoteMember = async (
       message: "Member promoted successfully",
     });
   } catch (error: any) {
-    // Handle specific validation errors
     if (
       error.message &&
       (error.message.includes("Invalid member ID") ||
@@ -120,7 +112,6 @@ export const promoteMember = async (
       return;
     }
 
-    // Handle other errors
     response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({
       error: "Failed to promote member",
     });
@@ -176,7 +167,6 @@ export const getTeamMembers = async (
   try {
     const { teamId } = request.params;
 
-    // Input validation
     if (!teamId) {
       response.status(HTTP_Status.BAD_REQUEST).json({
         error: "Team ID is required",
@@ -187,13 +177,11 @@ export const getTeamMembers = async (
     const members = await memberService.getTeamMembers(Number(teamId));
     response.status(HTTP_Status.OK).json(members);
   } catch (error: any) {
-    // Handle specific validation errors
     if (error.message && error.message.includes("Invalid team ID")) {
       response.status(HTTP_Status.BAD_REQUEST).json({ error: error.message });
       return;
     }
 
-    // Handle other errors
     response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({
       error: "Failed to retrieve team members",
     });

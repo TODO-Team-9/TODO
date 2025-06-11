@@ -239,7 +239,6 @@ class UserProfile extends LitElement {
         return;
       }
 
-      // Fetch detailed user profile from API
       const response = await AuthManager.makeAuthenticatedRequest(
         getApiUrl(`api/users/${currentUser.user_id}`)
       );
@@ -253,7 +252,6 @@ class UserProfile extends LitElement {
 
       if (response.ok) {
         this.user = data.user;
-        // TODO: Fetch user stats (tasks, teams, etc.) when those endpoints are available
         this.userStats = {
           totalTasks: 0,
           completedTasks: 0,

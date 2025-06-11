@@ -2,7 +2,6 @@ import userService from "../services/UserService";
 import { getApiUrl } from "./config.js";
 import { navigator } from "../index.js";
 
-// Authentication utility functions
 export class AuthManager {
   static getToken() {
     return localStorage.getItem("authToken");
@@ -76,7 +75,6 @@ export class AuthManager {
       });
     } catch (error) {
       console.error("Logout API call failed:", error);
-      // Continue with local cleanup even if API call fails
     }
 
     localStorage.removeItem("authToken");
@@ -108,8 +106,7 @@ export class AuthManager {
     try {
       const response = await fetch(url, mergedOptions);
       if (response.status === 401) {
-        // Token expired or invalid
-        this.logout().catch(console.error); // Fire and forget
+        this.logout().catch(console.error);
         return null;
       }
 

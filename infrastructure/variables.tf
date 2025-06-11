@@ -86,3 +86,8 @@ variable "trusted_ssh_ips" {
   description = "List of trusted IP addresses allowed to SSH into EC2 instances"
   type        = list(string)
 }
+
+variable "acm_certificate_arn" {
+  description = "ARN of the ACM certificate for HTTPS on the ALB"
+  type        = string
+}

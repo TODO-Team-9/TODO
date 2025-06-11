@@ -6,5 +6,5 @@ export default defineConfig({
     outDir: "../public",
     emptyOutDir: true,
   },
-  envDir: "./frontend", // Look for .env files in the frontend directory
+  envDir: "./frontend",
 });

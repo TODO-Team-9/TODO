@@ -81,7 +81,6 @@ class TodoColumn extends LitElement {
             const toast = this.renderRoot.querySelector('#toast');
             toast.show('You can only update tickets assigned to you', 'error')
         }
-
     }
 
   render() {

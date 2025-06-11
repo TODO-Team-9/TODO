@@ -4,6 +4,8 @@ import "./Header.js";
 import "./MemberStats.js";
 import "../shared/StatCard.js";
 
+import '../shared/Toast.js';
+
 import teamService from '../../services/TeamService.js';
 
 class TeamStats extends LitElement {
@@ -37,17 +39,26 @@ class TeamStats extends LitElement {
     this.inProgress = 0;
   }
 
+    firstUpdated() {
+        this.getStats();    
+    }
+
   connectedCallback(){
     super.connectedCallback();
-    this.getStats();
   }
 
   async getStats(){
-    try{
-        const stats = await teamService.getTeamStats(localStorage.getItem('selectedTeam'));
-        this.backlog = stats.backlog;
-        this.inProgress = stats.in_progress;
-        this.done = stats.completed;
+    try{        
+        const selectedTeam = localStorage.getItem('selectedTeam');
+        if(selectedTeam){
+            const stats = await teamService.getTeamStats(selectedTeam);
+            this.backlog = stats.backlog;
+            this.inProgress = stats.in_progress;
+            this.done = stats.completed;
+        }else{
+            const toast = this.renderRoot.querySelector('#toast');
+            toast.show('No team selected', 'error')
+        }
     }catch (error){
         this.backlog = 0;
         this.done = 0;
@@ -57,6 +68,7 @@ class TeamStats extends LitElement {
 
   render() {
     return html`
+        <toast-message id="toast"></toast-message>
         <team-header .title=${'Team Report'} .buttonCaption=${'Team Board'} .route=${'/home'}></team-header>
         <section class="stats">
             <stat-card .label="${'Backlog'}" .stat=${this.backlog}></stat-card>

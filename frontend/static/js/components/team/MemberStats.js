@@ -129,8 +129,11 @@ class MemberStats extends LitElement {
 
     async getStats(){
         try{
-            const stats = await teamService.getTeamMemberStats(localStorage.getItem('selectedTeam'), this.startDate, this.endDate);
-            this.members = Array.isArray(stats) ? stats : [];
+            const selectedTeam = localStorage.getItem('selectedTeam');
+            if(selectedTeam){
+                const stats = await teamService.getTeamMemberStats(selectedTeam, this.startDate, this.endDate);
+                this.members = Array.isArray(stats) ? stats : [];
+            }
         }catch (error){
             this.members = [];
         }
@@ -138,49 +141,49 @@ class MemberStats extends LitElement {
 
   render() {
     return html`
-      <section class="header">
-        <section class="date-group">
-            <label for="start-date">Start Date</label>
-            <input
-            id="start-date"
-            type="date"
-            .value=${this.startDate}
-            @change=${e => this.startDate = e.target.value}
-            />
+        <section class="header">
+            <section class="date-group">
+                <label for="start-date">Start Date</label>
+                <input
+                id="start-date"
+                type="date"
+                .value=${this.startDate}
+                @change=${e => this.startDate = e.target.value}
+                />
+            </section>
+            <section class="date-group">
+                <label for="end-date">End Date</label>
+                <input
+                id="end-date"
+                type="date"
+                .value=${this.endDate}
+                @change=${e => this.endDate = e.target.value}
+                />
+            </section>
+            <button @click=${this.getStats}>Filter</button>
         </section>
-        <section class="date-group">
-            <label for="end-date">End Date</label>
-            <input
-            id="end-date"
-            type="date"
-            .value=${this.endDate}
-            @change=${e => this.endDate = e.target.value}
-            />
-        </section>
-        <button @click=${this.getStats}>Filter</button>
-      </section>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Backlog</th>
-            <th>In Progress</th>
-            <th>Done</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${this.members.map(member => html`
+        <table>
+            <thead>
             <tr>
-              <td>${member.username}</td>
-              <td class="backlog">${member.backlog}</td>
-              <td class="in-progress">${member.in_progress}</td>
-              <td class="done">${member.completed}</td>
-              <td class="total">${member.total}</td>
+                <th>Name</th>
+                <th>Backlog</th>
+                <th>In Progress</th>
+                <th>Done</th>
+                <th>Total</th>
             </tr>
-          `)}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+            ${this.members.map(member => html`
+                <tr>
+                <td>${member.username}</td>
+                <td class="backlog">${member.backlog}</td>
+                <td class="in-progress">${member.in_progress}</td>
+                <td class="done">${member.completed}</td>
+                <td class="total">${member.total}</td>
+                </tr>
+            `)}
+            </tbody>
+        </table>
     `;
   }
 }

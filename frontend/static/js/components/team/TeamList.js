@@ -85,6 +85,11 @@ class TeamList extends LitElement {
 
                 const members = await teamService.getTeamMembers(this.teams[0].team_id);
                 this.members = Array.isArray(members) ? members : [];
+            }else{
+                const currentPath = window.location.pathname.replace(/\/$/, '');
+                if(currentPath == '/home'){
+                    navigator('/team/join');
+                }
             }
         } catch (error) {
             console.log(error);

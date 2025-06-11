@@ -100,7 +100,11 @@ class RequestTable extends LitElement {
 
         if(selectedTeamName == 0){
             const requests = await teamService.getAllRequests();
-            this.filterPending(requests);
+            this.currentRequests = requests.filter((request) => request.status == 'PENDING').map((request) => ({
+                id: request.request_id,
+                username: request.username,
+                team_name: this.teams.find(team => team.team_id === request.team_id).team_name
+            }));            
         }else{
             const selectedTeam = this.teams.find(team => team.team_name === selectedTeamName);
             try {

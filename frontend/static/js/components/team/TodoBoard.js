@@ -44,9 +44,6 @@ class TodoBoard extends LitElement {
     const selectedTeam = localStorage.getItem('selectedTeam');
     if (selectedTeam) {
         this.loadTodosAndTeam();
-    }else{
-        navigator('/team/join');
-        return;    
     }
   }
 

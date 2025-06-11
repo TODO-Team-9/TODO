@@ -8,20 +8,8 @@ import {
 
 const router = Router();
 
-router.get(
-  "/teams/:teamId/activity",
-  // authenticate,
-  getTeamTaskActivityReport
-);
-router.get(
-  "/teams/:teamId/stats",
-  // authenticate,
-  getTeamDailyTaskStats
-);
-router.get(
-  "/teams/:teamId/statuses",
-  // authenticate,
-  getTeamTaskStatusCounts
-);
+router.get("/teams/:teamId/activity", authenticate, getTeamTaskActivityReport);
+router.get("/teams/:teamId/stats", authenticate, getTeamDailyTaskStats);
+router.get("/teams/:teamId/statuses", authenticate, getTeamTaskStatusCounts);
 
 export default router;

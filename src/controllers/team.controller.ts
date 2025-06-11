@@ -1,8 +1,11 @@
 import { Request, Response } from "express";
 import { TeamService } from "../services/team.service";
+import { MemberService } from "../services/member.service";
 import { HTTP_Status } from "../enums/HTTP_Status";
+import { Role } from "../enums/Role";
 
 const teamService = new TeamService();
+const memberService = new MemberService();
 
 export const createTeam = async (
   request: Request,
@@ -19,8 +22,17 @@ export const createTeam = async (
       return;
     }
 
+    // Ensure user is authenticated
+    const creatorUserId = request.user?.userId;
+    if (!creatorUserId) {
+      response.status(HTTP_Status.UNAUTHORIZED).json({ error: "User not authenticated" });
+      return;
+    }
+
     const team = await teamService.createTeam(teamName, teamDescription);
-    response.status(HTTP_Status.CREATED).json(team);
+    // Add creator as Team Lead
+    const member = await memberService.addMember(creatorUserId, team.teamId, Role.Team.TEAM_LEAD);
+    response.status(HTTP_Status.CREATED).json({ team, member });
   } catch (error: any) {
     // Handle specific validation errors
     if (

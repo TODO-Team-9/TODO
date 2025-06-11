@@ -70,6 +70,16 @@ class TeamList extends LitElement {
     connectedCallback(){
         super.connectedCallback();
         this.loadTeamsAndMembers();
+        window.addEventListener('team-created', this._onTeamCreated.bind(this));
+    }
+
+    disconnectedCallback() {
+        window.removeEventListener('team-created', this._onTeamCreated.bind(this));
+        super.disconnectedCallback();
+    }
+
+    _onTeamCreated() {
+        this.loadTeamsAndMembers();
     }
 
     async loadTeamsAndMembers() {

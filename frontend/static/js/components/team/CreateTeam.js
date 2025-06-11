@@ -111,6 +111,7 @@ class CreateTeam extends LitElement {
         }else{
             this.errorMessage = '';
             this.successMessage = 'Team created succesfully';
+            window.dispatchEvent(new CustomEvent('team-created'));
         }
         form.reset();
     }

@@ -1,6 +1,7 @@
 import { LitElement, html, css } from "lit";
 import { getApiUrl } from "../../utils/config.js";
 import "./TwoFactorSetup.js";
+import { navigator } from "../../index.js";
 
 class LoginForm extends LitElement {
   static properties = {
@@ -247,7 +248,7 @@ class LoginForm extends LitElement {
       const app = document.querySelector("#app");
       app.replaceChildren(twoFactorSetup);
     } else {
-      window.location.href = "/home";
+      navigator("/home");
     }
   }
   handleLoginError(response, data, credentials) {

@@ -1,5 +1,6 @@
 import userService from "../services/UserService";
 import { getApiUrl } from "./config.js";
+import { navigator } from "../index.js";
 
 // Authentication utility functions
 export class AuthManager {
@@ -81,7 +82,7 @@ export class AuthManager {
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
     localStorage.removeItem("selectedTeam");
-    window.location.href = "/";
+    navigator("/");
   }
 
   static async makeAuthenticatedRequest(url, options = {}) {

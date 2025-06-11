@@ -233,10 +233,12 @@ class RegisterForm extends LitElement {
     return html`
       <h2>Register</h2>
       ${this.errorMessage
-        ? html`<div class="error">${this.errorMessage}</div>`
+        ? html`<aside class="error" role="alert">${this.errorMessage}</aside>`
         : ""}
       ${this.successMessage
-        ? html`<div class="success">${this.successMessage}</div>`
+        ? html`<aside class="success" role="status">
+            ${this.successMessage}
+          </aside>`
         : ""}
       <form
         @submit=${this.handleRegister}
@@ -289,7 +291,9 @@ class RegisterForm extends LitElement {
           @input=${this.validateInputs}
         />
         ${this.passwordMismatch
-          ? html`<div class="password-error">Passwords do not match</div>`
+          ? html`<output class="password-error" role="alert"
+              >Passwords do not match</output
+            >`
           : ""}
         <button type="submit" ?disabled=${this.loading}>
           ${this.loading ? "Creating account..." : "Register"}
@@ -356,46 +360,44 @@ class RegisterForm extends LitElement {
   renderPasswordRequirements() {
     const password =
       this.shadowRoot?.querySelector('input[name="password"]')?.value || "";
-
     return html`
-      <div class="password-requirements">
+      <aside class="password-requirements">
         <h4>Password Requirements:</h4>
         <ul>
           ${passwordRules.map(
             (rule) => html`
               <li>
-                <span class=${rule.test(password) ? "check" : "cross"}>
+                <output class=${rule.test(password) ? "check" : "cross"}>
                   ${rule.test(password) ? "✓" : "✗"}
-                </span>
+                </output>
                 ${rule.text}
               </li>
             `
           )}
         </ul>
-      </div>
+      </aside>
     `;
   }
 
   renderUsernameRequirements() {
     const username =
       this.shadowRoot?.querySelector('input[name="username"]')?.value || "";
-
     return html`
-      <div class="username-requirements">
+      <aside class="username-requirements">
         <h4>Username Requirements:</h4>
         <ul>
           ${usernameRules.map(
             (rule) => html`
               <li>
-                <span class=${rule.test(username) ? "check" : "cross"}>
+                <output class=${rule.test(username) ? "check" : "cross"}>
                   ${rule.test(username) ? "✓" : "✗"}
-                </span>
+                </output>
                 ${rule.text}
               </li>
             `
           )}
         </ul>
-      </div>
+      </aside>
     `;
   }
 

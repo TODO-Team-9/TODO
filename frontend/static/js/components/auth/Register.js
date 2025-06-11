@@ -316,7 +316,6 @@ class RegisterForm extends LitElement {
       'input[name="username"]'
     ).value;
 
-    // Validate username format
     const usernameValidation = validateUsername(username);
     this.usernameValidationErrors = usernameValidation.errors;
   }
@@ -329,11 +328,9 @@ class RegisterForm extends LitElement {
       'input[name="confirmPassword"]'
     ).value;
 
-    // Validate password complexity
     const passwordValidation = validatePassword(password);
     this.passwordValidationErrors = passwordValidation.errors;
 
-    // Check if passwords match
     if (confirmPassword && password !== confirmPassword) {
       this.passwordMismatch = true;
     } else {
@@ -411,13 +408,13 @@ class RegisterForm extends LitElement {
     const username = formData.get("username");
     const emailAddress = formData.get("emailAddress");
     const password = formData.get("password");
-    const confirmPassword = formData.get("confirmPassword"); // Validate passwords match
+    const confirmPassword = formData.get("confirmPassword");
     if (password !== confirmPassword) {
       this.errorMessage = "Passwords do not match";
       this.passwordMismatch = true;
       this.loading = false;
       return;
-    } // Validate username format
+    }
     const usernameValidation = validateUsername(username);
     if (!usernameValidation.isValid) {
       this.errorMessage =
@@ -426,7 +423,8 @@ class RegisterForm extends LitElement {
       this.clearPasswordFields();
       this.loading = false;
       return;
-    } // Validate password complexity
+    }
+
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
       this.errorMessage =

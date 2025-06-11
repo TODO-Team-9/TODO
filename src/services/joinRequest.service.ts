@@ -6,7 +6,7 @@ import { AllJoinRequest } from "../models/AllJoinRequest";
 export class JoinRequestError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'JoinRequestError';
+    this.name = "JoinRequestError";
   }
 }
 
@@ -26,7 +26,9 @@ export class JoinRequestService {
       return request;
     } catch (error: any) {
       if (error.message.includes("pending join request already exists")) {
-        throw new JoinRequestError("A pending request already exists for this user and team");
+        throw new JoinRequestError(
+          "A pending request already exists for this user and team"
+        );
       }
       throw error;
     }
@@ -39,7 +41,6 @@ export class JoinRequestService {
     try {
       await sql`CALL update_join_request(${requestId}, ${newStatus})`;
     } catch (error: any) {
-      // Map database errors to specific error messages
       if (error.message.includes("Join request does not exist")) {
         throw new JoinRequestError("Join request not found");
       }

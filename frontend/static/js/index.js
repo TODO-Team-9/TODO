@@ -71,7 +71,7 @@ export const router = async () => {
       result: [location.pathname],
     };
   }
-  // Check authentication
+
   const isAuthenticated = AuthManager.isAuthenticated();
   const hasProvisionalToken = AuthManager.hasProvisionalToken();
   const route = currentRoute.route;
@@ -87,7 +87,6 @@ export const router = async () => {
     }
   }
 
-  // Redirect unauthenticated users to login
   if (route.requiresAuth && !isAuthenticated) {
     navigator("/");
     return;
@@ -107,7 +106,6 @@ export const router = async () => {
     return;
   }
 
-  // Redirect authenticated users away from login/register
   if (
     !route.requiresAuth &&
     isAuthenticated &&

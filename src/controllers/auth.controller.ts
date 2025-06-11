@@ -20,7 +20,7 @@ export async function register(
         .status(HTTP_Status.BAD_REQUEST)
         .json({ error: "All fields are required" });
       return;
-    } // Validate password complexity
+    }
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
       response.status(HTTP_Status.BAD_REQUEST).json({
@@ -30,7 +30,6 @@ export async function register(
       return;
     }
 
-    // Validate username format
     const usernameValidation = validateUsername(username);
     if (!usernameValidation.isValid) {
       response.status(HTTP_Status.BAD_REQUEST).json({
@@ -76,7 +75,8 @@ export async function register(
       },
       process.env.JWT_PROVISIONAL_SECRET,
       { expiresIn: "15m" }
-    ); // Create a backwards-compatible token for frontend use (without cookie flag)
+    );
+
     const frontendToken = jwt.sign(
       {
         userId: newUser.user_id,
@@ -88,7 +88,7 @@ export async function register(
     );
     response.cookie("provisionalToken", provisionalToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Only use secure in production
+      secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       maxAge: 15 * 60 * 1000,
     });
@@ -142,7 +142,7 @@ export async function login(
         .status(HTTP_Status.UNAUTHORIZED)
         .json({ error: "Invalid credentials" });
       return;
-    } // Check if user has 2FA enabled
+    }
     const has2FA = !!user.two_factor_secret;
 
     if (has2FA) {
@@ -164,7 +164,6 @@ export async function login(
         return;
       }
 
-      // 2FA verified - issue full JWT
       if (!process.env.JWT_SECRET) {
         response
           .status(HTTP_Status.INTERNAL_SERVER_ERROR)
@@ -208,7 +207,6 @@ export async function login(
         },
       });
     } else {
-      // User doesn't have 2FA - issue provisional JWT and require 2FA setup
       if (!process.env.JWT_PROVISIONAL_SECRET) {
         response
           .status(HTTP_Status.INTERNAL_SERVER_ERROR)
@@ -224,7 +222,8 @@ export async function login(
         },
         process.env.JWT_PROVISIONAL_SECRET,
         { expiresIn: "15m" }
-      ); // Create a backwards-compatible token for frontend use (without cookie flag)
+      );
+
       const frontendProvisionalToken = jwt.sign(
         {
           userId: user.user_id,
@@ -364,7 +363,7 @@ export async function enable2FA(
 }
 
 export async function logout(
-  request: Request,
+  _request: Request,
   response: Response
 ): Promise<void> {
   try {

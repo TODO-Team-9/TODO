@@ -15,17 +15,14 @@ import { generalLimiter } from "./middleware/rateLimiter.middleware";
 const app = express();
 const PORT = process.env.PORT ?? 3000;
 
-// Set security headers (without CSP)
 app.use(
   helmet({
-    contentSecurityPolicy: false, // Disable helmet's CSP as we use our own middleware
+    contentSecurityPolicy: false,
   })
 );
 
-// Apply CSP headers to all responses
 app.use(cspMiddleware);
 
-// CORS middleware
 app.use(corsMiddleware);
 
 app.use(generalLimiter);
@@ -34,7 +31,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Configure static file serving with CSP headers
 app.use(
   "/",
   express.static(path.join(__dirname, "../public"), {

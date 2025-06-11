@@ -3,7 +3,6 @@ import { Team } from "../models/Team";
 
 export class TeamService {
   async createTeam(teamName: string, teamDescription?: string): Promise<Team> {
-    // Validate input
     if (!teamName || teamName.trim().length === 0) {
       throw new Error("Team name is required");
     }
@@ -14,12 +13,10 @@ export class TeamService {
       throw new Error("Team description must be less than 128 characters");
     }
 
-    // Call create_team stored procedure
     await sql`
       CALL create_team(${teamName}, ${teamDescription ?? null})
     `;
 
-    // Retrieve the newly created team
     const [team] = await sql<Team[]>`
       SELECT * FROM teams 
       WHERE team_name = ${teamName}
@@ -35,7 +32,6 @@ export class TeamService {
   }
 
   async getAllTeams(): Promise<Team[]> {
-    // Query teams table directly instead of using the view
     const teams = await sql<Team[]>`
       SELECT team_id, team_name, team_description
       FROM teams
@@ -45,12 +41,10 @@ export class TeamService {
   }
 
   async getTeamById(teamId: number): Promise<Team | null> {
-    // Validate input
     if (!teamId || isNaN(teamId) || teamId <= 0) {
       throw new Error("Invalid team ID");
     }
 
-    // Query teams table with proper type casting and validation
     const [team] = await sql<Team[]>`
       SELECT * FROM teams 
       WHERE team_id = ${teamId}

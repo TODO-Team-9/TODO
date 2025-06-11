@@ -74,7 +74,7 @@ export async function register(
         isHttpOnlyCookie: true,
       },
       process.env.JWT_PROVISIONAL_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "15m" }
     );
 
     const frontendToken = jwt.sign(
@@ -84,14 +84,13 @@ export async function register(
         twoFactorVerified: false,
       },
       process.env.JWT_PROVISIONAL_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "15m" }
     );
-
     response.cookie("provisionalToken", provisionalToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 60 * 60 * 1000,
+      maxAge: 15 * 60 * 1000,
     });
 
     const { password_hash, two_factor_secret, ...userWithoutSensitiveData } =
@@ -179,9 +178,8 @@ export async function login(
           isHttpOnlyCookie: true,
         },
         process.env.JWT_SECRET,
-        { expiresIn: "24h" }
+        { expiresIn: "30m" }
       );
-
       const frontendToken = jwt.sign(
         {
           userId: user.user_id,
@@ -189,14 +187,13 @@ export async function login(
           twoFactorVerified: true,
         },
         process.env.JWT_SECRET,
-        { expiresIn: "24h" }
+        { expiresIn: "30m" }
       );
-
       response.cookie("authToken", tokenJwt, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 24 * 60 * 60 * 1000,
+        maxAge: 30 * 60 * 1000,
       });
 
       response.status(HTTP_Status.OK).json({
@@ -224,7 +221,7 @@ export async function login(
           isHttpOnlyCookie: true,
         },
         process.env.JWT_PROVISIONAL_SECRET,
-        { expiresIn: "1h" }
+        { expiresIn: "15m" }
       );
 
       const frontendProvisionalToken = jwt.sign(
@@ -234,14 +231,13 @@ export async function login(
           twoFactorVerified: false,
         },
         process.env.JWT_PROVISIONAL_SECRET,
-        { expiresIn: "1h" }
+        { expiresIn: "15m" }
       );
-
       response.cookie("provisionalToken", provisionalToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 60 * 60 * 1000,
+        maxAge: 15 * 60 * 1000,
       });
 
       response.status(HTTP_Status.OK).json({
@@ -334,9 +330,8 @@ export async function enable2FA(
         isHttpOnlyCookie: true,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "24h" }
+      { expiresIn: "30m" }
     );
-
     const frontendToken = jwt.sign(
       {
         userId: request.user?.userId,
@@ -345,15 +340,14 @@ export async function enable2FA(
         twoFactorVerified: true,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "24h" }
+      { expiresIn: "30m" }
     );
-
     response.clearCookie("provisionalToken");
     response.cookie("authToken", fullToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 30 * 60 * 1000,
     });
 
     response.status(HTTP_Status.OK).json({

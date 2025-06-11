@@ -259,15 +259,16 @@ class LoginForm extends LitElement {
     } else {
       this.errorMessage = data.error || "Login failed";
       this.handleTwoFactorError();
+      this.clearPasswordField();
     }
   }
-
   handleRateLimitError(data) {
     this.errorMessage =
       data.error || "Too many login attempts. Please try again later.";
     if (data.retryAfter) {
       this.errorMessage += ` You can try again in ${data.retryAfter}.`;
     }
+    this.clearPasswordField();
   }
   showTwoFactorInput(credentials) {
     this.requiresTwoFactor = true;
@@ -279,7 +280,6 @@ class LoginForm extends LitElement {
       }
     }, 100);
   }
-
   handleTwoFactorError() {
     if (this.requiresTwoFactor) {
       const tokenInput = this.shadowRoot.querySelector('input[name="token"]');
@@ -287,6 +287,15 @@ class LoginForm extends LitElement {
         tokenInput.value = "";
         tokenInput.focus();
       }
+    }
+  }
+
+  clearPasswordField() {
+    const passwordInput = this.shadowRoot.querySelector(
+      'input[name="password"]'
+    );
+    if (passwordInput) {
+      passwordInput.value = "";
     }
   }
   resetForm() {

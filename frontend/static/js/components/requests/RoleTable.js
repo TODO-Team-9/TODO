@@ -3,6 +3,7 @@ import { navigator } from '../../index.js';
 import { AuthManager } from '../../utils/auth.js';
 
 import "../shared/Table.js";
+import '../shared/Toast.js';
 
 import teamService from '../../services/TeamService.js';
 
@@ -111,29 +112,29 @@ class RoleTable extends LitElement {
 
     async removeMember(row){
         const response = await teamService.removeMember(row.team_id, row.user_id);  
-        alert(response.message);
-
+        const toast = this.renderRoot.querySelector('#toast');
+        toast.show(response.message, 'error');
         await this.loadMembers(row.team_id);
     }
 
     async updateRole(row, newRole){
+        const toast = this.renderRoot.querySelector('#toast');
         if(newRole == 1 && row.team_role == 'Team Lead'){
-            alert('User already a Team Lead');
+            toast.show('User already a Team Lead', 'error');
             return;
         }
 
         if(newRole == 2 && row.team_role == 'TODO User'){
-            alert('User already a TODO User');
+            toast.show('User already a TODO User', 'error');
             return;
         }
-
-        //Handle Role Update;
+        
         const body = {
             teamId: row.team_id,
             teamRoleId: newRole
         }
         const response = await teamService.updateMemberRole(row.member_id, body);
-        alert(response.message);
+        toast.show(response.message, 'success');
 
         await this.loadMembers(row.team_id);
     }
@@ -142,6 +143,7 @@ class RoleTable extends LitElement {
         return html`
             <section class="roles">
                 <h2>Team Roles<h2>
+                <toast-message id="toast"></toast-message>
                 <select @change="${this.getTeamRoles}" name="team" required>
                     <option disabled selected value="">Select Team</option>
                     ${this.teams.map(

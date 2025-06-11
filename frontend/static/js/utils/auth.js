@@ -1,4 +1,5 @@
 import userService from "../services/UserService";
+import { getApiUrl } from "./config.js";
 
 // Authentication utility functions
 export class AuthManager {
@@ -6,23 +7,29 @@ export class AuthManager {
     return localStorage.getItem("authToken");
   }
 
-  static async isNormalUser(){
-    const response = await userService.getUser(JSON.parse(localStorage.getItem('user')).user_id);
+  static async isNormalUser() {
+    const response = await userService.getUser(
+      JSON.parse(localStorage.getItem("user")).user_id
+    );
     const user = response.user;
 
-    if(user && user.system_role_id === 2){
-        return true;
-    }else{
-        return false;
+    if (user && user.system_role_id === 2) {
+      return true;
+    } else {
+      return false;
     }
   }
 
-  static async teamLeadTeams(){
-    const response = await userService.getUserTeams(JSON.parse(localStorage.getItem('user')).user_id);
-    const teamLeadTeams = response.filter((team) => team.team_role_id === 1).map((team) => ({
+  static async teamLeadTeams() {
+    const response = await userService.getUserTeams(
+      JSON.parse(localStorage.getItem("user")).user_id
+    );
+    const teamLeadTeams = response
+      .filter((team) => team.team_role_id === 1)
+      .map((team) => ({
         team_id: team.team_id,
-        team_name: team.team_name
-    }));
+        team_name: team.team_name,
+      }));
 
     return teamLeadTeams;
   }
@@ -57,8 +64,20 @@ export class AuthManager {
       return false;
     }
   }
+  static async logout() {
+    try {
+      await fetch(getApiUrl("auth/logout"), {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (error) {
+      console.error("Logout API call failed:", error);
+      // Continue with local cleanup even if API call fails
+    }
 
-  static logout() {
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
     localStorage.removeItem("selectedTeam");
@@ -70,6 +89,7 @@ export class AuthManager {
 
     const defaultOptions = {
       headers: {
+        credentials: "include",
         "Content-Type": "application/json",
         ...(token && { Authorization: `Bearer ${token}` }),
       },
@@ -86,10 +106,9 @@ export class AuthManager {
 
     try {
       const response = await fetch(url, mergedOptions);
-
       if (response.status === 401) {
         // Token expired or invalid
-        this.logout();
+        this.logout().catch(console.error); // Fire and forget
         return null;
       }
 

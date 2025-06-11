@@ -4,6 +4,7 @@ import { navigator } from '../../index.js';
 import './TodoColumn.js';
 import './TodoTicket.js';
 import './Header.js';
+import '../shared/Toast.js';
 
 import todoService from '../../services/TodoService.js';
 import teamService from '../../services/TeamService.js';
@@ -12,7 +13,7 @@ class TodoBoard extends LitElement {
   static properties = {
     statuses: { type: Array },
     teamName: { type: String },
-    tasks: { type: Array }
+    tasks: { type: Array },
   };
 
   static styles = css`
@@ -53,7 +54,6 @@ class TodoBoard extends LitElement {
         const currentTeam = localStorage.getItem('selectedTeam');
 
         if(currentTeam == null){
-            alert('Join a team first');
             navigator('/team/join');
             return;
         }else{
@@ -90,6 +90,7 @@ class TodoBoard extends LitElement {
   render() {
     return html`
       <team-header .title=${this.teamName} .buttonCaption=${'Create Todo'} .route=${'/create/todo'}></team-header>
+      <toast-message id="toast"></toast-message>
       <section class="board">
         ${this.statuses.map(
           (status) => html`

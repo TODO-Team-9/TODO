@@ -4,6 +4,7 @@ import teamService from '../../services/TeamService.js';
 import DOMPurify from 'dompurify';
 
 import "./Header.js";
+import '../shared/Toast.js';
 
 class CreateTeam extends LitElement {
   static styles = css`
@@ -55,22 +56,46 @@ class CreateTeam extends LitElement {
     button:hover {
       background-color:rgb(71, 71, 71);
     }
+
+    .error {
+      color: #d32f2f;
+      background-color: #ffebee;
+      padding: 0.75rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      text-align: center;
+      font-size: 11pt;
+    }
+
+    .success {
+      color: #2e7d32;
+      background-color: #e8f5e8;
+      padding: 0.75rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      text-align: center;
+      font-size: 11pt;
+    }
   `;
 
   static properties = {
     onCreate: { type: Function },
+    errorMessage: { type: String },
+    successMessage: { type: String }
   };
 
   constructor() {
     super();
     this.onCreate = null;
+    this.errorMessage = '';
+    this.successMessage = '';
   }
 
-  handleSubmit(e) {
+  async handleSubmit(e) {
     e.preventDefault();
     const form = e.target;
     if(InputValidator.validate(form.name.value.trim()) || InputValidator.validate(form.description.value.trim())){
-        alert("Input not allowed!");
+        this.errorMessage = 'Input not allowed!';
         form.reset();
         return;
     }else{
@@ -78,9 +103,15 @@ class CreateTeam extends LitElement {
             teamName: DOMPurify.sanitize(form.name.value.trim()),
             teamDescription: DOMPurify.sanitize(form.description.value.trim())
         };
-    
-        teamService.createTeam(team);
-        alert('Team:' + form.name.value.trim() + ' Created');
+
+        const response = await teamService.createTeam(team);
+        if(response.error){
+            this.successMessage = '';
+            this.errorMessage = response.error; 
+        }else{
+            this.errorMessage = '';
+            this.successMessage = 'Team created succesfully';
+        }
         form.reset();
     }
   }
@@ -88,6 +119,13 @@ class CreateTeam extends LitElement {
     return html`
       <team-header .title=${'Create Team'} .buttonCaption=${'Team Board'} .route=${'/home'}></team-header>
       <section class="form-container">
+        ${this.errorMessage
+        ? html`<section class="error">${this.errorMessage}</section>`
+        : ""}
+        ${this.successMessage
+        ? html`<section class="success">${this.successMessage}</section>`
+        : ""}
+
         <form @submit=${this.handleSubmit}>
             <input name="name" placeholder="Name" maxlength="32"  required />
             <textarea name="description" placeholder="Description" maxlength="128" rows="3" required></textarea>

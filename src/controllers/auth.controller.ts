@@ -67,8 +67,19 @@ export async function register(
         .json({ error: "JWT provisional secret is not configured" });
       return;
     }
-
     const provisionalToken = jwt.sign(
+      {
+        userId: newUser.user_id,
+        username: newUser.username,
+        twoFactorVerified: false,
+        isHttpOnlyCookie: true,
+      },
+      process.env.JWT_PROVISIONAL_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    // Create a backwards-compatible token for frontend use (without cookie flag)
+    const frontendToken = jwt.sign(
       {
         userId: newUser.user_id,
         username: newUser.username,
@@ -78,6 +89,13 @@ export async function register(
       { expiresIn: "1h" }
     );
 
+    response.cookie("provisionalToken", provisionalToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Only use secure in production
+      sameSite: "strict",
+      maxAge: 60 * 60 * 1000,
+    });
+
     const { password_hash, two_factor_secret, ...userWithoutSensitiveData } =
       newUser;
 
@@ -85,7 +103,7 @@ export async function register(
       message:
         "User registered successfully. Please complete 2FA setup to access your account.",
       user: userWithoutSensitiveData,
-      token: provisionalToken,
+      token: frontendToken,
       requiresTwoFactorSetup: true,
     });
   } catch (error) {
@@ -156,8 +174,18 @@ export async function login(
           .json({ error: "JWT secret is not configured" });
         return;
       }
-
       const tokenJwt = jwt.sign(
+        {
+          userId: user.user_id,
+          username: user.username,
+          twoFactorVerified: true,
+          isHttpOnlyCookie: true,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+
+      const frontendToken = jwt.sign(
         {
           userId: user.user_id,
           username: user.username,
@@ -167,9 +195,16 @@ export async function login(
         { expiresIn: "24h" }
       );
 
+      response.cookie("authToken", tokenJwt, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+
       response.status(HTTP_Status.OK).json({
         message: "Login successful",
-        token: tokenJwt,
+        token: frontendToken,
         user: {
           user_id: user.user_id,
           username: user.username,
@@ -185,8 +220,19 @@ export async function login(
           .json({ error: "JWT provisional secret is not configured" });
         return;
       }
-
       const provisionalToken = jwt.sign(
+        {
+          userId: user.user_id,
+          username: user.username,
+          twoFactorVerified: false,
+          isHttpOnlyCookie: true,
+        },
+        process.env.JWT_PROVISIONAL_SECRET,
+        { expiresIn: "1h" }
+      );
+
+      // Create a backwards-compatible token for frontend use (without cookie flag)
+      const frontendProvisionalToken = jwt.sign(
         {
           userId: user.user_id,
           username: user.username,
@@ -196,12 +242,19 @@ export async function login(
         { expiresIn: "1h" }
       );
 
+      response.cookie("provisionalToken", provisionalToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 60 * 60 * 1000,
+      });
+
       response.status(HTTP_Status.OK).json({
         message: "2FA setup required",
-        token: provisionalToken,
+        token: frontendProvisionalToken,
         requiresTwoFactorSetup: true,
         user: {
-          userId: user.user_id,
+          user_id: user.user_id,
           username: user.username,
           emailAddress: user.email_address,
           twoFactorEnabled: false,
@@ -277,10 +330,21 @@ export async function enable2FA(
         .json({ error: "JWT secret is not configured" });
       return;
     }
-
     const fullToken = jwt.sign(
       {
-        user_id: request.user?.userId,
+        userId: request.user?.userId,
+        username: request.user?.username,
+        role: request.user?.role,
+        twoFactorVerified: true,
+        isHttpOnlyCookie: true,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
+    const frontendToken = jwt.sign(
+      {
+        userId: request.user?.userId,
         username: request.user?.username,
         role: request.user?.role,
         twoFactorVerified: true,
@@ -289,14 +353,41 @@ export async function enable2FA(
       { expiresIn: "24h" }
     );
 
+    response.clearCookie("provisionalToken");
+    response.cookie("authToken", fullToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
     response.status(HTTP_Status.OK).json({
       message: "2FA enabled successfully",
-      token: fullToken,
+      token: frontendToken,
     });
   } catch (error) {
     console.error("Enable 2FA error:", error);
     response
       .status(HTTP_Status.INTERNAL_SERVER_ERROR)
       .json({ error: "Failed to enable 2FA" });
+  }
+}
+
+export async function logout(
+  request: Request,
+  response: Response
+): Promise<void> {
+  try {
+    response.clearCookie("authToken");
+    response.clearCookie("provisionalToken");
+
+    response.status(HTTP_Status.OK).json({
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    console.error("Logout error:", error);
+    response
+      .status(HTTP_Status.INTERNAL_SERVER_ERROR)
+      .json({ error: "Failed to logout" });
   }
 }

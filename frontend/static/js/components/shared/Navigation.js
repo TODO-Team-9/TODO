@@ -5,7 +5,7 @@ class NavigationSidebar extends LitElement {
   static properties = {
     user: { type: Object },
     isNormalUser: { type: Boolean },
-    isTeamLead: { type: Boolean }
+    isTeamLead: { type: Boolean },
   };
 
   constructor() {
@@ -29,6 +29,12 @@ class NavigationSidebar extends LitElement {
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+
+    .left-section {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
     }
 
     .links a {
@@ -71,18 +77,18 @@ class NavigationSidebar extends LitElement {
     }
   `;
 
-  async connectedCallback(){
+  async connectedCallback() {
     super.connectedCallback();
     this.isNormalUser = await this.isNormal();
     this.isTeamLead = await this.isLead();
   }
 
-  async isLead(){
+  async isLead() {
     const teams = await AuthManager.teamLeadTeams();
     return teams.length != 0;
   }
-  
-  async isNormal(){
+
+  async isNormal() {
     return await AuthManager.isNormalUser();
   }
 
@@ -92,31 +98,35 @@ class NavigationSidebar extends LitElement {
   render() {
     return html`
       <nav>
+      <section class="left-section">
         <section class="logo">TODO App</section>
         <section class="links">
           <a
             href="/home"
-            class=${
-            this.currentPath !== "/requests" &&
+            class=${this.currentPath !== "/requests" &&
             this.currentPath !== "/settings" &&
             this.currentPath !== "/roles"
               ? "active"
               : ""}
             >Home</a
           >
-          ${!this.isNormalUser || this.isTeamLead ? 
-            html`<a
+          ${!this.isNormalUser || this.isTeamLead
+            ? html`<a
                 href="/requests"
-                class=${this.currentPath === "/requests" || this.currentPath === "/roles" ? "active" : ""}
+                class=${this.currentPath === "/requests" ||
+                this.currentPath === "/roles"
+                  ? "active"
+                  : ""}
                 >Requests</a
-            >` : ''
-          }
+              >`
+            : ""}
 
           <a
             href="/settings"
             class=${this.currentPath === "/settings" ? "active" : ""}
             >Settings</a
           >
+        </section>
         </section>
         ${this.user
           ? html`
@@ -131,9 +141,8 @@ class NavigationSidebar extends LitElement {
       </nav>
     `;
   }
-
-  handleLogout() {
-    AuthManager.logout();
+  async handleLogout() {
+    await AuthManager.logout();
   }
 }
 

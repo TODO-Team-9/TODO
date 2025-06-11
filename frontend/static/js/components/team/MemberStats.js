@@ -1,8 +1,12 @@
 import { LitElement, html, css } from 'lit';
 
+import teamService from '../../services/TeamService.js';
+
 class MemberStats extends LitElement {
   static properties = {
-    members: { type: Array }
+    members: { type: Array },
+    startDate: { type: String },
+    endDate: { type: String }
   };
 
   static styles = css`
@@ -18,7 +22,7 @@ class MemberStats extends LitElement {
 
     .header {
       display: flex;
-      justify-content: flex-end;
+      justify-content: center;
       margin-bottom: 1rem;
     }
 
@@ -31,6 +35,30 @@ class MemberStats extends LitElement {
       border-radius: 4px;
       cursor: pointer;
       width: 8rem;
+    }
+
+    .date-group {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-right: 1rem;
+    }
+
+    .date-group label {
+        font-size: 10pt;
+        margin-bottom: 0.25rem;
+        text-align: center;
+        color: #2e2e2e;
+        font-weight: 500;
+    }
+
+    input[type="date"] {
+        padding: 0.5rem;
+        font-size: 12pt;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        font-family: sans-serif;
+        width: 10rem;
     }
 
     button:hover {
@@ -89,46 +117,73 @@ class MemberStats extends LitElement {
 
   constructor() {
     super();
-    this.members = [
-      { name: 'Alice', backlog: 5, done: 2, inProgress: 3, inReview: 2 },
-      { name: 'Bob', backlog: 7, done: 4, inProgress: 2, inReview: 6 },
-      { name: 'Charlie', backlog: 4, done: 4, inProgress: 0, inReview: 3 }
-    ];
+    this.members = [];
+    this.startDate = '2025-01-01';
+    this.endDate = '2025-12-31';
   }
 
-  sum(member) {
-    return member.backlog + member.done + member.inProgress + member.inReview;
-  }
+    connectedCallback(){
+        super.connectedCallback();
+        this.getStats();
+    }
+
+    async getStats(){
+        try{
+            const selectedTeam = localStorage.getItem('selectedTeam');
+            if(selectedTeam){
+                const stats = await teamService.getTeamMemberStats(selectedTeam, this.startDate, this.endDate);
+                this.members = Array.isArray(stats) ? stats : [];
+            }
+        }catch (error){
+            this.members = [];
+        }
+    }
 
   render() {
     return html`
-      <section class="header">
-        <button @click=${() => console.log("filter")}>Filter</button>
-      </section>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Backlog</th>
-            <th>In Progress</th>
-            <th>In Review</th>
-            <th>Done</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${this.members.map(member => html`
+        <section class="header">
+            <section class="date-group">
+                <label for="start-date">Start Date</label>
+                <input
+                id="start-date"
+                type="date"
+                .value=${this.startDate}
+                @change=${e => this.startDate = e.target.value}
+                />
+            </section>
+            <section class="date-group">
+                <label for="end-date">End Date</label>
+                <input
+                id="end-date"
+                type="date"
+                .value=${this.endDate}
+                @change=${e => this.endDate = e.target.value}
+                />
+            </section>
+            <button @click=${this.getStats}>Filter</button>
+        </section>
+        <table>
+            <thead>
             <tr>
-              <td>${member.name}</td>
-              <td class="backlog">${member.backlog}</td>
-              <td class="in-progress">${member.inProgress}</td>
-              <td class="in-review">${member.inReview}</td>
-              <td class="done">${member.done}</td>
-              <td class="total">${this.sum(member)}</td>
+                <th>Name</th>
+                <th>Backlog</th>
+                <th>In Progress</th>
+                <th>Done</th>
+                <th>Total</th>
             </tr>
-          `)}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+            ${this.members.map(member => html`
+                <tr>
+                <td>${member.username}</td>
+                <td class="backlog">${member.backlog}</td>
+                <td class="in-progress">${member.in_progress}</td>
+                <td class="done">${member.completed}</td>
+                <td class="total">${member.total}</td>
+                </tr>
+            `)}
+            </tbody>
+        </table>
     `;
   }
 }

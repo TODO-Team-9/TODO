@@ -2,6 +2,7 @@ import { LitElement, html, css } from "lit";
 import { getApiUrl } from "../../utils/config.js";
 import { validatePassword, passwordRules } from "../../utils/password.js";
 import { validateUsername, usernameRules } from "../../utils/username.js";
+import { navigator } from "../../index.js";
 
 class RegisterForm extends LitElement {
   static properties = {
@@ -442,6 +443,7 @@ class RegisterForm extends LitElement {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
           username,
           emailAddress,
@@ -453,7 +455,7 @@ class RegisterForm extends LitElement {
         localStorage.setItem("authToken", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
-        window.location.href = "/setup-2fa";
+        navigator("/setup-2fa");
       } else if (response.status === 429) {
         this.errorMessage =
           data.error ||

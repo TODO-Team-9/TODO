@@ -6,10 +6,12 @@ import { AuthManager } from '../utils/auth.js';
 class ApiService {
     async request(url, options = {}) {
         try {  
+            options.credentials = 'include';
             const token = AuthManager.getToken();
             options.headers = {
                 'Content-Type': 'application/json',
                 ...(token && { Authorization: `Bearer ${token}` }),
+                ...options.headers,
             };
 
             const response = await fetch(config.API_URL + url, options);

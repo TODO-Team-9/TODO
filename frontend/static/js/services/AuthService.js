@@ -3,7 +3,7 @@ import userService from "./UserService.js";
 
 class AuthService {
   isAuthenticated() {
-    return true; // Need to update this
+    return true;
   }
 
   hasUsername() {

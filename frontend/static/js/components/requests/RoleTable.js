@@ -64,7 +64,6 @@ class RoleTable extends LitElement {
     connectedCallback(){
         super.connectedCallback();
         this.loadTeams();
-        // this.loadMembers();
     }
 
     async loadMembers(teamId){

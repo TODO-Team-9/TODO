@@ -25,8 +25,6 @@ export function validatePassword(password: string): PasswordValidationResult {
     errors.push("Password must contain at least 1 digit (0-9)");
   }
 
-  // Check for at least 1 special character (punctuation or space)
-  // Using a comprehensive punctuation character class plus space
   if (!/[\s\p{P}\p{S}]/u.test(password)) {
     errors.push(
       "Password must contain at least 1 special character (punctuation or space)"

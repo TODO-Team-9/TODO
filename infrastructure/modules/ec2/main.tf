@@ -31,17 +31,17 @@ resource "aws_instance" "this" {
     npm install -g pm2 typescript ts-node
 
     # Cloning the repo
-    git clone https://github.com/AreYouAFootyFan/AreYouAFootyFan.git /home/ubuntu/footy-app
+    git clone https://github.com/TODO-Team-9/TODO.git /home/ubuntu/todo
 
     # Setting permissions
-    chown -R ubuntu:ubuntu /home/ubuntu/footy-app
+    chown -R ubuntu:ubuntu /home/ubuntu/todo
 
     # Installing dependencies
-    cd /home/ubuntu/footy-app
+    cd /home/ubuntu/todo
     sudo -u ubuntu npm install
 
-    # Start the app with PM2 using ts-node
-    sudo -u ubuntu pm2 start src/app.ts --name "footy-app" --interpreter ./node_modules/.bin/ts-node
+    # Start the app with PM2
+    sudo -u ubuntu pm2 start dist/app.js --name todo
 
     # Set PM2 to start on boot
     sudo -u ubuntu pm2 startup systemd -u ubuntu --hp /home/ubuntu

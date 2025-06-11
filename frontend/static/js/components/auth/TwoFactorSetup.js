@@ -85,14 +85,15 @@ class TwoFactorSetup extends LitElement {
       border: 1px solid #ddd;
       border-radius: 0.5rem;
     }
-
     .secret-display {
+      display: block;
       background: #f5f5f5;
       padding: 1rem;
       border-radius: 0.25rem;
       border: 1px solid #ddd;
       font-family: monospace;
       word-break: break-all;
+      overflow-wrap: anywhere;
       margin: 0.5rem 0;
     }
 
@@ -188,9 +189,14 @@ class TwoFactorSetup extends LitElement {
       font-size: 10pt;
       margin-left: 0.5rem;
     }
-
     .copy-button:hover {
       background: #0056b3;
+    }
+
+    @media (max-width: 700px) {
+      .setup-steps {
+        flex-direction: column;
+      }
     }
   `;
   async connectedCallback() {
@@ -293,14 +299,14 @@ class TwoFactorSetup extends LitElement {
   renderQRCodeSection() {
     if (this.qrCodeDataURL) {
       return html`
-        <div class="qr-code">
+        <figure class="qr-code">
           <img src="${this.qrCodeDataURL}" alt="2FA QR Code" />
-        </div>
+        </figure>
         <p><strong>Can't scan?</strong> Enter this code manually:</p>
-        <div class="secret-display">
+        <code class="secret-display">
           ${this.secret}
           <button class="copy-button" @click=${this.copySecret}>Copy</button>
-        </div>
+        </code>
       `;
     }
     return html`<p>Loading QR code...</p>`;
@@ -331,8 +337,8 @@ class TwoFactorSetup extends LitElement {
   render() {
     if (this.setupComplete) {
       return html`
-        <div class="completed">
-          <div class="checkmark">✓</div>
+        <main class="completed">
+          <mark class="checkmark">✓</mark>
           <h2>2FA Setup Complete!</h2>
           <p>
             Two-Factor Authentication has been successfully enabled for your
@@ -345,26 +351,28 @@ class TwoFactorSetup extends LitElement {
           <button @click=${() => (navigator('/home'))}>
             Continue to Dashboard
           </button>
-        </div>
+        </main>
       `;
     }
 
     return html`
       <h2>Set Up Two-Factor Authentication</h2>
-
       ${this.errorMessage
-        ? html`<div class="error">${this.errorMessage}</div>`
+        ? html`<aside class="error" role="alert">${this.errorMessage}</aside>`
         : ""}
       ${this.successMessage
-        ? html`<div class="success">${this.successMessage}</div>`
+        ? html`<aside class="success" role="status">
+            ${this.successMessage}
+          </aside>`
         : ""}
       ${this.loading && !this.qrCodeDataURL
         ? html`<p>Generating setup code...</p>`
         : html`
-            <div class="setup-steps">
-              <div class="step">
+            <main class="setup-steps">
+              <section class="step">
                 <h3>
-                  <span class="step-number">1</span>Install an Authenticator App
+                  <data class="step-number" value="1">1</data>Install an
+                  Authenticator App
                 </h3>
                 <p>
                   Download and install one of these authenticator apps on your
@@ -376,21 +384,25 @@ class TwoFactorSetup extends LitElement {
                   <li>Authy</li>
                   <li>1Password</li>
                 </ul>
-              </div>
-              <div class="step">
-                <h3><span class="step-number">2</span>Scan QR Code</h3>
+              </section>
+              <section class="step">
+                <h3>
+                  <data class="step-number" value="2">2</data>Scan QR Code
+                </h3>
                 <p>Open your authenticator app and scan this QR code:</p>
                 ${this.renderQRCodeSection()}
-              </div>
-              <div class="step">
-                <h3><span class="step-number">3</span>Verify Setup</h3>
+              </section>
+              <section class="step">
+                <h3>
+                  <data class="step-number" value="3">3</data>Verify Setup
+                </h3>
                 <p>
                   Enter the 6-digit code from your authenticator app to complete
                   setup:
                 </p>
                 ${this.renderVerificationForm()}
-              </div>
-            </div>
+              </section>
+            </main>
           `}
     `;
   }

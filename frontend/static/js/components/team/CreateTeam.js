@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { navigator } from '../../index.js';
+import { InputValidator } from '../../utils/inputValidator.js';
 import teamService from '../../services/TeamService.js';
 import DOMPurify from 'dompurify';
 

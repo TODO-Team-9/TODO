@@ -441,6 +441,7 @@ class RegisterForm extends LitElement {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
           username,
           emailAddress,

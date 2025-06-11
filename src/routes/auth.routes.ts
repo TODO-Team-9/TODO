@@ -4,6 +4,7 @@ import {
   login,
   enable2FA,
   generate2FA,
+  logout,
 } from "../controllers/auth.controller";
 import { authenticateProvisional } from "../middleware/auth.middleware";
 import {
@@ -28,5 +29,6 @@ router.post(
   authenticateProvisional,
   enable2FA as RequestHandler
 );
+router.post("/logout", logout as RequestHandler);
 
 export default router;

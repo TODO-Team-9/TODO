@@ -137,6 +137,7 @@ class LoginForm extends LitElement {
     try {
       const response = await fetch(getApiUrl("auth/login"), {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },

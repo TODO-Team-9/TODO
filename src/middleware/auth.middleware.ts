@@ -8,6 +8,7 @@ interface JwtPayload {
   username: string;
   role: number;
   twoFactorVerified?: boolean;
+  isHttpOnlyCookie?: boolean; // Flag to differentiate cookie tokens
 }
 
 // Extend Express Request interface
@@ -24,22 +25,25 @@ export const authenticateProvisional = (
   response: Response,
   next: NextFunction
 ): void => {
-  const authHeader = request.headers.authorization;
+  const cookieToken = request.cookies?.provisionalToken;
 
-  if (!authHeader) {
+  if (!cookieToken) {
+    // Check if they're trying to use header-based auth
+    const authHeader = request.headers.authorization;
+
+    if (authHeader) {
+      response.status(HTTP_Status.UNAUTHORIZED).json({
+        error:
+          "Header-based authentication is deprecated. Please use cookie-based authentication.",
+      });
+      return;
+    }
+
     response
       .status(HTTP_Status.UNAUTHORIZED)
       .json({ error: "No token provided" });
     return;
   }
-
-  const parts = authHeader.split(" ");
-  if (parts.length !== 2 || parts[0] !== "Bearer") {
-    response.status(HTTP_Status.UNAUTHORIZED).json({ error: "Token error" });
-    return;
-  }
-
-  const token = parts[1];
 
   if (!process.env.JWT_PROVISIONAL_SECRET) {
     response
@@ -50,9 +54,17 @@ export const authenticateProvisional = (
 
   try {
     const decoded = jwt.verify(
-      token,
+      cookieToken,
       process.env.JWT_PROVISIONAL_SECRET
     ) as JwtPayload;
+
+    // Verify this is a cookie token
+    if (!decoded.isHttpOnlyCookie) {
+      response
+        .status(HTTP_Status.UNAUTHORIZED)
+        .json({ error: "Invalid token source" });
+      return;
+    }
 
     request.user = decoded;
     next();
@@ -69,22 +81,24 @@ export const authenticate = (
   response: Response,
   next: NextFunction
 ): void => {
-  const authHeader = request.headers.authorization;
+  const cookieToken = request.cookies?.authToken;
 
-  if (!authHeader) {
+  if (!cookieToken) {
+    const authHeader = request.headers.authorization;
+
+    if (authHeader) {
+      response.status(HTTP_Status.UNAUTHORIZED).json({
+        error:
+          "Header-based authentication is deprecated. Please use cookie-based authentication.",
+      });
+      return;
+    }
+
     response
       .status(HTTP_Status.UNAUTHORIZED)
       .json({ error: "No token provided" });
     return;
   }
-
-  const parts = authHeader.split(" ");
-  if (parts.length !== 2 || parts[0] !== "Bearer") {
-    response.status(HTTP_Status.UNAUTHORIZED).json({ error: "Token error" });
-    return;
-  }
-
-  const token = parts[1];
 
   if (!process.env.JWT_SECRET) {
     response
@@ -94,7 +108,17 @@ export const authenticate = (
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
+    const decoded = jwt.verify(
+      cookieToken,
+      process.env.JWT_SECRET
+    ) as JwtPayload;
+
+    if (!decoded.isHttpOnlyCookie) {
+      response
+        .status(HTTP_Status.UNAUTHORIZED)
+        .json({ error: "Invalid token source" });
+      return;
+    }
 
     request.user = decoded;
     next();

@@ -163,11 +163,11 @@ class TwoFactorSetup extends LitElement {
       text-align: center;
       padding: 2rem;
     }
-
     .completed .checkmark {
       font-size: 48px;
       color: #4caf50;
       margin-bottom: 1rem;
+      background: none;
     }
 
     .app-list {
@@ -215,8 +215,6 @@ class TwoFactorSetup extends LitElement {
         return;
       }
 
-      // Generate TOTP secret by calling the registration endpoint with current user data
-      // Since we need to generate a new secret, we'll call a dedicated endpoint
       const response = await AuthManager.makeAuthenticatedRequest(
         getApiUrl("auth/generate-2fa"),
         {
@@ -348,7 +346,7 @@ class TwoFactorSetup extends LitElement {
             You will now need to provide a code from your authenticator app each
             time you log in.
           </p>
-          <button @click=${() => (navigator('/home'))}>
+          <button @click=${() => navigator("/home")}>
             Continue to Dashboard
           </button>
         </main>

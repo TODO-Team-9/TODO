@@ -41,7 +41,6 @@ export class MemberService {
   }
 
   async removeMember(userId: number, teamId: number): Promise<void> {
-    // Input validation
     if (!userId || isNaN(userId) || userId <= 0) {
       throw new Error("Invalid user ID");
     }
@@ -49,14 +48,12 @@ export class MemberService {
       throw new Error("Invalid team ID");
     }
 
-    // Call remove_member stored procedure
     await sql`
       CALL remove_member(${userId}, ${teamId})
     `;
   }
 
   async promoteMember(memberId: number, teamId: number): Promise<void> {
-    // Input validation
     if (!memberId || isNaN(memberId) || memberId <= 0) {
       throw new Error("Invalid member ID");
     }
@@ -64,7 +61,6 @@ export class MemberService {
       throw new Error("Invalid team ID");
     }
 
-    // Call promote_member stored procedure with team context
     await sql`
       CALL promote_member(${memberId}, ${teamId})
     `;
@@ -75,7 +71,6 @@ export class MemberService {
     teamId: number,
     teamRoleId: number
   ): Promise<void> {
-    // Input validation
     if (!memberId || isNaN(memberId) || memberId <= 0) {
       throw new Error("Invalid member ID");
     }
@@ -94,12 +89,10 @@ export class MemberService {
   async getTeamMembers(
     teamId: number
   ): Promise<(Member & { username: string })[]> {
-    // Input validation
     if (!teamId || isNaN(teamId) || teamId <= 0) {
       throw new Error("Invalid team ID");
     }
 
-    // Query team_members_usernames view
     const members = await sql<(Member & { username: string })[]>`
       SELECT m.*, u.username
       FROM members m

@@ -2,7 +2,6 @@ export function UsernameValidationResult(isValid, errors) {
   return { isValid, errors };
 }
 
-// Username validation rules - centralized for consistency
 export const usernameRules = [
   {
     text: "At least 3 characters",
@@ -29,7 +28,6 @@ export const usernameRules = [
 export function validateUsername(username) {
   const errors = [];
 
-  // Use the centralized rules
   usernameRules.forEach((rule) => {
     if (!rule.test(username)) {
       errors.push(rule.text);

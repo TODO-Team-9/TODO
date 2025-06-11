@@ -12,3 +12,8 @@ output "public_dns" {
   value = try(aws_instance.this[0].public_dns, null)
   description = "Public DNS of the first EC2 instance (if any)"
 }
+
+output "ec2_instance_id" {
+  value = try(aws_instance.this[0].id, null)
+  description = "ID of the first EC2 instance (if any)"
+}

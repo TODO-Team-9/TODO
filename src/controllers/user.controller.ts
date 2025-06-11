@@ -19,7 +19,6 @@ export async function createUser(
       return;
     }
 
-    // Validate username format
     const usernameValidation = validateUsername(username);
     if (!usernameValidation.isValid) {
       response.status(HTTP_Status.BAD_REQUEST).json({
@@ -100,14 +99,6 @@ export async function getUserById(
 ): Promise<void> {
   try {
     const userId = parseInt(request.params.id, 10);
-
-    // if (
-    //   request.user?.userId !== userId &&
-    //   request.user?.role !== Role.System.ACCESS_ADMINISTRATOR
-    // ) {
-    //   response.status(HTTP_Status.FORBIDDEN).json({ error: "Access denied" });
-    //   return;
-    // }
 
     const user = await userService.findById(userId);
     if (!user) {

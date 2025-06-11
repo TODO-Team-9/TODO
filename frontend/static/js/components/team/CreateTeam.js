@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { navigator } from '../../index.js';
+import { InputValidator } from '../../utils/inputValidator.js';
 import teamService from '../../services/TeamService.js';
 import DOMPurify from 'dompurify';
 
@@ -111,6 +112,7 @@ class CreateTeam extends LitElement {
         }else{
             this.errorMessage = '';
             this.successMessage = 'Team created succesfully';
+            window.dispatchEvent(new CustomEvent('team-created'));
         }
         form.reset();
     }

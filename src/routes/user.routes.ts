@@ -14,27 +14,27 @@ import {
 
 const router = Router();
 
-// Admin routes
-router.get("/", authenticate, isAccessAdministrator, getAllUsers as RequestHandler);
-router.post("/:id/deactivate", authenticate, isAccessAdministrator, deactivateUser as RequestHandler);
-
-// User routes
-router.post("/", createUser as RequestHandler);
 router.get(
-    "/:id", 
-    // authenticate, 
-    getUserById as RequestHandler
+  "/",
+  authenticate,
+  isAccessAdministrator,
+  getAllUsers as RequestHandler
 );
+router.post(
+  "/:id/deactivate",
+  authenticate,
+  isAccessAdministrator,
+  deactivateUser as RequestHandler
+);
+
+router.post("/", createUser as RequestHandler);
+router.get("/:id", authenticate, getUserById as RequestHandler);
 
 router.get(
   "/:userId/join-requests",
-  // authenticate,
+  authenticate,
   getUserJoinRequests as RequestHandler
 );
-router.get(
-  "/:userId/teams",
-  // authenticate,
-  getUserTeams as RequestHandler
-);
+router.get("/:userId/teams", authenticate, getUserTeams as RequestHandler);
 
 export default router;

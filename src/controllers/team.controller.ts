@@ -1,8 +1,11 @@
 import { Request, Response } from "express";
 import { TeamService } from "../services/team.service";
+import { MemberService } from "../services/member.service";
 import { HTTP_Status } from "../enums/HTTP_Status";
+import { Role } from "../enums/Role";
 
 const teamService = new TeamService();
+const memberService = new MemberService();
 
 export const createTeam = async (
   request: Request,
@@ -11,7 +14,6 @@ export const createTeam = async (
   try {
     const { teamName, teamDescription } = request.body;
 
-    // Input validation
     if (!teamName) {
       response
         .status(HTTP_Status.BAD_REQUEST)
@@ -19,10 +21,22 @@ export const createTeam = async (
       return;
     }
 
+    const creatorUserId = request.user?.userId;
+    if (!creatorUserId) {
+      response
+        .status(HTTP_Status.UNAUTHORIZED)
+        .json({ error: "User not authenticated" });
+      return;
+    }
+
     const team = await teamService.createTeam(teamName, teamDescription);
-    response.status(HTTP_Status.CREATED).json(team);
+    const member = await memberService.addMember(
+      creatorUserId,
+      team.team_id,
+      Role.Team.TEAM_LEAD
+    );
+    response.status(HTTP_Status.CREATED).json({ team, member });
   } catch (error: any) {
-    // Handle specific validation errors
     if (
       error.message &&
       (error.message.includes("Team name is required") ||
@@ -33,7 +47,6 @@ export const createTeam = async (
       return;
     }
 
-    // Handle other errors
     response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({
       error: "Failed to create team",
     });

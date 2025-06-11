@@ -1,5 +1,5 @@
 export interface Team {
-  teamId: number;
-  teamName: string;
-  teamDescription?: string;
+  team_id: number;
+  team_name: string;
+  team_description?: string;
 } 

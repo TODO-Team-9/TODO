@@ -261,6 +261,13 @@ class RegisterForm extends LitElement {
           ? this.renderUsernameRequirements()
           : ""}
         <input
+          type="email"
+          name="emailAddress"
+          placeholder="Email"
+          required
+          ?disabled=${this.loading}
+        />
+        <input
           type="password"
           name="password"
           placeholder="Password"
@@ -402,6 +409,7 @@ class RegisterForm extends LitElement {
     this.successMessage = "";
     const formData = new FormData(e.target);
     const username = formData.get("username");
+    const emailAddress = formData.get("emailAddress");
     const password = formData.get("password");
     const confirmPassword = formData.get("confirmPassword"); // Validate passwords match
     if (password !== confirmPassword) {
@@ -437,6 +445,7 @@ class RegisterForm extends LitElement {
         credentials: "include",
         body: JSON.stringify({
           username,
+          emailAddress,
           password,
         }),
       });

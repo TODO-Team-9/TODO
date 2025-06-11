@@ -31,13 +31,14 @@ export class UserService {
     }
     return user;
   }
+
   async createUser(userData: UserRegistration): Promise<User> {
-    const { username, password } = userData;
+    const { username, emailAddress, password } = userData;
     const passwordHash = await this.hashPassword(password);
     const twoFactorSecret = "";
 
     try {
-      await sql`CALL add_user(${username}, ${passwordHash}, ${twoFactorSecret})`;
+      await sql`CALL add_user(${username}, ${emailAddress}, ${passwordHash}, ${twoFactorSecret})`;
       const user = await this.findByUsername(username);
       if (!user) {
         throw new Error("Failed to retrieve created user");
@@ -47,10 +48,11 @@ export class UserService {
       console.error("Error creating user:", error);
       throw error;
     }
-  }  async findByUsername(username: string): Promise<User | null> {
+  }
+  async findByUsername(username: string): Promise<User | null> {
     try {
       const result = await sql<User[]>`
-        SELECT user_id, username, password_hash, two_factor_secret, system_role_id, deactivated_at 
+        SELECT user_id, username, email_address, password_hash, two_factor_secret, system_role_id, deactivated_at 
         FROM users 
         WHERE LOWER(username) = LOWER(${username})
       `;
@@ -58,11 +60,27 @@ export class UserService {
     } catch (error) {
       console.error("Error finding user by username:", error);
       throw error;
-    }  }
+    }
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    try {
+      const result = await sql<User[]>`
+        SELECT user_id, username, email_address, password_hash, two_factor_secret, system_role_id, deactivated_at 
+        FROM users 
+        WHERE email_address = ${email}
+      `;
+      return result.length ? this.processUserResult(result[0]) : null;
+    } catch (error) {
+      console.error("Error finding user by email:", error);
+      throw error;
+    }
+  }
+
   async findById(userId: number): Promise<User | null> {
     try {
       const result = await sql<User[]>`
-        SELECT user_id, username, password_hash, two_factor_secret, system_role_id, deactivated_at 
+        SELECT user_id, username, email_address, password_hash, two_factor_secret, system_role_id, deactivated_at 
         FROM users 
         WHERE user_id = ${userId}
       `;
@@ -89,10 +107,11 @@ export class UserService {
       throw error;
     }
   }
+
   async getAllUsers(): Promise<User[]> {
     try {
       const users = await sql<User[]>`
-        SELECT user_id, username, password_hash, two_factor_secret, system_role_id, deactivated_at 
+        SELECT user_id, username, email_address, password_hash, two_factor_secret, system_role_id, deactivated_at 
         FROM users
       `;
       return users.map((user) => this.processUserResult(user));

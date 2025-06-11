@@ -13,12 +13,12 @@ export async function register(
   response: Response
 ): Promise<void> {
   try {
-    const { username, password } = request.body;
+    const { username, emailAddress, password } = request.body;
 
-    if (!username || !password) {
+    if (!username || !emailAddress || !password) {
       response
         .status(HTTP_Status.BAD_REQUEST)
-        .json({ error: "Username and password are required" });
+        .json({ error: "All fields are required" });
       return;
     } // Validate password complexity
     const passwordValidation = validatePassword(password);
@@ -47,8 +47,17 @@ export async function register(
         .json({ error: "Username already exists" });
       return;
     }
+
+    const existingEmail = await userService.findByEmail(emailAddress);
+    if (existingEmail) {
+      response
+        .status(HTTP_Status.CONFLICT)
+        .json({ error: "Email already exists" });
+      return;
+    }
     const newUser = await userService.createUser({
       username,
+      emailAddress,
       password,
     });
 
@@ -186,12 +195,15 @@ export async function login(
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
         maxAge: 30 * 60 * 1000,
-      });      response.status(HTTP_Status.OK).json({
+      });
+
+      response.status(HTTP_Status.OK).json({
         message: "Login successful",
         token: frontendToken,
         user: {
           user_id: user.user_id,
           username: user.username,
+          emailAddress: user.email_address,
           twoFactorEnabled: true,
         },
       });
@@ -227,13 +239,16 @@ export async function login(
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
         maxAge: 15 * 60 * 1000,
-      });      response.status(HTTP_Status.OK).json({
+      });
+
+      response.status(HTTP_Status.OK).json({
         message: "2FA setup required",
         token: frontendProvisionalToken,
         requiresTwoFactorSetup: true,
         user: {
           user_id: user.user_id,
           username: user.username,
+          emailAddress: user.email_address,
           twoFactorEnabled: false,
         },
       });

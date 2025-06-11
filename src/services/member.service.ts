@@ -3,8 +3,14 @@ import { Member } from "../models/Member";
 import { Role } from "../enums/Role";
 
 export class MemberService {
-  async addMember(userId: number, teamId: number, teamRoleId: number = Role.Team.TODO_USER): Promise<Member> {
-    // Input validation
+  async addMember(
+    userId: number,
+    teamId: number,
+    teamRoleId: number = Role.Team.TODO_USER
+  ): Promise<Member> {
+    console.log(
+      `addMember called with userId=${userId}, teamId=${teamId}, teamRoleId=${teamRoleId}`
+    );
     if (!userId || isNaN(userId) || userId <= 0) {
       throw new Error("Invalid user ID");
     }
@@ -15,12 +21,10 @@ export class MemberService {
       throw new Error("Invalid team role ID");
     }
 
-    // Call add_member stored procedure
     await sql`
       CALL add_member(${userId}, ${teamId}, ${teamRoleId})
     `;
 
-    // Retrieve the newly created member
     const [member] = await sql<Member[]>`
       SELECT * FROM members 
       WHERE user_id = ${userId} AND team_id = ${teamId}

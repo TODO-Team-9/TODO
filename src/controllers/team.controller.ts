@@ -14,7 +14,6 @@ export const createTeam = async (
   try {
     const { teamName, teamDescription } = request.body;
 
-    // Input validation
     if (!teamName) {
       response
         .status(HTTP_Status.BAD_REQUEST)
@@ -22,19 +21,22 @@ export const createTeam = async (
       return;
     }
 
-    // Ensure user is authenticated
     const creatorUserId = request.user?.userId;
     if (!creatorUserId) {
-      response.status(HTTP_Status.UNAUTHORIZED).json({ error: "User not authenticated" });
+      response
+        .status(HTTP_Status.UNAUTHORIZED)
+        .json({ error: "User not authenticated" });
       return;
     }
 
     const team = await teamService.createTeam(teamName, teamDescription);
-    // Add creator as Team Lead
-    const member = await memberService.addMember(creatorUserId, team.teamId, Role.Team.TEAM_LEAD);
+    const member = await memberService.addMember(
+      creatorUserId,
+      team.team_id,
+      Role.Team.TEAM_LEAD
+    );
     response.status(HTTP_Status.CREATED).json({ team, member });
   } catch (error: any) {
-    // Handle specific validation errors
     if (
       error.message &&
       (error.message.includes("Team name is required") ||
@@ -45,7 +47,6 @@ export const createTeam = async (
       return;
     }
 
-    // Handle other errors
     response.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({
       error: "Failed to create team",
     });

@@ -11,11 +11,11 @@ export async function createUser(
   response: Response
 ): Promise<void> {
   try {
-    const { username, emailAddress, password } = request.body;
-    if (!username || !emailAddress || !password) {
+    const { username, password } = request.body;
+    if (!username || !password) {
       response
         .status(HTTP_Status.BAD_REQUEST)
-        .json({ error: "All fields are required" });
+        .json({ error: "Username and password are required" });
       return;
     }
 
@@ -36,17 +36,8 @@ export async function createUser(
       return;
     }
 
-    const existingEmail = await userService.findByEmail(emailAddress);
-    if (existingEmail) {
-      response
-        .status(HTTP_Status.CONFLICT)
-        .json({ error: "Email already exists" });
-      return;
-    }
-
     const newUser = await userService.createUser({
       username,
-      emailAddress,
       password,
     });
     const { password_hash, two_factor_secret, ...userWithoutSensitiveData } =

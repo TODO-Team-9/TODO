@@ -256,17 +256,9 @@ class RegisterForm extends LitElement {
           @focus=${() => (this.showUsernameRequirements = true)}
           @blur=${() => (this.showUsernameRequirements = false)}
         />
-        ${this.showUsernameRequirements ||
-        this.usernameValidationErrors.length > 0
+        ${this.showUsernameRequirements ||        this.usernameValidationErrors.length > 0
           ? this.renderUsernameRequirements()
           : ""}
-        <input
-          type="email"
-          name="emailAddress"
-          placeholder="Email"
-          required
-          ?disabled=${this.loading}
-        />
         <input
           type="password"
           name="password"
@@ -406,13 +398,10 @@ class RegisterForm extends LitElement {
     e.preventDefault();
     this.loading = true;
     this.errorMessage = "";
-    this.successMessage = "";
-
-    const formData = new FormData(e.target);
+    this.successMessage = "";    const formData = new FormData(e.target);
     const username = formData.get("username");
-    const emailAddress = formData.get("emailAddress");
     const password = formData.get("password");
-    const confirmPassword = formData.get("confirmPassword"); // Validate passwords match
+    const confirmPassword = formData.get("confirmPassword");// Validate passwords match
     if (password !== confirmPassword) {
       this.errorMessage = "Passwords do not match";
       this.passwordMismatch = true;
@@ -442,11 +431,9 @@ class RegisterForm extends LitElement {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-        },
-        credentials: "include",
+        },        credentials: "include",
         body: JSON.stringify({
           username,
-          emailAddress,
           password,
         }),
       });

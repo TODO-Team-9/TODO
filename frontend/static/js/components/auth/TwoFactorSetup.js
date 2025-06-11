@@ -215,8 +215,6 @@ class TwoFactorSetup extends LitElement {
         return;
       }
 
-      // Generate TOTP secret by calling the registration endpoint with current user data
-      // Since we need to generate a new secret, we'll call a dedicated endpoint
       const response = await AuthManager.makeAuthenticatedRequest(
         getApiUrl("auth/generate-2fa"),
         {

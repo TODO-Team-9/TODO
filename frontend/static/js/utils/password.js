@@ -2,7 +2,6 @@ export function PasswordValidationResult(isValid, errors) {
   return { isValid, errors };
 }
 
-// Password validation rules - centralized for consistency
 export const passwordRules = [
   {
     text: "At least 10 characters",
@@ -34,7 +33,6 @@ export const passwordRules = [
 export function validatePassword(password) {
   const errors = [];
 
-  // Use the centralized rules
   passwordRules.forEach((rule) => {
     if (!rule.test(password)) {
       errors.push(rule.text);

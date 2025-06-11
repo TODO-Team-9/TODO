@@ -8,10 +8,9 @@ interface JwtPayload {
   username: string;
   role: number;
   twoFactorVerified?: boolean;
-  isHttpOnlyCookie?: boolean; // Flag to differentiate cookie tokens
+  isHttpOnlyCookie?: boolean;
 }
 
-// Extend Express Request interface
 declare global {
   namespace Express {
     interface Request {
@@ -28,7 +27,6 @@ export const authenticateProvisional = (
   const cookieToken = request.cookies?.provisionalToken;
 
   if (!cookieToken) {
-    // Check if they're trying to use header-based auth
     const authHeader = request.headers.authorization;
 
     if (authHeader) {
@@ -58,7 +56,6 @@ export const authenticateProvisional = (
       process.env.JWT_PROVISIONAL_SECRET
     ) as JwtPayload;
 
-    // Verify this is a cookie token
     if (!decoded.isHttpOnlyCookie) {
       response
         .status(HTTP_Status.UNAUTHORIZED)

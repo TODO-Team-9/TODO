@@ -74,7 +74,6 @@ export const getTeamById = async (
   try {
     const { id } = request.params;
 
-    // Input validation
     const teamId = Number(id);
     if (isNaN(teamId) || teamId <= 0) {
       response
@@ -91,7 +90,6 @@ export const getTeamById = async (
 
     response.status(HTTP_Status.OK).json(team);
   } catch (error: any) {
-    // Handle specific validation errors
     if (error.message && error.message.includes("Invalid team ID")) {
       response.status(HTTP_Status.BAD_REQUEST).json({ error: error.message });
       return;

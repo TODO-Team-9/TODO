@@ -163,11 +163,11 @@ class TwoFactorSetup extends LitElement {
       text-align: center;
       padding: 2rem;
     }
-
     .completed .checkmark {
       font-size: 48px;
       color: #4caf50;
       margin-bottom: 1rem;
+      background: none;
     }
 
     .app-list {
@@ -348,7 +348,7 @@ class TwoFactorSetup extends LitElement {
             You will now need to provide a code from your authenticator app each
             time you log in.
           </p>
-          <button @click=${() => (navigator('/home'))}>
+          <button @click=${() => navigator("/home")}>
             Continue to Dashboard
           </button>
         </main>

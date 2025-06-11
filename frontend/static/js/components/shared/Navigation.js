@@ -31,6 +31,12 @@ class NavigationSidebar extends LitElement {
       align-items: center;
     }
 
+    .left-section {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+    }
+
     .links a {
       margin-right: 1.5rem;
       text-decoration: none;
@@ -92,6 +98,7 @@ class NavigationSidebar extends LitElement {
   render() {
     return html`
       <nav>
+      <section class="left-section">
         <section class="logo">TODO App</section>
         <section class="links">
           <a
@@ -117,6 +124,7 @@ class NavigationSidebar extends LitElement {
             class=${this.currentPath === "/settings" ? "active" : ""}
             >Settings</a
           >
+        </section>
         </section>
         ${this.user
           ? html`

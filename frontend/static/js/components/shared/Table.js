@@ -113,13 +113,8 @@ class CustomTable extends LitElement {
     }
   `;
 
-  createRenderRoot() {
-    return this.attachShadow({ mode: 'open' });
-  }
-
   render() {
     return html`
-      <style>${CustomTable.styles}</style>
       <table>
         <thead>
           <tr>

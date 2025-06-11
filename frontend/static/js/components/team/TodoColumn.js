@@ -1,11 +1,14 @@
 import { LitElement, html, css } from 'lit';
 import { AuthManager } from '../../utils/auth';
 
+import '../shared/Toast.js';
+
 class TodoColumn extends LitElement {
   static properties = {
     id: { type: Number },
     title: { type: String },
-    tickets: { type: Array }
+    tickets: { type: Array },
+    toastType: {type: String}
   };
 
   static styles = css`
@@ -75,19 +78,20 @@ class TodoColumn extends LitElement {
                 composed: true
             }));        
         }else{
-            alert('You can only update tickets assigned to you');
+            const toast = this.renderRoot.querySelector('#toast');
+            toast.show('You can only update tickets assigned to you', 'error')
         }
-
     }
 
   render() {
     return html`
       <h2>${this.title}</h2>
+      <toast-message id="toast"></toast-message>
       <section
         class="ticket-container"
         @dragover=${this._onDragOver}
         @drop=${this._onDrop}
-      >
+      >      
         ${this.tickets.map(
           (ticket) => html`
             <todo-ticket

@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { getApiUrl } from "../../utils/config.js";
+import { navigator } from "../../index.js";
 
 class TwoFactorVerification extends LitElement {
   static properties = {
@@ -146,7 +147,7 @@ class TwoFactorVerification extends LitElement {
         localStorage.setItem("authToken", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
-        window.location.href = "/home";
+        navigator("/home");
       } else {
         this.errorMessage = data.error || "Invalid verification code";
         const form = this.shadowRoot.querySelector("form");
@@ -167,7 +168,7 @@ class TwoFactorVerification extends LitElement {
   }
 
   goBack() {
-    window.location.href = "/";
+    navigator("/");
   }
 
   render() {

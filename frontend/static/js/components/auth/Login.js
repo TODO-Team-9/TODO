@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { getApiUrl } from "../../utils/config.js";
+import { navigator } from "../../index.js";
 import "./TwoFactorVerification.js";
 import "./TwoFactorSetup.js";
 
@@ -156,7 +157,7 @@ class LoginForm extends LitElement {
           const app = document.querySelector("#app");
           app.replaceChildren(twoFactorSetup);
         } else {
-          window.location.href = "/home";
+          navigator("/home");
         }
       } else if (response.status === 429) {
         this.errorMessage =

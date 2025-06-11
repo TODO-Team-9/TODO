@@ -3,6 +3,7 @@ import { navigator } from '../../index.js';
 
 import "./Header.js";
 import "../shared/Table.js";
+import '../shared/Toast.js';
 
 import teamService from "../../services/TeamService.js";
 import userService from '../../services/UserService.js';
@@ -94,7 +95,6 @@ class JoinTeam extends LitElement {
     async loadRequests(){
         try {
             const requests = await userService.getUserRequests(JSON.parse(localStorage.getItem('user')).user_id);
-            console.log(requests);
             this.currentRequests = Array.isArray(requests) ? requests : [];
         } catch (error) {
             this.currentRequests = [];
@@ -122,7 +122,8 @@ class JoinTeam extends LitElement {
     };
 
     await teamService.requestTeam(request);
-    alert('Request to join: ' + selectedTeam.team_name + ' sent');
+    const toast = this.renderRoot.querySelector('#toast');
+    toast.show('Request to join: ' + selectedTeam.team_name + ' sent', 'success');
     await this.loadRequests();
     form.reset();
   }
@@ -130,6 +131,7 @@ class JoinTeam extends LitElement {
   render() {
     return html`
       <team-header .title=${'Join Team Requests'} .buttonCaption=${'Team Board'} .route=${'/home'}></team-header>
+      <toast-message id="toast"></toast-message>
         <section class="requests">
             <h2>Current Requests<h2>
             <custom-table
